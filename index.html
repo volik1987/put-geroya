@@ -50,7 +50,7 @@
       <!-- Бой в реальном времени -->
       <div class="battle" id="battle" hidden>
         <div class="battle-hud">
-          <div class="hp"><span>❤</span><div class="bar"><i id="hud-hp"></i></div></div>
+          <div class="hp"><span>❤</span><div class="bar"><i id="hud-hp"></i></div><b id="hud-hp-num">100/100</b></div>
           <span id="hud-wolves"></span>
         </div>
         <canvas id="battle-canvas"></canvas>
@@ -62,7 +62,8 @@
             <button data-dir="down" aria-label="Назад">▼</button>
           </div>
           <div class="act">
-            <button id="btn-potion" aria-label="Зелье">🧪<b id="hud-potions">0</b></button>
+            <button id="btn-vessel" class="item-btn" aria-label="Кровавый сосуд" hidden>🏺<b id="hud-vessel"></b></button>
+            <button id="btn-potion" class="item-btn" aria-label="Зелье">🧪<b id="hud-potions">0</b></button>
             <button id="btn-attack" aria-label="Удар">🗡️</button>
           </div>
         </div>
@@ -93,6 +94,7 @@
     <!-- Игровое меню поверх сюжета -->
     <dialog id="dlg-menu">
       <div class="menu">
+        <div class="bag" id="bag"></div>
         <button class="btn" data-close>Вернуться к игре</button>
         <button class="btn" id="btn-to-title">В главное меню</button>
         <button class="btn ghost" id="btn-menu-settings">Настройки</button>

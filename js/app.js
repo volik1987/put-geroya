@@ -43,7 +43,7 @@
   history.pushState({}, '');
   addEventListener('popstate', () => {
     if ($('#dlg-menu').open) $('#dlg-menu').close();
-    else if (current === 'story') $('#dlg-menu').showModal();
+    else if (current === 'story') { renderBag(); $('#dlg-menu').showModal(); }
     else if (current !== 'title') show(current === 'settings' ? previous : 'title');
     history.pushState({}, '');
   });
@@ -220,17 +220,22 @@
       canvas: $('#battle-canvas'),
       difficulty: st.flags.difficulty || 'normal',
       potions: st.flags.potion || 0,
+      vessel: !st.flags.vessel ? 'none' : st.flags.vesselFull ? 'full' : 'empty',
       heroIcon: st.gender === 'f' ? '👩' : '🧑',
       onHud(h) {
         $('#hud-hp').style.width = (100 * h.hp) / h.maxHp + '%';
+        $('#hud-hp-num').textContent = `${h.hp}/${h.maxHp} ОЗ`;
+        $('#btn-vessel').hidden = h.vessel === 'none';
+        $('#btn-vessel').classList.toggle('empty', h.vessel !== 'full');
+        $('#hud-vessel').textContent = h.vessel === 'full' ? '50' : 'пуст';
         $('#hud-wolves').textContent = `🐺 ${h.left}/${h.total}`;
         $('#hud-potions').textContent = h.potions;
         $('#btn-potion').disabled = !h.potions;
       },
-      onEnd(result, { potions }) {
+      onEnd(result, { potions, vessel }) {
         fight = null;
         const b = sc.battle;
-        Engine.go(result === 'win' ? b.win : b.lose, result === 'win' ? { set: { potion: potions } } : null);
+        Engine.go(result === 'win' ? b.win : b.lose, result === 'win' ? { set: { potion: potions, vesselFull: vessel === 'full' } } : null);
         renderScene();
       },
     });
@@ -261,6 +266,7 @@
   };
   press($('#btn-attack'), () => fight && fight.attack());
   press($('#btn-potion'), () => fight && fight.potion());
+  press($('#btn-vessel'), () => fight && fight.drink());
 
   // Клавиатура (для игры с компьютера): стрелки/WASD, пробел — удар, Q — зелье
   const KEYS = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
@@ -269,11 +275,23 @@
     if (KEYS[e.code]) { fight.move(KEYS[e.code], true); e.preventDefault(); }
     else if (e.code === 'Space' || e.code === 'KeyJ') { if (!e.repeat) fight.attack(); e.preventDefault(); }
     else if (e.code === 'KeyQ') fight.potion();
+    else if (e.code === 'KeyE') fight.drink();
   });
   addEventListener('keyup', (e) => { if (fight && KEYS[e.code]) fight.move(KEYS[e.code], false); });
 
   // --- Меню в игре ------------------------------------------------------------------
-  $('#btn-menu').addEventListener('click', () => $('#dlg-menu').showModal());
+  $('#btn-menu').addEventListener('click', () => { renderBag(); $('#dlg-menu').showModal(); });
+
+  // Сумка героя в меню
+  function renderBag() {
+    const f = (Engine.state && Engine.state.flags) || {};
+    const items = [];
+    if (f.gold) items.push(`💰 ${f.gold}`);
+    if (f.potion) items.push(`🧪 ${f.potion}`);
+    if (f.vessel) items.push(`🏺 Кровавый сосуд — ${f.vesselFull ? 'полон' : 'пуст'}`);
+    $('#bag').textContent = '';
+    items.forEach((t) => { const s = document.createElement('span'); s.textContent = t; $('#bag').appendChild(s); });
+  }
   $('#dlg-menu [data-close]').addEventListener('click', () => $('#dlg-menu').close());
   $('#btn-to-title').addEventListener('click', () => { $('#dlg-menu').close(); show('title'); });
   $('#btn-menu-settings').addEventListener('click', () => { $('#dlg-menu').close(); show('settings'); });

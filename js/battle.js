@@ -3,8 +3,9 @@
  * Вид сверху: герой с мечом, волки бегут к нему, приседают (красный «!») и прыгают.
  * Уклоняйся крестовиной, бей кнопкой 🗡️ (меч сам доворачивает к ближнему волку).
  *
- *   const fight = Battle.start({ canvas, enemy, difficulty, potions, heroIcon, onEnd, onHud });
- *   fight.move('left', true|false); fight.attack(); fight.potion(); fight.stop();
+ *   const fight = Battle.start({ canvas, difficulty, potions, vessel, heroIcon, onEnd, onHud });
+ *   vessel: 'none' | 'empty' | 'full' — Кровавый сосуд
+ *   fight.move('left', true|false); fight.attack(); fight.potion(); fight.drink(); fight.stop();
  */
 window.Battle = (() => {
   // Сложность задаётся ответом королеве
@@ -20,15 +21,16 @@ window.Battle = (() => {
   const REACH = 66;            // длина удара
   const ARC = (75 * Math.PI) / 180;
   const POTION_HEAL = 40;
+  const VESSEL_HEAL = 50;
 
-  function start({ canvas, enemy, difficulty, potions, heroIcon, onEnd, onHud }) {
+  function start({ canvas, difficulty, potions, vessel = 'none', heroIcon, onEnd, onHud }) {
     const g = canvas.getContext('2d');
     const d = DIFF[difficulty] || DIFF.normal;
     let W = 0, H = 0, raf = 0, last = 0, ended = false, time = 0, endTimer = -1, result = null;
 
     const input = { up: false, down: false, left: false, right: false };
     const hero = {
-      x: 0, y: 0, r: 16, hp: d.heroHp, maxHp: d.heroHp, potions,
+      x: 0, y: 0, r: 16, hp: d.heroHp, maxHp: d.heroHp, potions, vessel,
       face: { x: 0, y: -1 }, swing: 0, cd: 0, inv: 0, hitIds: new Set(), kx: 0, ky: 0,
     };
     let wolves = [];
@@ -77,7 +79,7 @@ window.Battle = (() => {
 
     function hud() {
       onHud && onHud({
-        hp: hero.hp, maxHp: hero.maxHp, potions: hero.potions,
+        hp: hero.hp, maxHp: hero.maxHp, potions: hero.potions, vessel: hero.vessel,
         left: wolves.filter((w) => !w.dead).length, total: wolves.length,
       });
     }
@@ -184,7 +186,7 @@ window.Battle = (() => {
         else if (wolves.every((w) => w.dead)) { result = 'win'; endTimer = 1.2; }
       } else {
         endTimer -= dt;
-        if (endTimer <= 0 && !ended) { ended = true; stop(); onEnd(result, { potions: hero.potions }); }
+        if (endTimer <= 0 && !ended) { ended = true; stop(); onEnd(result, { potions: hero.potions, vessel: hero.vessel }); }
       }
     }
 
@@ -354,6 +356,13 @@ window.Battle = (() => {
         hero.potions -= 1;
         hero.hp = Math.min(hero.maxHp, hero.hp + POTION_HEAL);
         fx.push({ x: hero.x, y: hero.y - 26, text: `+${POTION_HEAL}`, t: 0.9, color: '#8fe39a' });
+        hud();
+      },
+      drink() {
+        if (hero.vessel !== 'full' || hero.hp >= hero.maxHp || result) return;
+        hero.vessel = 'empty';
+        hero.hp = Math.min(hero.maxHp, hero.hp + VESSEL_HEAL);
+        fx.push({ x: hero.x, y: hero.y - 26, text: `+${VESSEL_HEAL}`, t: 0.9, color: '#ff8a9a' });
         hud();
       },
       stop() { ended = true; stop(); },

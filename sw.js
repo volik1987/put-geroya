@@ -2,7 +2,7 @@
  * Офлайн-режим. После первого открытия игра работает без интернета.
  * ВАЖНО: при каждом обновлении игры меняй VERSION — иначе у друзей останется старая версия.
  */
-const VERSION = 'v0.2.0';
+const VERSION = 'v0.3.0';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
   'js/text.js', 'js/engine.js', 'js/battle.js', 'js/share.js', 'js/app.js', 'story/story.js',
