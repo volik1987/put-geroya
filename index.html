@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14110f">
+  <meta name="description" content="Путь Героя — текстовое приключение, где выбор за тобой.">
+  <!-- Превью ссылки в мессенджерах (Telegram, WhatsApp) -->
+  <meta property="og:title" content="Путь Героя">
+  <meta property="og:description" content="Текстовое приключение. Выбери героя — и пройди свой путь.">
+  <meta property="og:image" content="icons/icon-512.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Путь Героя</title>
+</head>
+<body>
+  <main id="app">
+
+    <!-- Титульный экран -->
+    <section class="screen" id="screen-title">
+      <div class="title-wrap">
+        <div class="emblem" aria-hidden="true">✦</div>
+        <h1 class="game-title">Путь Героя</h1>
+        <p class="subtitle" id="story-subtitle"></p>
+      </div>
+      <div class="menu">
+        <button class="btn primary" id="btn-continue" hidden>Продолжить</button>
+        <button class="btn" id="btn-new">Новая игра</button>
+        <button class="btn ghost" id="btn-share-game">Поделиться игрой</button>
+        <button class="btn ghost" id="btn-install" hidden>Установить на телефон</button>
+        <button class="btn ghost" id="btn-settings">Настройки</button>
+      </div>
+      <p class="version" id="version"></p>
+    </section>
+
+
+    <!-- Сюжет -->
+    <section class="screen" id="screen-story" hidden>
+      <header class="story-top">
+        <button class="icon-btn" id="btn-menu" aria-label="Меню">☰</button>
+        <span class="chapter" id="chapter"></span>
+        <span class="hero-tag" id="hero-tag"></span>
+      </header>
+      <div class="scene-art" id="scene-art" hidden></div>
+      <article class="story-text" id="story-text" aria-live="polite"></article>
+      <div class="choices" id="choices"></div>
+
+      <!-- Бой в реальном времени -->
+      <div class="battle" id="battle" hidden>
+        <div class="battle-hud">
+          <div class="hp"><span>❤</span><div class="bar"><i id="hud-hp"></i></div></div>
+          <span id="hud-wolves"></span>
+        </div>
+        <canvas id="battle-canvas"></canvas>
+        <div class="controls">
+          <div class="dpad">
+            <button data-dir="up" aria-label="Вперёд">▲</button>
+            <button data-dir="left" aria-label="Влево">◀</button>
+            <button data-dir="right" aria-label="Вправо">▶</button>
+            <button data-dir="down" aria-label="Назад">▼</button>
+          </div>
+          <div class="act">
+            <button id="btn-potion" aria-label="Зелье">🧪<b id="hud-potions">0</b></button>
+            <button id="btn-attack" aria-label="Удар">🗡️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="flash" id="flash"></div>
+
+    <!-- Настройки -->
+    <section class="screen" id="screen-settings" hidden>
+      <h2>Настройки</h2>
+      <label class="field row">
+        <span>Размер текста</span>
+        <input id="opt-size" type="range" min="15" max="24" step="1">
+      </label>
+      <label class="field row">
+        <span>Плавное появление текста</span>
+        <input id="opt-typewriter" type="checkbox">
+      </label>
+      <div class="menu">
+        <button class="btn" id="btn-export">Скопировать сохранение</button>
+        <button class="btn" id="btn-import">Вставить сохранение</button>
+        <button class="btn danger" id="btn-reset">Удалить прогресс</button>
+        <button class="btn ghost" data-go="back">Назад</button>
+      </div>
+    </section>
+
+    <!-- Игровое меню поверх сюжета -->
+    <dialog id="dlg-menu">
+      <div class="menu">
+        <button class="btn" data-close>Вернуться к игре</button>
+        <button class="btn" id="btn-to-title">В главное меню</button>
+        <button class="btn ghost" id="btn-menu-settings">Настройки</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+
+  <script src="story/story.js"></script>
+  <script src="js/text.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/battle.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
