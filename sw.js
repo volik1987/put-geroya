@@ -1,11 +1,11 @@
 /*
  * Офлайн-режим. После первого открытия игра работает без интернета.
  * ВАЖНО: при каждом обновлении игры меняй VERSION — иначе у друзей останется старая версия.
+ * Основные файлы кладутся в кэш сразу, спрайты и портреты — по мере загрузки.
  */
-const VERSION = 'v0.3.0';
+const VERSION = 'v2.0.0';
 const FILES = [
-  './', 'index.html', 'manifest.webmanifest', 'css/style.css',
-  'js/text.js', 'js/engine.js', 'js/battle.js', 'js/share.js', 'js/app.js', 'story/story.js',
+  './', 'index.html', 'manifest.webmanifest', 'style.css', 'dialogues.js', 'game.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 

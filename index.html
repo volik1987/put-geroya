@@ -2,113 +2,147 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#14110f">
-  <meta name="description" content="Путь Героя — текстовое приключение, где выбор за тобой.">
-  <!-- Превью ссылки в мессенджерах (Telegram, WhatsApp) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#120f0d">
+  <meta name="description" content="Пиксельная RPG: Свет и Тьма в одном сердце.">
   <meta property="og:title" content="Путь Героя">
-  <meta property="og:description" content="Текстовое приключение. Выбери героя — и пройди свой путь.">
   <meta property="og:image" content="icons/icon-512.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css">
   <title>Путь Героя</title>
 </head>
 <body>
-  <main id="app">
+  <!-- Сцена 1280×720, целиком масштабируется под экран -->
+  <div id="stage">
+    <canvas id="game" width="1280" height="720"></canvas>
 
-    <!-- Титульный экран -->
-    <section class="screen" id="screen-title">
-      <div class="title-wrap">
-        <div class="emblem" aria-hidden="true">✦</div>
-        <h1 class="game-title">Путь Героя</h1>
-        <p class="subtitle" id="story-subtitle"></p>
+    <!-- Подсказка над локацией -->
+    <div id="area-name" class="area-name"></div>
+    <div id="hud" class="hud" hidden></div>
+    <div id="toast" class="toast"></div>
+    <div id="ach-pop" class="ach-pop"><div id="ach-pop-icon" class="ach-icon"></div><div><div class="ach-pop-label">Достижение получено</div><div id="ach-pop-title" class="ach-title"></div></div></div>
+    <div id="flash" class="flash"></div>
+
+    <!-- Диалог: портрет 256×256 слева, имя, текст, выборы -->
+    <div id="dialog" class="dialog" hidden>
+      <img id="dlg-portrait" class="dlg-portrait" alt="">
+      <div class="dlg-box">
+        <div id="dlg-name" class="dlg-name"></div>
+        <div id="dlg-text" class="dlg-text"></div>
+        <div id="dlg-choices" class="dlg-choices"></div>
+        <div id="dlg-next" class="dlg-next">▼</div>
       </div>
+    </div>
+
+    <!-- Титул -->
+    <section id="title" class="overlay">
+      <h1>Путь Героя</h1>
+      <p class="sub">Светлая и тёмная магия в одном сердце</p>
       <div class="menu">
-        <button class="btn primary" id="btn-continue" hidden>Продолжить</button>
-        <button class="btn" id="btn-new">Новая игра</button>
-        <button class="btn ghost" id="btn-share-game">Поделиться игрой</button>
-        <button class="btn ghost" id="btn-install" hidden>Установить на телефон</button>
-        <button class="btn ghost" id="btn-settings">Настройки</button>
+        <button id="btn-continue" hidden>Продолжить</button>
+        <button id="btn-new">Новая игра</button>
+        <button id="btn-ach" class="ghost">🏆 Достижения</button>
       </div>
-      <p class="version" id="version"></p>
+      <p class="hint">WASD — движение · Пробел / клик — атака · E — говорить · Q — бутылка · Enter — дальше</p>
     </section>
 
-
-    <!-- Сюжет -->
-    <section class="screen" id="screen-story" hidden>
-      <header class="story-top">
-        <button class="icon-btn" id="btn-menu" aria-label="Меню">☰</button>
-        <span class="chapter" id="chapter"></span>
-        <span class="hero-tag" id="hero-tag"></span>
-      </header>
-      <div class="scene-art" id="scene-art" hidden></div>
-      <article class="story-text" id="story-text" aria-live="polite"></article>
-      <div class="choices" id="choices"></div>
-
-      <!-- Бой в реальном времени -->
-      <div class="battle" id="battle" hidden>
-        <div class="battle-hud">
-          <div class="hp"><span>❤</span><div class="bar"><i id="hud-hp"></i></div><b id="hud-hp-num">100/100</b></div>
-          <span id="hud-wolves"></span>
+    <!-- Создание героя -->
+    <section id="create" class="overlay" hidden>
+      <h2>Создание героя</h2>
+      <div class="create-grid">
+        <div class="create-preview">
+          <canvas id="preview" width="128" height="128"></canvas>
+          <div id="preview-note" class="note"></div>
         </div>
-        <canvas id="battle-canvas"></canvas>
-        <div class="controls">
-          <div class="dpad">
-            <button data-dir="up" aria-label="Вперёд">▲</button>
-            <button data-dir="left" aria-label="Влево">◀</button>
-            <button data-dir="right" aria-label="Вправо">▶</button>
-            <button data-dir="down" aria-label="Назад">▼</button>
+        <div class="create-opts">
+          <div class="opt-title">Пол</div>
+          <div class="opt-row" data-group="gender">
+            <button data-value="m" class="on">Парень</button>
+            <button data-value="f">Девушка</button>
           </div>
-          <div class="act">
-            <button id="btn-vessel" class="item-btn" aria-label="Кровавый сосуд" hidden>🏺<b id="hud-vessel"></b></button>
-            <button id="btn-potion" class="item-btn" aria-label="Зелье">🧪<b id="hud-potions">0</b></button>
-            <button id="btn-attack" aria-label="Удар">🗡️</button>
+          <div class="opt-title">Оружие</div>
+          <div class="opt-row" data-group="weapon">
+            <button data-value="sword" class="on">⚔ Меч</button>
+            <button data-value="bow">🏹 Лук</button>
+            <button data-value="staff">🪄 Посох</button>
+          </div>
+          <div id="weapon-info" class="note"></div>
+          <div class="opt-title">Имя</div>
+          <input id="hero-name" maxlength="16" autocomplete="off" placeholder="Как тебя зовут?">
+          <div class="menu row">
+            <button id="btn-back" class="ghost">Назад</button>
+            <button id="btn-start" class="primary">В путь</button>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="flash" id="flash"></div>
-
-    <!-- Настройки -->
-    <section class="screen" id="screen-settings" hidden>
-      <h2>Настройки</h2>
-      <label class="field row">
-        <span>Размер текста</span>
-        <input id="opt-size" type="range" min="15" max="24" step="1">
-      </label>
-      <label class="field row">
-        <span>Плавное появление текста</span>
-        <input id="opt-typewriter" type="checkbox">
-      </label>
+    <!-- Концовка -->
+    <section id="ending" class="overlay" hidden>
+      <h2 id="ending-title"></h2>
+      <p id="ending-text" class="sub ending-text"></p>
       <div class="menu">
-        <button class="btn" id="btn-export">Скопировать сохранение</button>
-        <button class="btn" id="btn-import">Вставить сохранение</button>
-        <button class="btn danger" id="btn-reset">Удалить прогресс</button>
-        <button class="btn ghost" data-go="back">Назад</button>
+        <button id="btn-ending" class="primary">В главное меню</button>
       </div>
     </section>
 
-    <!-- Игровое меню поверх сюжета -->
-    <dialog id="dlg-menu">
-      <div class="menu">
-        <div class="bag" id="bag"></div>
-        <button class="btn" data-close>Вернуться к игре</button>
-        <button class="btn" id="btn-to-title">В главное меню</button>
-        <button class="btn ghost" id="btn-menu-settings">Настройки</button>
+    <!-- Слой трещины экрана (этап 8): поверх игры и диалога, под окном ошибки -->
+    <canvas id="crackfx" class="crackfx" width="1280" height="720"></canvas>
+
+    <!-- «Ошибка 888»: игра заблокирована после Пути Мести (тексты — LOCK_SCREEN в dialogues.js) -->
+    <section id="locked" class="locked" hidden>
+      <div class="err-box" role="alertdialog" aria-labelledby="err-title">
+        <div class="err-head"><span id="err-head"></span><span class="err-x">✕</span></div>
+        <div class="err-body">
+          <div class="err-icon">⛔</div>
+          <div>
+            <div id="err-title" class="err-title"></div>
+            <div id="err-text"></div>
+            <div id="err-code" class="err-code"></div>
+          </div>
+        </div>
+        <div id="err-progress" class="err-progress" hidden><div id="err-bar" class="err-bar"></div></div>
+        <div class="err-actions"><button id="btn-reinstall"></button></div>
       </div>
-    </dialog>
+    </section>
 
-    <div class="toast" id="toast" role="status"></div>
-  </main>
+    <!-- Достижения: список (тексты — ACHIEVEMENTS в dialogues.js) -->
+    <section id="achievements" class="overlay dim" hidden>
+      <h2>Достижения</h2>
+      <div id="ach-count" class="note"></div>
+      <div id="ach-list" class="ach-list"></div>
+      <div class="menu"><button id="btn-ach-back">Назад</button></div>
+    </section>
 
-  <script src="story/story.js"></script>
-  <script src="js/text.js"></script>
-  <script src="js/engine.js"></script>
-  <script src="js/battle.js"></script>
-  <script src="js/share.js"></script>
-  <script src="js/app.js"></script>
+    <!-- Пауза -->
+    <section id="pause" class="overlay dim" hidden>
+      <h2>Пауза</h2>
+      <div class="menu">
+        <button id="btn-resume">Продолжить</button>
+        <button id="btn-ach-pause">🏆 Достижения</button>
+        <button id="btn-to-title">В главное меню</button>
+        <button id="btn-wipe" class="ghost">Стереть сохранение</button>
+      </div>
+    </section>
+
+    <!-- Сенсорное управление (появляется только на телефоне) -->
+    <div id="touch" class="touch" hidden>
+      <div id="stick" class="stick"><div class="knob"></div></div>
+      <button id="btn-atk" class="atk">⚔</button>
+      <button id="btn-act" class="act">E</button>
+      <button id="btn-flask" class="flask">🧪</button>
+      <button id="btn-menu" class="menu-btn">☰</button>
+    </div>
+  </div>
+
+  <script src="dialogues.js"></script>
+  <script src="game.js"></script>
+  <script>
+    // офлайн-режим и обновления (в режиме ?test для автотестов не нужен)
+    if ('serviceWorker' in navigator && !location.search.includes('test')) navigator.serviceWorker.register('sw.js');
+  </script>
 </body>
 </html>
