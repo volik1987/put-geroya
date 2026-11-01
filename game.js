@@ -14,33 +14,56 @@
   const TALK_DIST = 92;
   const HERO_HP = 100;               // максимум ОЗ (Святое сияние даёт +25)
   const FLASK_HEAL = 50;
+  const DASH = { speed: 950, time: 0.16, inv: 0.3, cd: 1.0 };   // рывок: Shift; неуязвимость 0.3 с
+  const MAX_MANA = 100;
+  // уровни: всего опыта для уровня L — 10·L·(L−1); за уровень +10 ОЗ, +10% урона, рывок быстрее на 0.06 с
+  const xpFor = (L) => 10 * L * (L - 1);
 
   // Враги: ОЗ, скорость, урон, прыжок с предупреждением «!»
   const ENEMIES = {
-    wolf: { hp: 6, speed: 105, aggro: 360, dmg: 10, windup: 0.55, lunge: 480, lungeT: 0.3, rest: 0.7, w: 40, h: 18 },
-    guard: { sprite: 'nokt_guard', hp: 12, speed: 90, aggro: 600, dmg: 12, windup: 0.5, lunge: 400, lungeT: 0.25, rest: 0.8, w: 34, h: 18 },
-    priest: { sprite: 'priest', boss: 'Первосвященник Кассиан', hp: 40, speed: 85, keep: 260, aggro: 700, rest: 0.5, w: 34, h: 18,
+    // xp — опыт за победу; resist — сопротивление дальнему урону (стрелы и магия) у боссов; mana — очки маны
+    wolf: { xp: 5, gold: 2, hp: 6, speed: 105, aggro: 360, dmg: 10, windup: 0.55, lunge: 480, lungeT: 0.3, rest: 0.7, w: 40, h: 18 },
+    guard: { sprite: 'nokt_guard', xp: 8, gold: 5, hp: 12, speed: 90, aggro: 600, dmg: 12, windup: 0.5, lunge: 400, lungeT: 0.25, rest: 0.8, w: 34, h: 18 },
+    priest: { sprite: 'priest', boss: 'Первосвященник Кассиан', xp: 50, resist: 0.35, hp: 40, speed: 85, keep: 260, aggro: 700, rest: 0.5, w: 34, h: 18,
       ranged: { every: 1.6, windup: 0.55, speed: 330, dmg: 10, count: 3, spread: 0.28 } },
-    bellows: { art: 'bellows', static: true, hp: 10, w: 56, h: 28 },
-    dolita_boss: { sprite: 'dolita', boss: 'Долита Тенебрис', hp: 45, speed: 150, aggro: 900, dmg: 14, windup: 0.45, lunge: 560, lungeT: 0.3, rest: 0.6, w: 34, h: 18,
+    // Маги Света и Тьмы: держат дистанцию, бьют самонаводящимся сгустком, отпрыгивают от героя; дают очко маны
+    mage_dark: { sprite: 'priest', tint: '#9a4aff', xp: 12, mana: 1, gold: 5, hp: 14, speed: 95, keep: 280, aggro: 650, rest: 0.6, w: 34, h: 18, blink: 3,
+      ranged: { every: 1.8, windup: 0.6, speed: 300, dmg: 9, count: 1, spread: 0, color: '170,90,255', homing: 1.6 } },
+    mage_light: { sprite: 'elder', tint: '#ffd86a', xp: 12, mana: 1, gold: 5, hp: 14, speed: 95, keep: 280, aggro: 650, rest: 0.6, w: 34, h: 18, blink: 3,
+      ranged: { every: 1.8, windup: 0.6, speed: 300, dmg: 9, count: 1, spread: 0, color: '255,220,120', homing: 1.6 } },
+    bellows: { art: 'bellows', static: true, xp: 2, hp: 10, w: 56, h: 28 },
+    dolita_boss: { sprite: 'dolita', boss: 'Долита Тенебрис', xp: 60, resist: 0.35, hp: 45, speed: 150, aggro: 900, dmg: 14, windup: 0.45, lunge: 560, lungeT: 0.3, rest: 0.6, w: 34, h: 18,
       ranged: { every: 2.4, windup: 0.5, speed: 380, dmg: 10, count: 5, spread: 0.22 } },
-    dark_knight: { boss: 'Тёмный рыцарь', hp: 60, speed: 135, aggro: 900, dmg: 14, windup: 0.5, lunge: 600, lungeT: 0.28, rest: 0.55, w: 34, h: 18,
+    dark_knight: { boss: 'Тёмный рыцарь', xp: 50, resist: 0.3, hp: 60, speed: 135, aggro: 900, dmg: 14, windup: 0.5, lunge: 600, lungeT: 0.28, rest: 0.55, w: 34, h: 18,
       ranged: { every: 2.2, windup: 0.5, speed: 420, dmg: 10, count: 3, spread: 0.3, color: '90,180,255' } },
     // Путь Ненависти: рыцарь бьётся насмерть, после трещины в шлеме — Аэдел (и Долита, если её пощадили)
-    dark_knight_h: { sprite: 'dark_knight', boss: 'Тёмный рыцарь', hp: 50, speed: 140, aggro: 900, dmg: 14, windup: 0.48, lunge: 600, lungeT: 0.28, rest: 0.5, w: 34, h: 18,
+    dark_knight_h: { sprite: 'dark_knight', boss: 'Тёмный рыцарь', xp: 50, resist: 0.3, hp: 50, speed: 140, aggro: 900, dmg: 14, windup: 0.48, lunge: 600, lungeT: 0.28, rest: 0.5, w: 34, h: 18,
       ranged: { every: 2.2, windup: 0.5, speed: 420, dmg: 10, count: 3, spread: 0.3, color: '90,180,255' } },
-    aedel_boss: { sprite: 'aedel', boss: 'Аэдел Анима', hp: 55, speed: 160, aggro: 900, dmg: 15, windup: 0.42, lunge: 650, lungeT: 0.28, rest: 0.5, w: 34, h: 18,
-      ranged: { every: 1.9, windup: 0.45, speed: 450, dmg: 10, count: 5, spread: 0.24, color: '90,180,255' } },
-    dolita_ally: { sprite: 'dolita', hp: 20, speed: 140, keep: 240, aggro: 900, rest: 0.6, w: 34, h: 18,
+    // Аэдел-мечник: уворачивается от половины ударов (dodge), сам делает рывок (dash), бьёт голубой волной до стены (wave — точек в волне)
+    aedel_boss: { sprite: 'aedel', boss: 'Аэдел Анима', xp: 70, resist: 0.4, hp: 55, speed: 160, aggro: 900, dmg: 15, windup: 0.42, lunge: 650, lungeT: 0.28, rest: 0.5, w: 34, h: 18,
+      dodge: 0.5, dash: { speed: 900, time: 0.18, cd: 2.2, at: 300 },
+      ranged: { every: 2.5, windup: 0.6, speed: 420, dmg: 14, wave: 9, color: '120,200,255' } },
+    // Орден Духа: призраки летают сквозь стены (ghost), стрелы и магия бьют их в 1.5 раза сильнее
+    ghost: { sprite: 'nokt_guard', tint: '#bfe8ff', ghost: true, xp: 6, gold: 3, hp: 8, speed: 165, aggro: 800, dmg: 9, windup: 0.4, lunge: 520, lungeT: 0.25, rest: 0.6, w: 30, h: 16 },
+    // Дэйн Филит: телепорт (blink), призрачные копии (copies), волны духа; слаб к Духу (weakSpirit — множитель урона)
+    dane: { sprite: 'priest', tint: '#8fd8ff', boss: 'Дэйн Филит', xp: 60, resist: 0.3, hp: 55, speed: 110, keep: 240, aggro: 900, rest: 0.5, w: 34, h: 18,
+      blink: 2.5, copies: { every: 9, n: 2 }, weakSpirit: 1.35,
+      ranged: { every: 2.2, windup: 0.5, speed: 330, dmg: 11, wave: 5, color: '150,220,255' } },
+    // Гидан — только на арене «Перчатки вызова»
+    gidan_duel: { sprite: 'gidan', boss: 'Император Гидан', xp: 90, resist: 0.35, hp: 70, speed: 120, keep: 250, aggro: 900, rest: 0.5, w: 34, h: 18, blink: 3.5,
+      ranged: { every: 1.6, windup: 0.5, speed: 340, dmg: 12, count: 3, spread: 0.3, color: '154,74,255', homing: 1.2 } },
+    dane_copy: { sprite: 'priest', tint: '#8fd8ff', ghost: true, xp: 0, gold: 0, hp: 3, life: 8, speed: 175, aggro: 900, dmg: 8, windup: 0.45, lunge: 520, lungeT: 0.25, rest: 0.6, w: 30, h: 16 },
+    dolita_ally: { sprite: 'dolita', xp: 20, gold: 0, hp: 20, speed: 140, keep: 240, aggro: 900, rest: 0.6, w: 34, h: 18,
       ranged: { every: 3, windup: 0.6, speed: 340, dmg: 8, count: 3, spread: 0.3 } },
-    captain: { sprite: 'nokt_captain', hp: 22, speed: 80, aggro: 600, dmg: 16, windup: 0.7, lunge: 430, lungeT: 0.3, rest: 1.0, w: 40, h: 20 },
+    captain: { sprite: 'nokt_captain', xp: 15, gold: 5, hp: 22, speed: 80, aggro: 600, dmg: 16, windup: 0.7, lunge: 430, lungeT: 0.3, rest: 1.0, w: 40, h: 20 },
   };
 
   // Оружие влияет на спрайт и параметры боя (бой — на этапе 2)
   const WEAPONS = {
-    sword: { name: 'Меч',   type: 'melee',  dmg: 3, range: 70,  cooldown: 0.35, info: 'Ближний бой. Быстрые удары, урон 3.' },
-    bow:   { name: 'Лук',   type: 'arrow',  dmg: 2, range: 420, cooldown: 0.5,  info: 'Дальний бой. Стрелы летят далеко, урон 2.' },
-    staff: { name: 'Посох', type: 'magic',  dmg: 4, range: 320, cooldown: 0.85, info: 'Магический снаряд. Медленно, но урон 4.' },
+    // меч — риск ближнего боя; лук — запас стрел (ammo, +1 за regen с); посох — мана (manaCost из 100, +manaRegen/с) и каст (cast с стоя)
+    sword: { name: 'Меч',   type: 'melee',  dmg: 3, range: 70,  cooldown: 0.35, info: 'Ближний бой. Быстрые удары, урон 3 — но враг рядом.' },
+    bow:   { name: 'Лук',   type: 'arrow',  dmg: 4, range: 460, cooldown: 0.45, ammo: 6, regen: 2, info: 'Дальний бой, урон 4. 6 стрел, новая — раз в 2 с.' },
+    staff: { name: 'Посох', type: 'magic',  dmg: 5, range: 340, cooldown: 0.8, cast: 0.25, manaCost: 20, manaRegen: 8, info: 'Магия, урон 5. Каст 0.25 с, тратит ману.' },
   };
 
   // Стихия Светлой магии — выбирается у королевы, даёт способность в бою
@@ -81,7 +104,15 @@
       npcs: [
         { id: 'white_stone', prop: 'stone', x: 12, y: 7.4,
           talk: [{ if: { flag: 'prologue_done' }, d: 'stone_silent' }, { d: 'stone_touch' }] },
+        { id: 'mage_light', sprite: 'elder', tint: '#ffd86a', x: 4.5, y: 6.6, dir: 'right', if: [{ flag: 'prologue_done' }, { not: 'duel_light' }],
+          talk: [{ if: { flag: 'mages_light_beaten' }, d: 'mage_light_after' }, { d: 'mage_light' }] },
       ],
+      // маги Света — по вызову
+      encounters: [{
+        if: { flag: 'duel_light' },
+        enemies: [{ kind: 'mage_light', x: 4.5, y: 6.6 }, { kind: 'mage_light', x: 19.5, y: 6.6 }],
+        onClear: { set: { duel_light: false, mages_light_beaten: true }, d: 'mage_light_win' },
+      }],
       onEnter: [{ if: { not: 'intro_seen' }, d: 'intro' }],
     },
 
@@ -107,10 +138,12 @@
       ],
       npcs: [
         { id: 'throne', prop: 'throne', x: 7.5, y: 1.2 },
+        { id: 'pl_guard1', sprite: 'nokt_guard', x: 6, y: 3.6, dir: 'up', if: { eq: ['power_scene', 'lumina'] } },
+        { id: 'pl_guard2', sprite: 'nokt_guard', x: 9, y: 3.6, dir: 'up', if: { eq: ['power_scene', 'lumina'] } },
         { id: 'lumina', sprite: 'lumina', x: 7.5, y: 2.6, dir: 'down',
           talk: [{ if: { flag: 'prologue_done' }, d: 'queen_after' }, { d: 'queen_intro' }] },
       ],
-      onEnter: [{ if: { not: 'prologue_done' }, d: 'queen_intro' }],
+      onEnter: [{ if: { eq: ['power_scene', 'lumina'] }, d: 'power_lumina' }, { if: { not: 'prologue_done' }, d: 'queen_intro' }],
     },
 
     // ============================================================ Этап 2
@@ -149,6 +182,7 @@
         { id: 'house3', prop: 'house', x: 6, y: 13 },
         { id: 'house4', prop: 'house', x: 21, y: 13 },
         { id: 'sign', prop: 'sign', x: 2, y: 6.2, talk: [{ d: 'village_sign' }] },
+        { id: 'darian', sprite: 'darian', x: 10.5, y: 9.4, dir: 'down', if: { not: 'city_seen' }, talk: [{ d: 'darian' }] },
         { id: 'elder', sprite: 'elder', x: 16.5, y: 6.4, dir: 'down',
           talk: [
             { if: { flag: 'elder_rewarded' }, d: 'elder_after' },
@@ -284,8 +318,8 @@
       'KccccccccccccccccccccccccccccK',
       'KccccccccccccccccccccccccccccK',
       'KccccccccccccccccccccccccccccK',
-      'KcccccccccccccFFcccccccccccccK',
-      'KcccccccccccccFFcccccccccccccK',
+      ',cccccccccccccFFcccccccccccccK',
+      ',cccccccccccccFFcccccccccccccK',
       'KccccccccccccccccccccccccccccK',
       'KccccccccccccccccccccccccccccK',
       'KccccccccccccccccccccccccccccK',
@@ -300,6 +334,8 @@
     exits: [
       { x: 14, y: 19, to: 'north_gate', at: [9.5, 1], dir: 'down' },
       { x: 15, y: 19, to: 'north_gate', at: [9.5, 1], dir: 'down' },
+      { x: 0, y: 9, if: { flag: 'theft_done' }, to: 'spirit_order', at: [18, 7.5], dir: 'left', else: 'order_locked' },
+      { x: 0, y: 10, if: { flag: 'theft_done' }, to: 'spirit_order', at: [18, 7.5], dir: 'left', else: 'order_locked' },
       { x: 29, y: 4, if: { flag: 'theft_done' }, to: 'temple_nave', at: [8.5, 14], dir: 'up', else: 'city_east_locked' },
       { x: 29, y: 5, if: { flag: 'theft_done' }, to: 'temple_nave', at: [8.5, 14], dir: 'up', else: 'city_east_locked' },
     ],
@@ -319,6 +355,9 @@
       { id: 'st_eola', prop: 'statue', color: '#3cc46a', x: 11.5, y: 12.3, talk: [{ d: 'statue_eola' }] },
       { id: 'st_dillad', prop: 'statue', color: '#5ab8f0', x: 18.5, y: 12.3, talk: [{ d: 'statue_dillad' }] },
       { id: 'sign_temple', prop: 'sign', x: 27.5, y: 6.2, talk: [{ d: 'sign_temple' }] },
+      { id: 'sign_order', prop: 'sign', x: 1.6, y: 8.2, talk: [{ d: 'sign_order' }] },
+      { id: 'darian', sprite: 'darian', x: 23.3, y: 13.4, dir: 'left', talk: [{ d: 'darian' }] },
+      { id: 'polianna', sprite: 'polianna', x: 26.5, y: 8.4, dir: 'left', talk: [{ d: 'polianna' }] },
     ],
     // зона: дошёл до площади — у героя крадут кошель
     triggers: [{ if: { not: 'theft_done' }, maxY: 14.6 * 64, d: 'theft' }],
@@ -366,7 +405,7 @@
       { x: 0, y: 7, if: { flag: 'dolita_beaten' }, to: 'gidan_study', at: [10, 4.5], dir: 'left', else: 'door_locked' },
     ],
     npcs: [
-      { id: 'altar', prop: 'altar', x: 8.5, y: 2.1 },
+      { id: 'altar', prop: 'altar', x: 8.5, y: 2.1, talk: [{ d: 'altar_offer' }] },
       { id: 'mirror', prop: 'mirror', x: 2, y: 1.2, talk: [{ d: 'mirror_hint' }] },
       { id: 'pew1', prop: 'pew', x: 5.5, y: 9.6 }, { id: 'pew2', prop: 'pew', x: 5.5, y: 11.6 },
       { id: 'pew3', prop: 'pew', x: 12.2, y: 9.6 }, { id: 'pew4', prop: 'pew', x: 12.2, y: 11.6 },
@@ -379,12 +418,18 @@
         ] },
       { id: 'tguard1', sprite: 'nokt_guard', x: 6.3, y: 3.8, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
       { id: 'tguard2', sprite: 'nokt_guard', x: 10.7, y: 3.8, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
+      { id: 'mage_dark', sprite: 'priest', tint: '#9a4aff', x: 2.2, y: 13.4, dir: 'right', if: { not: 'duel_dark' },
+        talk: [{ if: { flag: 'mages_dark_beaten' }, d: 'mage_dark_after' }, { d: 'mage_dark' }] },
     ],
-    // Путь Власти: бой с Первосвященником
+    // Путь Власти: бой с Первосвященником; маги Тьмы — по вызову
     encounters: [{
       if: [{ flag: 'priest_fight' }, { not: 'priest_beaten' }],
       enemies: [{ kind: 'priest', x: 8.5, y: 3.4 }, { kind: 'guard', x: 6.3, y: 3.4 }, { kind: 'guard', x: 10.7, y: 3.4 }],
       onClear: { set: { priest_beaten: true, temple_done: true }, d: 'priest_beaten' },
+    }, {
+      if: { flag: 'duel_dark' },
+      enemies: [{ kind: 'mage_dark', x: 2.2, y: 13 }, { kind: 'mage_dark', x: 15, y: 13 }],
+      onClear: { set: { duel_dark: false, mages_dark_beaten: true }, d: 'mage_dark_win' },
     }],
     respawn: { map: 'temple_nave', at: [8.5, 14], dir: 'up', d: 'hero_down_temple' },
     onEnter: [{ if: { not: 'temple_seen' }, d: 'temple_intro' }],
@@ -460,14 +505,18 @@
       { x: 11, y: 5, to: 'temple_nave', at: [1.2, 6.5], dir: 'right' },
     ],
     npcs: [
+      { id: 'pg_portrait', prop: 'portrait', who: 'gidan', x: 8.5, y: 1, if: { eq: ['power_scene', 'gidan'] } },
+      { id: 'pg_gidan', sprite: 'gidan', x: 7, y: 3.4, dir: 'down', if: { eq: ['power_scene', 'gidan'] } },
+      { id: 'pg_aedel', sprite: 'aedel', x: 8.3, y: 3.6, dir: 'left', if: { eq: ['power_scene', 'gidan'] } },
       { id: 'desk', prop: 'desk', x: 5.5, y: 2.4, talk: [{ if: { flag: 'lumina_letter_read' }, d: 'desk_again' }, { d: 'lumina_letter' }] },
     ],
-    onEnter: [{ if: { not: 'study_seen' }, d: 'study_intro' }],
+    onEnter: [{ if: { eq: ['power_scene', 'gidan'] }, d: 'power_gidan' }, { if: { not: 'study_seen' }, d: 'study_intro' }],
   };
 
   // ============================================================ Этап 6. Столица Нокт (Путь Надежды)
   // o тёмный мрамор дворца  h клумба  V ворота дворца (открываются флагом palace_open)
   MAPS.nokt_capital = {
+    rainStart: true,                                  // вышли из храма — начинается дождь
     title: 'Нокт · Столица Ноктюрн',
     tiles: [
       'KKKKKKKKKKKK,,KKKKKKKKKKKK',
@@ -507,6 +556,8 @@
       { id: 'citizen', sprite: 'merchant', x: 19, y: 10.5, dir: 'left', talk: [{ if: { eq: ['temple_path', 'hate'] }, d: 'capital_citizen_hate' }, { d: 'capital_citizen' }] },
       { id: 'dolita_capital', sprite: 'dolita', x: 12.5, y: 12.5, dir: 'down', if: [{ not: 'dolita_led' }, { eq: ['temple_path', 'hope'] }], talk: [{ d: 'capital_dolita' }] },
       { id: 'sign_garden', prop: 'sign', x: 1.6, y: 7.2, talk: [{ d: 'sign_garden' }] },
+      { id: 'polianna', sprite: 'polianna', x: 4.5, y: 11.4, dir: 'right', talk: [{ d: 'polianna' }] },
+      { id: 'darian', sprite: 'darian', x: 21.2, y: 13.4, dir: 'left', talk: [{ d: 'darian' }] },
     ],
     onEnter: [
       { if: [{ not: 'capital_seen' }, { eq: ['temple_path', 'hate'] }], d: 'capital_hate' },
@@ -540,7 +591,13 @@
       { x: 23, y: 8, to: 'nokt_capital', at: [1, 8.6], dir: 'right' },
     ],
     npcs: [
-      { id: 'dolita_garden', sprite: 'dolita', x: 9, y: 8, dir: 'left', if: { not: 'wedding' },
+      { id: 'pw_arch', prop: 'arch', x: 16.5, y: 4.4, if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_dolita', sprite: 'dolita', x: 16, y: 5.2, dir: 'down', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_gidan', sprite: 'gidan', x: 13.6, y: 6.4, dir: 'right', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_aedel', sprite: 'aedel', x: 19.5, y: 6.4, dir: 'left', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_guard', sprite: 'nokt_guard', x: 19.5, y: 9.4, dir: 'up', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pd_stone', prop: 'stone', x: 16.5, y: 5.4, if: { eq: ['power_scene', 'dolita'] } },
+      { id: 'dolita_garden', sprite: 'dolita', x: 9, y: 8, dir: 'left', if: [{ not: 'wedding' }, { not: 'power_scene' }],
         talk: [{ if: { flag: 'palace_password' }, d: 'garden_after' }, { d: 'garden_games' }] },
       // свадьба Долиты и Аэдела
       { id: 'arch', prop: 'arch', x: 16.5, y: 4.4, if: { flag: 'wedding' } },
@@ -553,25 +610,93 @@
       { id: 'w_elder', sprite: 'elder', x: 13.6, y: 9.4, dir: 'up', if: { flag: 'wedding' } },
     ],
     onEnter: [
+      { if: { eq: ['power_scene', 'wedding'] }, d: 'power_wedding' },
+      { if: { eq: ['power_scene', 'dolita'] }, d: 'power_dolita_end' },
       { if: [{ flag: 'wedding' }, { not: 'wedding_seen' }], d: 'wedding' },
       { if: { not: 'garden_seen' }, d: 'garden_intro' },
     ],
   };
 
   // Ворота дворца: пароль, Тёмный рыцарь, в середине боя его останавливает Долита
+  // Арена «Перчатки вызова» (этап F): противники появляются из DUELS, выход — через дверь внизу
+  MAPS.arena = {
+    title: 'Арена вызова',
+    ground: 'o',
+    tiles: [
+      'KKKKKKKKKKKKKKKK',
+      'KooooooooooooooK',
+      'KooooooooooooooK',
+      'KooPooooooooPooK',
+      'KooooooooooooooK',
+      'KooooooooooooooK',
+      'KooPooooooooPooK',
+      'KooooooooooooooK',
+      'KooooooooooooooK',
+      'KKKKKKKooKKKKKKK',
+    ],
+    spawn: [7.5, 8],
+    exits: [{ x: 7, y: 9, d: 'duel_leave' }, { x: 8, y: 9, d: 'duel_leave' }],
+    npcs: [],
+  };
+
+  // Орден Духа (этап E): ледяной зал Диллада — призраки, потом Дэйн Филит
+  MAPS.spirit_order = {
+    title: 'Орден Духа · Ледяной зал',
+    ground: 'i',
+    tiles: [
+      'IIIIIIIIIIIIIIIIIIII',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiPiiiiiiiiiiiiPiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'Iiiiiiiiiiiiiiiiiiii',
+      'Iiiiiiiiiiiiiiiiiiii',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiPiiiiiiiiiiiiPiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IiiiiiiiiiiiiiiiiiiI',
+      'IIIIIIIIIIIIIIIIIIII',
+    ],
+    spawn: [18, 7.5],
+    exits: [
+      { x: 19, y: 6, to: 'trade_city', at: [1, 9.5], dir: 'right' },
+      { x: 19, y: 7, to: 'trade_city', at: [1, 9.5], dir: 'right' },
+    ],
+    npcs: [
+      { id: 'st_dillad_order', prop: 'statue', color: '#5ab8f0', x: 9.5, y: 1.6, talk: [{ d: 'statue_dillad' }] },
+      { id: 'dane', sprite: 'priest', tint: '#8fd8ff', x: 9.5, y: 3.2, dir: 'down', if: [{ flag: 'order_ghosts_clear' }, { not: 'dane_fight' }],
+        talk: [{ if: { flag: 'dane_defeated' }, d: 'dane_after' }, { d: 'dane' }] },
+      { id: 'polianna', sprite: 'polianna', x: 16.5, y: 11.4, dir: 'left', talk: [{ d: 'polianna' }] },
+    ],
+    encounters: [{
+      if: [{ flag: 'order_seen' }, { not: 'order_ghosts_clear' }],
+      enemies: [{ kind: 'ghost', x: 4, y: 4 }, { kind: 'ghost', x: 15, y: 4 }, { kind: 'ghost', x: 4, y: 10 }, { kind: 'ghost', x: 15, y: 10 }],
+      onClear: { set: { order_ghosts_clear: true }, d: 'order_ghosts_clear' },
+    }, {
+      if: [{ flag: 'dane_fight' }, { not: 'dane_defeated' }], lock: true,
+      enemies: [{ kind: 'dane', x: 9.5, y: 3.2 }],
+      onClear: { set: { dane_defeated: true, dane_fight: false }, d: 'dane_beaten' },
+    }],
+    respawn: { map: 'spirit_order', at: [18, 7.5], dir: 'left', d: 'hero_down_order' },
+    onEnter: [{ if: { not: 'order_seen' }, d: 'order_intro' }],
+  };
+
   MAPS.palace_gate = {
     title: 'Нокт · Ворота дворца',
+    ground: 'c',
     tiles: [
       'KKKKKKKVVKKKKKKK',
       'KccccccccccccccK',
       'KccccccccccccccK',
       'KccccccccccccccK',
       'KccccccccccccccK',
+      'KccPccccccccPccK',                            // колонны — укрытие от волн Аэдела
       'KccccccccccccccK',
       'KccccccccccccccK',
       'KccccccccccccccK',
-      'KccccccccccccccK',
-      'KccccccccccccccK',
+      'KccPccccccccPccK',
       'KccccccccccccccK',
       'KccccccccccccccK',
       'KccccccccccccccK',
@@ -585,8 +710,13 @@
       { x: 8, y: 0, to: 'palace_throne', at: [7.5, 11.5], dir: 'up' },
     ],
     npcs: [
-      { id: 'pguard', sprite: 'nokt_guard', x: 10.5, y: 2.2, dir: 'down', if: { not: 'hgate_seen' }, talk: [{ if: { flag: 'palace_open' }, d: 'pguard_open' }, { if: { flag: 'palace_password' }, d: 'pguard_pass' }, { d: 'pguard' }] },
-      { id: 'knight', sprite: 'dark_knight', x: 7.5, y: 2.2, dir: 'down', if: [{ not: 'knight_fight' }, { not: 'hknight_fight' }], talk: [{ d: 'knight_silent' }] },
+      { id: 'pa_aedel', sprite: 'aedel', x: 7.5, y: 4.2, dir: 'down', if: { eq: ['power_scene', 'aedel'] } },
+      { id: 'pa_stone', sprite: 'dark_knight', tint: '#8a8a90', x: 6.2, y: 4, dir: 'right', if: { eq: ['power_scene', 'aedel'] } },
+      { id: 'pa_dolita', sprite: 'dolita', x: 10.5, y: 6.6, dir: 'left', if: { eq: ['power_scene', 'aedel'] } },
+      { id: 'pa_guard1', sprite: 'nokt_guard', x: 4.5, y: 6.2, dir: 'right', if: { eq: ['power_scene', 'aedel'] } },
+      { id: 'pa_guard2', sprite: 'nokt_guard', x: 11.6, y: 4.2, dir: 'left', if: { eq: ['power_scene', 'aedel'] } },
+      { id: 'pguard', sprite: 'nokt_guard', x: 10.5, y: 2.2, dir: 'down', if: [{ not: 'hgate_seen' }, { not: 'power_scene' }], talk: [{ if: { flag: 'palace_open' }, d: 'pguard_open' }, { if: { flag: 'palace_password' }, d: 'pguard_pass' }, { d: 'pguard' }] },
+      { id: 'knight', sprite: 'dark_knight', x: 7.5, y: 2.2, dir: 'down', if: [{ not: 'knight_fight' }, { not: 'hknight_fight' }, { not: 'power_scene' }], talk: [{ d: 'knight_silent' }] },
       // бой остановлен: рыцарь опускает меч (knight_halt), затем снимает шлем (knight_stopped)
       { id: 'knight_halt', sprite: 'dark_knight', x: 7.5, y: 3.4, dir: 'down', if: [{ flag: 'knight_halt' }, { not: 'knight_stopped' }] },
       { id: 'g_aedel', sprite: 'aedel', x: 7.5, y: 3.4, dir: 'down', if: { flag: 'knight_stopped' }, talk: [{ d: 'aedel_gate_after' }] },
@@ -599,23 +729,25 @@
       onStop: { set: { knight_halt: true }, d: 'knight_unmask', at: [7.5, 5.6], dir: 'up' },
     }, {
       // Путь Ненависти, фаза 1: Тёмный рыцарь
-      if: [{ flag: 'hknight_fight' }, { not: 'helm_broken' }],
+      if: [{ flag: 'hknight_fight' }, { not: 'helm_broken' }], lock: true,
       enemies: [{ kind: 'dark_knight_h', x: 7.5, y: 2.6 }],
       onClear: { set: { helm_broken: true }, d: 'helm_broken' },
     }, {
       // фаза 2: Аэдел без шлема; пощажённая Долита встаёт рядом с ним
-      if: [{ flag: 'helm_broken' }, { not: 'aedel_beaten' }],
+      if: [{ flag: 'helm_broken' }, { not: 'aedel_beaten' }], lock: true,      // двери заперты до конца боя
       enemies: [{ kind: 'aedel_boss', x: 7.5, y: 3 }, { kind: 'dolita_ally', x: 10.5, y: 3, if: { flag: 'dolita_spared' } }],
       onClear: { set: { aedel_beaten: true, palace_open: true }, add: { path_hate: 1 }, d: 'aedel_defeated' },
     }],
     respawn: { map: 'palace_gate', at: [7.5, 12], dir: 'up', d: 'hero_down_knight' },
     onEnter: [
+      { if: { eq: ['power_scene', 'aedel'] }, d: 'power_aedel' },
       { if: [{ eq: ['temple_path', 'hate'] }, { not: 'hgate_seen' }], d: 'hate_gate_intro' },
       { if: { not: 'pgate_seen' }, d: 'pgate_intro' },
     ],
   };
 
   MAPS.palace_throne = {
+    entry: 'letterbox',                               // вход — полосы letterbox
     title: 'Дворец Нокта · Тронный зал',
     ground: 'o',
     tiles: [
@@ -642,6 +774,8 @@
       { id: 'nthrone', prop: 'nthrone', x: 7.5, y: 1.2 },
       { id: 't_gidan', sprite: 'gidan', x: 7.5, y: 2.4, dir: 'down', if: { not: 'gidan_gone' }, talk: [{ if: { eq: ['temple_path', 'hope'] }, d: 'gidan_after' }] },
       { id: 't_aedel', sprite: 'aedel', x: 5.2, y: 3.4, dir: 'down', if: { eq: ['temple_path', 'hope'] } },
+      { id: 'p_aedel', sprite: 'aedel', x: 5.2, y: 3.4, dir: 'down', if: { eq: ['power_scene', 'deal'] } },
+      { id: 'p_dolita', sprite: 'dolita', x: 8.9, y: 7.6, dir: 'up', if: { eq: ['power_scene', 'deal'] } },
       { id: 't_dolita', sprite: 'dolita', x: 9.8, y: 3.4, dir: 'down', if: { eq: ['temple_path', 'hope'] } },
     ],
     // подошёл к трону — император заговорил: послом (Надежда), с Игроком (Ненависть) или с предложением (Ненависть, повтор)
@@ -651,6 +785,7 @@
       { if: [{ not: 'throne_seen' }, { eq: ['temple_path', 'hate'] }, { flag: 'hate_first_clear' }], maxY: 6.5 * 64, d: 'gidan_offer' },
     ],
     onEnter: [
+      { if: { eq: ['power_scene', 'deal'] }, d: 'power_deal' },
       { if: [{ not: 'palace_seen' }, { eq: ['temple_path', 'hate'] }], d: 'palace_hate_intro' },
       { if: { not: 'palace_seen' }, d: 'palace_intro' },
     ],
@@ -690,6 +825,7 @@
   // Z стена мыслей  z пол. Фигуры в тупиках меняют облик; ложные тают, настоящий Гидан дважды ускользает,
   // а пойманный выглядит как сам герой. Тексты шёпота — HUNT_TEXT в dialogues.js.
   MAPS.mind_maze = {
+    entry: 'letterbox',                               // вход — полосы letterbox
     title: 'Лабиринт сознания',
     tiles: [
       'ZZZZZZZZZZZZZZZZZZZZZZZZZ',
@@ -716,16 +852,73 @@
       spots: [[5, 1], [13, 1], [23, 1], [9, 3], [7, 5], [11, 5], [21, 5], [1, 9], [7, 11], [11, 13], [23, 15]],
       figures: 5, slips: 2,                          // 1 настоящий + 4 морока; настоящий ускользает дважды
       sprites: ['gidan', 'dolita', 'aedel', 'lumina', 'elder', 'priest', 'stranger'],
-      confuseEvery: 11, confuseFor: 3.5,             // мысли путаются: управление наоборот
+      confuseEvery: 16, confuseFor: 3,               // мысли путаются: управление наоборот
       caught: 'maze_caught',
+      // якоря возвращают рассудок и снимают перекрытия; zone — о чём рядом издевается Гидан
+      anchors: [
+        { kind: 'portrait', x: 3, y: 13, zone: 'dolita' }, { kind: 'mirror', x: 13, y: 7 },
+        { kind: 'letter', x: 19, y: 3, zone: 'empire' }, { kind: 'ribbon', x: 18, y: 9 },
+      ],
+      anchorCd: 20, anchorCalm: 6,                   // перезарядка якоря и сколько секунд после него безумие не растёт
+      // Безумие: копится в зоне внимания Гидана (attention клеток) и пока он говорит; урон dps[0]…dps[1] ОЗ/с от from%
+      madness: { attention: 6, rise: 10, fall: 12, from: 20, dps: [1, 2] },
+      taunt: { every: [8, 15], show: 3.5, slow: 0.9 },
+      block: { every: [18, 24], hold: 12 },          // Гидан закрывает проход рядом с героем
     },
-    onEnter: [{ if: { not: 'maze_seen' }, d: 'maze_intro' }],
+    onEnter: [
+      { if: { flag: 'maze_caught' }, to: 'hate_palace', at: [19.5, 8], dir: 'left' },   // лабиринт уже пройден
+      { if: { not: 'maze_seen' }, d: 'maze_intro' },
+    ],
+  };
+
+  // Покои после лабиринта: три комнаты (Долита, Аэдел, Гидан); осмотрел все — дверь слева открывается
+  MAPS.hate_palace = {
+    entry: 'letterbox',                               // вход — полосы letterbox
+    title: 'Дворец Нокта · Опустевшие покои',
+    ground: 'o',
+    dark: true,
+    tiles: [
+      'KKKKKKKKKKKKKKKKKKKKKK',
+      'KooooooKooooooKBBBBBBK',
+      'KooooooKooooooKooooooK',
+      'KooooooKooooooKooooooK',
+      'KooooooKooooooKooooooK',
+      'KooooooKooooooKooooooK',
+      'KKKooKKKKKooKKKKKooKKK',
+      'KooooooooooooooooooooK',
+      'ErrrrrrrrrrrrrrrrrrrrK',
+      'EooooooooooooooooooooK',
+      'KKKKKKKKKKKKKKKKKKKKKK',
+    ],
+    spawn: [19.5, 8],
+    exits: [
+      { x: 0, y: 8, if: { flag: 'labyrinth_exit_unlocked' }, d: 'maze_exit', else: 'rooms_door_locked' },
+      { x: 0, y: 9, if: { flag: 'labyrinth_exit_unlocked' }, d: 'maze_exit', else: 'rooms_door_locked' },
+    ],
+    npcs: [
+      { id: 'r_commode', prop: 'commode', x: 2, y: 1.1, talk: [{ d: 'dolita_commode' }] },
+      { id: 'r_dmirror', prop: 'mirror', x: 5.2, y: 1.2, talk: [{ d: 'dolita_mirror' }] },
+      { id: 'r_diary', prop: 'note', x: 3.5, y: 3.6, talk: [{ if: { flag: 'room_dolita_visited' }, d: 'dolita_diary_again' }, { d: 'dolita_diary' }] },
+      { id: 'r_portrait', prop: 'portrait', who: 'aedel', x: 10.5, y: 1, talk: [{ if: { flag: 'room_aedel_visited' }, d: 'aedel_portrait_again' }, { d: 'aedel_portrait' }] },
+      { id: 'r_stand', prop: 'stand', x: 12.6, y: 1.2, talk: [{ d: 'aedel_stand' }] },
+      { id: 'r_desk', prop: 'desk', x: 17.5, y: 2.6, talk: [{ if: { flag: 'room_gidan_visited' }, d: 'gidan_desk_again' }, { d: 'gidan_desk_letter' }] },
+    ],
+    rooms: {
+      need: 3, hintAt: 60, markersAt: 120,          // через минуту без толку — подсказка Гидана, через две — метки
+      list: [
+        { id: 'dolita', flag: 'room_dolita_visited', key: 'r_diary', area: [1, 1, 6, 5] },
+        { id: 'aedel', flag: 'room_aedel_visited', key: 'r_portrait', area: [8, 1, 13, 5] },
+        { id: 'gidan', flag: 'room_gidan_visited', key: 'r_desk', area: [15, 1, 20, 5] },
+      ],
+    },
+    onEnter: [{ if: { not: 'maze_exit_seen' }, d: 'rooms_intro' }],
   };
 
   // ============================================================ Этап 8. Мета-сцена: пустота, трое Кукол
   // v пустота (пол)  Y край пустоты (стена). Долита, Гидан и Аэдел здесь живы, что бы ни было раньше.
   MAPS.void = {
     title: '…',
+    entry: 'letterbox',
     vignette: true,
     tiles: [
       'YYYYYYYYYYYYYYYYYYYY',
@@ -750,13 +943,130 @@
     onEnter: [{ if: { not: 'void_seen' }, d: 'void_scene' }],
   };
 
+  // ============================================================ Атмосфера локаций (LOCATION_FX)
+  // Порядок отрисовки: renderGround → renderFog → renderMid + renderEntities (объекты и персонажи по нижней кромке)
+  //   → renderForeground (передний план, свет, дождь, виньетка) → renderUI.
+  // fog — туман между землёй и объектами: rgb, a [мин, макс] (0.05–0.15), speed px/с, where: all | water | low,
+  //   pulse — дышит в такт органу, colors — несколько цветов по кругу (лабиринт). Три слоя с разной скоростью (параллакс).
+  // vignette 0…1 — затемнение краёв; lights [x, y, радиус, 'r,g,b', пульс] (клетки) — свечение 'lighter';
+  // rays [x, y] — косые лучи из окон; parts { тип: штук в секунду } — частицы (≤100 на локацию); chimneys — трубы с дымом;
+  // fg — передний план поверх героя: прозрачнеет, когда герой за ним; rain — дождь, когда поднят флаг rain_on;
+  // puddles — лужи с рябью под дождём; oddShadow — у героя есть тень, которая идёт не за ним.
+  const LOCATION_FX = {
+    luminos_square: {
+      fog: { rgb: '255,236,200', a: [0.04, 0.08], speed: 6 }, vignette: 0.2,
+      lights: [[12, 4, 2.4, '170,220,255', 0.15]], parts: { pollen: 4 },
+      fg: [{ t: 'branch', x: 3.5, y: 1.4 }, { t: 'branch', x: 20.5, y: 1.4, flip: 1 }, { t: 'banner', x: 8.5, y: 1.1, c: 'lum' },
+        { t: 'banner', x: 15.5, y: 1.1, c: 'lum' }, { t: 'branch', x: 3.5, y: 10.6 }, { t: 'branch', x: 20.5, y: 10.6, flip: 1 }],
+    },
+    luminos_throne: {
+      fog: { rgb: '255,240,210', a: [0.04, 0.07], speed: 4 }, vignette: 0.3,
+      lights: [[5.5, 1.6, 1.6, '255,210,130', 0.2], [9.5, 1.6, 1.6, '255,210,130', 0.2]], rays: [[1, 2], [1, 6], [14, 2], [14, 6]],
+      parts: { dust: 4 },
+      fg: [{ t: 'curtain', x: 1.1, y: 3.6 }, { t: 'curtain', x: 14.9, y: 3.6, flip: 1 }, { t: 'banner', x: 4.5, y: 1.1, c: 'lum' }, { t: 'banner', x: 10.5, y: 1.1, c: 'lum' }],
+    },
+    village: {
+      fog: { rgb: '255,226,180', a: [0.06, 0.12], speed: 5 }, vignette: 0.15,
+      lights: [[18, 6.8, 1.6, '150,220,255', 0.2]], parts: { pollen: 6 },
+      chimneys: [[7.05, 4.1], [22.05, 4.1], [7.05, 12.1], [22.05, 12.1]],
+      fg: [{ t: 'branch', x: 3.5, y: 15.4 }, { t: 'branch', x: 11.5, y: 15.4, flip: 1 }, { t: 'branch', x: 19.5, y: 15.4 },
+        { t: 'branch', x: 8.5, y: 0.9, flip: 1 }, { t: 'branch', x: 23.5, y: 0.9 }],
+    },
+    stream: {
+      fog: { rgb: '220,240,255', a: [0.06, 0.13], speed: 8, where: 'water' }, vignette: 0.15, parts: { pollen: 5 },
+      fg: [{ t: 'branch', x: 4.5, y: 15.4 }, { t: 'branch', x: 15.5, y: 15.4, flip: 1 }, { t: 'branch', x: 25.5, y: 0.9 }, { t: 'branch', x: 9.5, y: 0.9, flip: 1 }],
+    },
+    north_gate: {
+      fog: { rgb: '200,200,215', a: [0.05, 0.1], speed: 10 }, vignette: 0.3,
+      lights: [[7.6, 10.4, 1.5, '255,160,80', 0.35], [12.4, 10.4, 1.5, '255,160,80', 0.35]], parts: { dust: 3 },
+      fg: [{ t: 'chain', x: 8.4, y: 11.5 }, { t: 'chain', x: 11.6, y: 11.5 }, { t: 'banner', x: 4.5, y: 11.2, c: 'nokt' }, { t: 'banner', x: 15.5, y: 11.2, c: 'nokt' }],
+    },
+    trade_city: {
+      fog: { rgb: '210,230,255', a: [0.08, 0.14], speed: 6, where: 'water' }, vignette: 0.2,
+      parts: { bird: 0.4, dust: 4 },
+      lights: [[6, 5.6, 1.4, '255,190,110', 0.3], [12.5, 5.6, 1.4, '255,190,110', 0.3], [17.5, 5.6, 1.4, '255,190,110', 0.3], [24, 5.6, 1.4, '255,190,110', 0.3]],
+      fg: [{ t: 'line', x: 10, y: 4.6, x2: 13.6 }, { t: 'line', x: 16.4, y: 4.6, x2: 20 }, { t: 'line', x: 11, y: 15.6, x2: 14.4 },
+        { t: 'lantern', x: 6, y: 5.6 }, { t: 'lantern', x: 12.5, y: 5.6 }, { t: 'lantern', x: 17.5, y: 5.6 }, { t: 'lantern', x: 24, y: 5.6 },
+        { t: 'awning', x: 3.5, y: 6.6, c: '#8a2a3a' }, { t: 'awning', x: 25, y: 11.6, c: '#2a5a7a' }],
+    },
+    temple_nave: {
+      fog: { rgb: '170,20,40', a: [0.08, 0.15], speed: 4, pulse: true }, vignette: 0.55,
+      lights: [[1.5, 2.2, 1.3, '255,120,70', 0.4], [16.5, 2.2, 1.3, '255,120,70', 0.4], [1.5, 9, 1.3, '255,120,70', 0.4], [16.5, 9, 1.3, '255,120,70', 0.4], [8.5, 2.2, 2.4, '255,60,60', 0.25]],
+      rays: [[4, 1], [12, 1]], parts: { drip: 2, ember: 3 },
+      fg: [{ t: 'cloth', x: 3.5, y: 2.2 }, { t: 'cloth', x: 14.5, y: 2.2 }, { t: 'arch', x: 1.2, y: 1.4 }, { t: 'arch', x: 16.8, y: 1.4, flip: 1 }, { t: 'cloth', x: 6, y: 1.6 }, { t: 'cloth', x: 11, y: 1.6 }],
+    },
+    organ_hall: {
+      fog: { rgb: '170,15,35', a: [0.09, 0.15], speed: 3, pulse: true }, vignette: 0.6, candles: true,
+      lights: [[8.5, 2, 3.2, '255,50,60', 0.35], [1.5, 4, 1.2, '255,120,70', 0.4], [16.5, 4, 1.2, '255,120,70', 0.4]],
+      parts: { drip: 3, ember: 3 },
+      fg: [{ t: 'cloth', x: 2.5, y: 3.6 }, { t: 'cloth', x: 15.5, y: 3.6 }, { t: 'arch', x: 1.2, y: 3.6 }, { t: 'arch', x: 16.8, y: 3.6, flip: 1 }],
+    },
+    gidan_study: {
+      fog: { rgb: '200,170,140', a: [0.04, 0.08], speed: 3 }, vignette: 0.45,
+      lights: [[6.6, 2.4, 1.5, '255,200,120', 0.3]], parts: { dust: 3 },
+      fg: [{ t: 'beam', y: 2.2 }, { t: 'arch', x: 1.2, y: 2.4 }, { t: 'arch', x: 10.8, y: 2.4, flip: 1 }],
+    },
+    arena: {
+      fog: { rgb: '150,110,200', a: [0.06, 0.12], speed: 4 }, vignette: 0.55,
+      lights: [[3.5, 2.6, 1.4, '200,150,255', 0.3], [12.5, 2.6, 1.4, '200,150,255', 0.3], [3.5, 5.6, 1.4, '200,150,255', 0.3], [12.5, 5.6, 1.4, '200,150,255', 0.3]],
+      parts: { dust: 4, ember: 2 },
+      fg: [{ t: 'banner', x: 4, y: 1.1, c: 'nokt' }, { t: 'banner', x: 12, y: 1.1, c: 'lum' }],
+    },
+    spirit_order: {
+      fog: { rgb: '170,215,255', a: [0.07, 0.13], speed: 5 }, vignette: 0.45,
+      lights: [[9.5, 1.2, 2.4, '120,200,255', 0.3], [1.5, 6.5, 1.3, '150,220,255', 0.25], [3.5, 3.2, 1.2, '150,220,255', 0.3], [16.5, 3.2, 1.2, '150,220,255', 0.3],
+        [3.5, 9.2, 1.2, '150,220,255', 0.3], [16.5, 9.2, 1.2, '150,220,255', 0.3]],
+      rays: [[6, 1], [13, 1]], parts: { wisp: 3, feather: 1.2, dust: 4 },
+      fg: [{ t: 'arch', x: 1.2, y: 2.4 }, { t: 'arch', x: 18.8, y: 2.4, flip: 1 }, { t: 'banner', x: 6, y: 1.1, c: 'nokt' }, { t: 'banner', x: 13, y: 1.1, c: 'nokt' }],
+    },
+    nokt_capital: {
+      fog: { rgb: '190,170,230', a: [0.05, 0.1], speed: 7 }, vignette: 0.3, rain: true,
+      lights: [[5.5, 3.6, 1.4, '200,150,255', 0.3], [19.5, 3.6, 1.4, '200,150,255', 0.3], [5.5, 14.6, 1.4, '200,150,255', 0.3], [19.5, 14.6, 1.4, '200,150,255', 0.3], [12.5, 8.6, 2, '170,200,255', 0.2]],
+      rays: [[3, 1], [9, 1], [16, 1], [22, 1]], parts: { firefly: 2, petal: 2 }, puddles: [[6, 7], [18, 11], [9, 13], [20, 6]],
+      fg: [{ t: 'banner', x: 6, y: 1.1, c: 'nokt' }, { t: 'banner', x: 19, y: 1.1, c: 'nokt' }, { t: 'lantern', x: 5.5, y: 3.6 }, { t: 'lantern', x: 19.5, y: 3.6 },
+        { t: 'lantern', x: 5.5, y: 14.6 }, { t: 'lantern', x: 19.5, y: 14.6 }],
+    },
+    nokt_garden: {
+      fog: { rgb: '190,220,200', a: [0.05, 0.1], speed: 5 }, vignette: 0.3, rain: true,
+      lights: [[6, 5, 2.6, '150,190,255', 0.15], [16.5, 4.2, 1.6, '255,220,240', 0.3]], parts: { firefly: 4, petal: 4 }, puddles: [[13, 11], [20, 8]],
+      fg: [{ t: 'nbranch', x: 7.5, y: 10.6 }, { t: 'nbranch', x: 18.5, y: 10.6, flip: 1 }, { t: 'nbranch', x: 15.5, y: 5.6 }, { t: 'gazebo', x: 16.5, y: 2.6 },
+        { t: 'nbranch', x: 3.5, y: 13.4 }, { t: 'nbranch', x: 20.5, y: 13.4, flip: 1 }],
+    },
+    palace_gate: {
+      fog: { rgb: '150,180,220', a: [0.07, 0.14], speed: 12 }, vignette: 0.4, rain: true,
+      lights: [[6, 0.9, 1.4, '255,160,80', 0.35], [10, 0.9, 1.4, '255,160,80', 0.35]], puddles: [[4, 6], [11, 9], [6, 11], [12, 4]],
+      fg: [{ t: 'banner', x: 3, y: 1.1, c: 'nokt' }, { t: 'banner', x: 13, y: 1.1, c: 'nokt' }, { t: 'chain', x: 6.4, y: 1.4 }, { t: 'chain', x: 9.6, y: 1.4 }],
+    },
+    palace_throne: {
+      fog: { rgb: '160,170,220', a: [0.05, 0.1], speed: 4 }, vignette: 0.4,
+      lights: [[5.5, 1.4, 1.5, '255,210,150', 0.25], [9.5, 1.4, 1.5, '255,210,150', 0.25]], rays: [[1, 2], [1, 6], [14, 3], [14, 7]], parts: { dust: 3 },
+      fg: [{ t: 'curtain', x: 1.1, y: 3.6 }, { t: 'curtain', x: 14.9, y: 3.6, flip: 1 }, { t: 'banner', x: 4, y: 1.1, c: 'nokt' }, { t: 'banner', x: 12, y: 1.1, c: 'nokt' }],
+    },
+    palace_hall: {
+      fog: { rgb: '220,200,170', a: [0.04, 0.08], speed: 4 }, vignette: 0.35,
+      lights: [[5, 4.6, 1.3, '255,200,120', 0.3], [8.5, 4.6, 1.3, '255,200,120', 0.3], [12, 4.6, 1.3, '255,200,120', 0.3]], rays: [[2, 1], [9, 1], [15, 1]], parts: { dust: 3 },
+      fg: [{ t: 'curtain', x: 1.1, y: 3.6 }, { t: 'curtain', x: 16.9, y: 3.6, flip: 1 }, { t: 'banner', x: 5, y: 1.1, c: 'nokt' }, { t: 'banner', x: 12, y: 1.1, c: 'nokt' }],
+    },
+    mind_maze: {
+      fog: { rgb: '120,40,200', colors: ['120,40,200', '40,120,220', '200,30,120'], a: [0.08, 0.15], speed: 9 }, vignette: 0.6,
+      parts: { glitch: 6 }, oddShadow: true,
+    },
+    hate_palace: {
+      fog: { rgb: '150,160,210', a: [0.05, 0.1], speed: 4 }, vignette: 0.5,
+      lights: [[3.5, 3.2, 1.2, '255,200,130', 0.4], [17.5, 2, 1.3, '255,200,130', 0.4]], parts: { dust: 2 },
+      fg: [{ t: 'banner', x: 4, y: 7.1, c: 'nokt' }, { t: 'banner', x: 15, y: 7.1, c: 'nokt' }, { t: 'arch', x: 3.5, y: 6.4 }, { t: 'arch', x: 17.5, y: 6.4, flip: 1 }],
+    },
+    void: { vignette: 0, parts: { glitch: 2 } },
+  };
+
   const PROP_SIZE = {
     throne: { w: 110, h: 50 }, stone: { w: 40, h: 18 }, sign: { w: 30, h: 14 },
     house: { w: 140, h: 52 }, altar: { w: 150, h: 40 }, pew: { w: 150, h: 26 }, mirror: { w: 50, h: 20 }, desk: { w: 130, h: 34 }, nhouse: { w: 140, h: 52 }, stall: { w: 92, h: 34 }, statue: { w: 40, h: 22 }, spring: { w: 70, h: 30 }, note: { w: 0, h: 0 },
     nthrone: { w: 110, h: 50 }, table: { w: 380, h: 56 }, arch: { w: 0, h: 0 },
+    commode: { w: 90, h: 24 }, portrait: { w: 70, h: 16 }, stand: { w: 40, h: 18 },
   };
   let exitLock = false;
-  const SOLID = new Set(['#', 'T', '~', 'W', 'G', 'F', 'P', 'R', 'K', 'X', 'B', 'Z', 'Y']);
+  const SOLID = new Set(['#', 'T', '~', 'W', 'G', 'F', 'P', 'R', 'K', 'X', 'B', 'Z', 'Y', 'I']);
   // ворота Нокта открываются флагом
   const isSolid = (t) => SOLID.has(t) || (t === 'N' && !state.flags.north_gate_open) || (t === 'V' && !state.flags.palace_open);
 
@@ -765,9 +1075,17 @@
   let mode = 'title';        // title | create | play | dialog | pause
   let map = null;            // текущая карта
   let npcs = [];
-  const hero = { x: 0, y: 0, dir: 'down', moving: false, walk: 0, cd: 0, inv: 0, swing: null, kx: 0, ky: 0 };
+  const hero = { x: 0, y: 0, dir: 'down', moving: false, walk: 0, cd: 0, inv: 0, swing: null, kx: 0, ky: 0,
+    dash: null, dashCd: 0, dodge: 0, trail: [], ammo: 6, mana: MAX_MANA, casting: null };
   let enemies = [], shots = [], sparks = [], floaters = [];
   let curEnc = null;                 // текущая схватка карты (map.encounters)
+  const buffs = { dmg: 0, speed: 0 }; // еда Дариан: секунды до конца баффа
+  const zoom = { k: 1, want: 1, x: 0, y: 0 }; // наезд камеры (ключ реплики zoom), 2 с на 1.0 → 1.4
+  let dim = 0;                       // затемнение экрана после красной вспышки
+  let waveId = 0;                    // номер голубой волны (точки одной волны рисуются дугой)
+  const BEAT = 0.5;                  // такт органа: трубы, жидкость и её урон
+  let flaskRefill = 0, flaskT = 0;   // Сосуд жизни: одно пополнение на бой и таймер до него
+  let panel = null;                  // открытое окно: { kind: 'bag'|'shop'|'skills', back: 'play'|'pause', msg }
   let ebolts = [];                   // снаряды врагов
   const hz = { phase: 'rest', t: 1.5, i: 0, tick: 0 };   // затопление пола (map.hazard)
   const cam = { x: 0, y: 0 };
@@ -983,6 +1301,25 @@
       px(x, '#6d675f', X, Y, w, w - 2); px(x, '#837c72', X, Y, w, 1); px(x, '#46423c', X, Y + w - 2, w, 1);
     }
   });
+  makeTile('i', (x, r) => {                       // пол Ордена Духа: голубой лёд плитами
+    px(x, '#2a3a4c', 0, 0, 32, 32);
+    px(x, '#33475c', 1, 1, 14, 14); px(x, '#33475c', 17, 17, 14, 14);
+    px(x, '#2e4155', 17, 1, 14, 14); px(x, '#2e4155', 1, 17, 14, 14);
+    for (let i = 0; i < 6; i++) px(x, '#8fc8ee', (r() * 30) | 0, (r() * 30) | 0, 2, 1);
+    px(x, '#5a7a96', 3, 3, 6, 1);
+  });
+  makeTile('I', (x, r) => {                       // стена Ордена: серо-голубой камень в инее
+    px(x, '#1c2633', 0, 0, 32, 32);
+    for (let row = 0; row < 4; row++) {
+      const off = row % 2 ? 8 : 0;
+      for (let col = -1; col < 3; col++) {
+        const X = col * 16 + off + 1, Y = row * 8 + 1;
+        px(x, r() < 0.5 ? '#2c3a4c' : '#283546', X, Y, 14, 6);
+        px(x, '#4a6078', X, Y, 14, 1);
+      }
+    }
+    px(x, '#9ad8ff', 0, 0, 32, 2); px(x, '#cfeeff', (r() * 24) | 0, 2, 4, 2);
+  });
   makeTile('K', (x, r) => {                       // чёрная стена Нокта с фиолетовыми прожилками
     px(x, '#1d1a24', 0, 0, 32, 32);
     for (let row = 0; row < 4; row++) {
@@ -1144,6 +1481,32 @@
     px(x, '#f3ead6', 28, 5, 9, 6); px(x, '#d4af4a', 33, 9, 3, 2);           // письмо с золотой печатью
     px(x, '#1a1a1a', 40, 3, 3, 6); px(x, '#e8e0f0', 41, 1, 1, 3);
   });
+  // Покои после лабиринта: комод Долиты, стойка для меча Аэдела, чёрная лента-якорь
+  const COMMODE = art(48, 24, (x) => {
+    px(x, '#3a2418', 0, 4, 48, 20); px(x, '#5a3a24', 0, 4, 48, 2);
+    for (const yy of [8, 15]) { px(x, '#2a180e', 2, yy, 44, 6); px(x, '#c9a84a', 22, yy + 2, 4, 2); }
+    px(x, '#efe6d0', 6, 0, 12, 5); px(x, '#1a1a1a', 8, 1, 8, 1); px(x, '#1a1a1a', 8, 3, 6, 1);   // ноты
+    px(x, '#111', 18, 0, 2, 5);                                                                  // чёрная лента
+    px(x, '#d8cfe8', 32, 0, 6, 4); px(x, '#a090c0', 33, 1, 4, 2);                               // пиала
+  });
+  const STAND = art(24, 32, (x) => {
+    px(x, '#3a2a1a', 4, 28, 16, 4); px(x, '#5a4028', 10, 6, 4, 22); px(x, '#5a4028', 4, 10, 16, 3);
+    px(x, '#2a1a0e', 4, 13, 2, 3); px(x, '#2a1a0e', 18, 13, 2, 3);
+  });
+  const RIBBON = art(24, 24, (x) => {
+    px(x, '#111', 10, 4, 4, 4); px(x, '#222', 4, 2, 6, 5); px(x, '#222', 14, 2, 6, 5);
+    px(x, '#111', 8, 8, 3, 12); px(x, '#111', 13, 8, 3, 14); px(x, '#555', 5, 3, 2, 1); px(x, '#555', 15, 3, 2, 1);
+  });
+  // портрет в золотой раме; Аэдел после осмотра отворачивается и закрывает глаза
+  function drawPortraitProp(who, x, y, k = 1) {
+    const w = 84 * k, h = 100 * k, X = x - w / 2, Y = y - 120 * k;
+    g.fillStyle = '#7a5a20'; g.fillRect(X - 6 * k, Y - 6 * k, w + 12 * k, h + 12 * k);
+    g.fillStyle = '#d4af4a'; g.fillRect(X - 3 * k, Y - 3 * k, w + 6 * k, h + 6 * k);
+    g.fillStyle = '#1a1420'; g.fillRect(X, Y, w, h);
+    const turned = who === 'aedel' && state.flags.room_aedel_visited;
+    const im = img(`assets/portraits/${turned ? 'aedel_away' : who}.png`);
+    if (ready(im)) g.drawImage(im, 40, 0, 176, 210, X, Y, w, h);
+  }
   // Мехи органа — механизмы, которые надо разбить
   const NTHRONE = art(48, 56, (x) => {          // трон Нокта: чёрный с серебром и аметистами
     px(x, '#55506a', 8, 2, 32, 40); px(x, '#1d1a24', 10, 4, 28, 36);
@@ -1200,9 +1563,11 @@
     if (Array.isArray(c)) return c.every(check);
     const f = state.flags;
     if ('flag' in c) return !!f[c.flag];
-    if ('not' in c) return !f[c.not];
+    if ('not' in c) return typeof c.not === 'object' ? !check(c.not) : !f[c.not];
     if ('eq' in c) return f[c.eq[0]] === c.eq[1];
     if ('gte' in c) return (f[c.gte[0]] || 0) >= c.gte[1];
+    if ('lt' in c) return (f[c.lt[0]] || 0) < c.lt[1];
+    if ('any' in c) return c.any.some(check);
     if ('in' in c) return c.in[1].includes(f[c.in[0]]);
     return true;
   }
@@ -1210,6 +1575,9 @@
     if (!o) return;
     if (o.toast) toast(render(o.toast));
     if (o.heal) state.hp = maxHp();
+    if (o.hurt) state.hp = Math.max(1, state.hp - o.hurt);   // подношение кровью: не ниже 1 ОЗ
+    if (o.ui) pending.ui = o.ui;
+    if (o.duelEnd) pending.duelEnd = true;             // после диалога — с арены обратно в мир                       // после диалога — окно лавки / дерева / сумки
     const val = (v) => (typeof v === 'string' && v[0] === '$' ? state.flags[v.slice(1)] ?? 0 : v);   // '$gold' — значение флага
     for (const [k, v] of Object.entries(o.set || {})) state.flags[k] = val(v);
     for (const [k, n] of Object.entries(o.add || {})) state.flags[k] = (state.flags[k] || 0) + val(n);
@@ -1219,7 +1587,9 @@
     if (o.ending) pending.ending = o.ending;           // после диалога — экран концовки
     if (o.crack) startCrack();                         // экран трескается прямо на реплике
     if (o.lock) pending.lock = true;                   // после диалога — «Ошибка 888»
-    if (o.achieve) unlock(o.achieve);                  // достижение прямо на реплике
+    if (o.achieve) unlock(o.achieve);
+    if (o.zoom) { zoom.x = o.zoom[0] * T + T / 2; zoom.y = o.zoom[1] * T; zoom.want = o.zoom[2]; }
+    if (o.letterbox) lboxWant = 1;                     // киношные полосы до конца диалога                  // достижение прямо на реплике
     if (o.thief) spawnThief();
     if (o.pickPath) {                                  // ведущий путь по накопленным очкам (при равенстве: ненависть, власть, надежда)
       const f = state.flags, order = ['hate', 'power', 'hope'];
@@ -1240,10 +1610,55 @@
   // ---------------------------------------------------------------- Карта
   function tileAt(tx, ty) {
     if (ty < 0 || ty >= map.tiles.length || tx < 0 || tx >= map.tiles[0].length) return '#';
+    if (hunt && hunt.blocks.some((b) => b.tx === tx && b.ty === ty)) return 'Z';      // Гидан закрыл проход
     return map.tiles[ty][tx];
   }
 
-  function maxHp() { return HERO_HP + (state.flags.light_element === 'radiance' ? 25 : 0); }
+  function maxHp() {
+    return HERO_HP + (state.flags.light_element === 'radiance' ? 25 : 0) + (lvl() - 1) * 10 + (blessed('feelings') ? Math.round(20 * blessK()) : 0);
+  }
+  const lvl = () => state.flags.level || 1;
+  // Сумка, дерево Полианны, благословения и проклятия
+  const inv = (id) => state.flags['inv_' + id] || 0;
+  const skill = (b) => state.flags['skill_' + b] || 0;
+  const blessK = () => (skill('spirit') >= 3 ? 1.5 : skill('spirit') >= 1 ? 1.25 : 1);
+  const blessed = (k) => !!state.flags['bless_' + k] && state.flags.temple_path !== 'hate';   // на пути Ненависти боги молчат
+  const cursed = (k) => !!state.flags['curse_' + k];
+  const dmgMul = () => (1 + (lvl() - 1) * 0.1) * (1 + 0.15 * Math.min(2, skill('power'))) * (buffs.dmg > 0 ? 1.2 : 1)
+    * (blessed('blood') ? 1 + (inv('amulet') ? 0.35 : 0.2) * blessK() : 1) * (cursed('blood') ? 0.85 : 1);
+  const dashCd = () => Math.max(0.4, DASH.cd - (lvl() - 1) * 0.06 - (skill('agility') >= 1 ? 0.15 : 0) - (blessed('spirit') ? 0.1 * blessK() : 0))
+    + (cursed('spirit') ? 0.3 : 0);
+  const dashInv = () => (skill('agility') >= 2 ? 0.45 : DASH.inv);
+  const speedMul = () => 1 + (skill('agility') >= 2 ? 0.1 : 0) + (buffs.speed > 0 ? 0.2 : 0) + (blessed('spirit') ? 0.1 * blessK() : 0);
+  const maxMana = () => Math.round((MAX_MANA + (skill('spirit') >= 2 ? 30 : 0)) * (cursed('mind') ? 0.6 : 1));
+  const maxAmmo = (w) => (w.ammo ? w.ammo + (skill('spirit') >= 2 ? 2 : 0) : 0);
+  const manaRegenMul = () => (blessed('mind') ? 1 + 0.5 * blessK() : 1);
+  const castMul = () => (blessed('mind') ? 1 - 0.3 * blessK() : 1);
+  const healMul = () => (1 + (inv('bowl') ? 0.25 : 0) + (blessed('feelings') ? 0.3 * blessK() : 0)) * (cursed('feelings') ? 0.7 : 1);
+  function healHero(n) {
+    const v = Math.round(n * healMul());
+    state.hp = Math.min(maxHp(), state.hp + v);
+    floaters.push({ x: hero.x, y: hero.y - 70, text: '+' + v, life: 1, color: '#9cf0a0' });
+    burst(hero.x, hero.y - 28, 16, '120,230,140');
+    return v;
+  }
+  function gainXp(n, manaPts) {
+    const f = state.flags;
+    if (manaPts) {
+      f.mana_points = (f.mana_points || 0) + manaPts;
+      floaters.push({ x: hero.x, y: hero.y - 96, text: `+${manaPts} ✦ маны`, life: 1.4, color: '#c9a0ff' });
+    }
+    if (!n) return;
+    f.xp = (f.xp || 0) + n;
+    floaters.push({ x: hero.x + 30, y: hero.y - 80, text: `+${n} опыта`, life: 1.1, color: '#ffe08a' });
+    while (f.xp >= xpFor(lvl() + 1)) {
+      f.level = lvl() + 1;
+      state.hp = maxHp();
+      burst(hero.x, hero.y - 30, 30, '255,224,138');
+      toast(`Уровень ${f.level}! +10 ОЗ, +10% урона, рывок быстрее`);
+    }
+    updateHud();
+  }
 
   // NPC и предметы с условием if появляются/исчезают по флагам
   function refreshNpcs() {
@@ -1265,25 +1680,37 @@
     hz.phase = 'rest'; hz.t = 2; hz.i = 0;
     spawnEncounter();
     startHunt();
+    startRooms();
     shots = []; sparks = []; floaters = [];
     hero.swing = null; hero.kx = hero.ky = 0; hero.inv = 0;
+    hero.dash = null; hero.casting = null; hero.trail = []; hero.dodge = 0;
+    hero.ammo = maxAmmo(WEAPONS[state.hero.weapon]); hero.mana = maxMana();
+    state.flags.potato_today = 0;                    // новый визит — Дариан снова печёт картошку
+    flaskT = 0;
     ghost = null;
     chase = null; chasePending = false;
     if (state.hp == null || state.hp > maxHp()) state.hp = maxHp();
     exitLock = true;
     snapCamera();
-    showArea(map.title);
+    startFx();
+    rainK = fx.rain && state.flags.rain_on ? 1 : 0;
+    if (map.rainStart && state.flags.temple_done && !state.flags.rain_on) { state.flags.rain_on = true; rainK = 0; }   // после храма — дождь, нарастает за 2 с
+    if (!fading) showArea(map.title);                 // при переходе название уже показано на затемнении
     updateHud();
     save();
     // сцена по флагам при входе
     for (const e of map.onEnter || []) {
-      if (check(e.if)) { setTimeout(() => startDialogue(e.d), 500); break; }
+      if (!check(e.if)) continue;
+      if (e.to) setTimeout(() => fade(() => enterMap(e.to, e.at, e.dir)), 50);   // карта уже пройдена — сразу дальше
+      else setTimeout(() => startDialogue(e.d), 500);
+      break;
     }
   }
 
   // белая вспышка поверх всего (на реплике с fx: 'flash')
-  function flash() {
+  function flash(color) {
     const f = $('flash');
+    f.style.background = color || '';
     f.classList.remove('on');
     void f.offsetWidth;
     f.classList.add('on');
@@ -1305,7 +1732,8 @@
     const el2 = ELEMENTS[state.flags.light_element];
     el.hidden = false;
     const gold = state.flags.gold ? ` · 💰 ${state.flags.gold}` : '';
-    el.textContent = `${state.hero.name} · ${WEAPONS[state.hero.weapon].name}${el2 ? ' · ' + el2.icon + ' ' + el2.name : ''}${gold}`;
+    const mp = state.flags.mana_points ? ` · ✦ ${state.flags.mana_points}` : '';
+    el.textContent = `${state.hero.name} · Ур. ${lvl()} · ${WEAPONS[state.hero.weapon].name}${el2 ? ' · ' + el2.icon + ' ' + el2.name : ''}${gold}${mp}`;
   }
 
   let areaTimer = 0;
@@ -1332,8 +1760,12 @@
     if (mode === 'play') {
       if (e.code === 'KeyE' || e.code === 'Enter') { interact(); e.preventDefault(); }
       if (e.code === 'Space' || e.code === 'KeyJ') { if (!e.repeat) attack(); e.preventDefault(); }
-      if (e.code === 'KeyQ') useFlask();
+      if (e.code === 'KeyQ') quickHeal();
+      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') dash();
+      if (e.code === 'KeyI' || e.code === 'Tab') { openPanel('bag'); e.preventDefault(); }
       if (e.code === 'Escape') pause(true);
+    } else if (mode === 'panel') {
+      if (e.code === 'Escape' || e.code === 'KeyI' || e.code === 'Tab') { closePanel(); e.preventDefault(); }
     } else if (mode === 'pause' && e.code === 'Escape') pause(false);
   });
   addEventListener('keyup', (e) => { if (KEYMAP[e.code]) keys[KEYMAP[e.code]] = false; });
@@ -1355,6 +1787,16 @@
     if (mode !== 'play') { hero.moving = false; return; }
 
     const v = moveVector();
+    if (hunt && hunt.stun > 0) v.len = 0;              // безумие: секунду не слушаются ноги
+    if (hero.casting) v.len = 0;                       // посох: каст — стоя
+    if (hero.dash) {                                   // рывок: короткий бросок, движение не слушается
+      hero.dash.t -= dt;
+      moveHero(hero.dash.vx * dt, 0); moveHero(0, hero.dash.vy * dt);
+      if (Math.random() < 0.6) hero.trail.push({ x: hero.x, y: hero.y, dir: hero.dir, life: 0.25 });
+      if (hero.dash.t <= 0) hero.dash = null;
+      v.len = 0;
+      checkExits();
+    }
     hero.moving = v.len > 0.15;
     if (hero.kx || hero.ky) {                         // отбрасывание после удара
       moveHero(hero.kx * dt, 0); moveHero(0, hero.ky * dt);
@@ -1365,8 +1807,9 @@
     if (hero.moving) {
       hero.dir = Math.abs(v.x) > Math.abs(v.y) ? (v.x > 0 ? 'right' : 'left') : (v.y > 0 ? 'down' : 'up');
       hero.walk += dt * 10;
-      moveHero(v.x * HERO_SPEED * dt, 0);
-      moveHero(0, v.y * HERO_SPEED * dt);
+      const spd = HERO_SPEED * speedMul() * (hunt && hunt.taunt ? hunt.h.taunt.slow : 1);
+      moveHero(v.x * spd * dt, 0);
+      moveHero(0, v.y * spd * dt);
       checkExits();
     }
 
@@ -1384,6 +1827,7 @@
     updateChase(dt);
     updateFireflies(dt);
     updateHunt(dt);
+    updateRooms(dt);
     if (mode === 'play') checkTriggers();
     if (mode !== 'play') return;                       // герой пал или начался диалог
     followCamera(dt);
@@ -1670,22 +2114,87 @@
   // Охота в лабиринте сознания (map.hunt): видно только вокруг героя, фигуры меняют облик,
   // морок тает с шёпотом, настоящий Гидан ускользает slips раз, пойманный — с лицом героя.
   let hunt = null;
+  const rnd = (a) => a[0] + Math.random() * (a[1] - a[0]);
   function startHunt() {
     const h = map.hunt;
     hunt = null;
     if (!h || !check(h.if)) return;
     const spots = h.spots.slice().sort(() => Math.random() - 0.5);
     const figs = spots.slice(0, h.figures).map((s, i) => ({ x: s[0] * T + T / 2, y: s[1] * T + T - 6, real: i === 0, ph: Math.random() * 6, alive: 1 }));
-    hunt = { h, figs, slips: h.slips, confuse: 0, nextConfuse: h.confuseEvery, scare: 0, whisper: null, wt: 0 };
+    const anchors = (h.anchors || []).map((a) => ({ ...a, px: a.x * T + T / 2, py: a.y * T + T - 10, cd: 0 }));
+    hunt = {
+      h, figs, anchors, slips: h.slips, confuse: 0, nextConfuse: h.confuseEvery, scare: 0, whisper: null, wt: 0,
+      mad: 0, calm: 0, stun: 0, stunCd: 0, drain: 0,                    // Безумие
+      taunt: null, nextTaunt: rnd(h.taunt.every), lastTaunt: null, shake: 0, laugh: 0,   // издёвки
+      blocks: [], nextBlock: rnd(h.block.every),                        // перекрытые проходы
+    };
   }
   function whisper(text) {
     hunt.whisper = render(text);
     hunt.wt = 3;
     hunt.scare = 0.7;
   }
+  // смех Гидана: надпись и короткая тряска экрана
+  function laugh() {
+    hunt.laugh = 1.2;
+    hunt.shake = 0.2;
+  }
+  // о чём издеваться: у якоря со своей зоной, в тупике — о судьбе, иначе — общее
+  function tauntZone() {
+    for (const a of hunt.anchors) if (a.zone && Math.hypot(a.px - hero.x, a.py - hero.y) < 4 * T) return a.zone;
+    const tx = Math.floor(hero.x / T), ty = Math.floor((hero.y - 10) / T);
+    const open = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => !isSolid(tileAt(tx + dx, ty + dy))).length;
+    return open <= 1 ? 'fate' : 'any';
+  }
+  function startTaunt() {
+    const pool = HUNT_TEXT.taunts[tauntZone()].filter((t) => t !== hunt.lastTaunt);
+    const text = pool[(Math.random() * pool.length) | 0] || HUNT_TEXT.taunts.any.find((t) => t !== hunt.lastTaunt);
+    hunt.lastTaunt = text;
+    hunt.taunt = { text: render(text), t: hunt.h.taunt.show };
+    state.flags.gidan_taunt_count = (state.flags.gidan_taunt_count || 0) + 1;
+  }
+  // перекрыть коридор в 2–5 клетках от героя (не клетку героя, не якорь, не фигуру)
+  function blockPassage() {
+    const htx = Math.floor(hero.x / T), hty = Math.floor((hero.y - 10) / T);
+    const cand = [];
+    for (let ty = 1; ty < map.tiles.length - 1; ty++) {
+      for (let tx = 1; tx < map.tiles[0].length - 1; tx++) {
+        if (map.tiles[ty][tx] !== 'z') continue;
+        const d = Math.abs(tx - htx) + Math.abs(ty - hty);
+        if (d < 2 || d > 5) continue;
+        const o = (x, y) => map.tiles[y][x] === 'z';
+        if (!((o(tx - 1, ty) && o(tx + 1, ty) && !o(tx, ty - 1) && !o(tx, ty + 1)) || (o(tx, ty - 1) && o(tx, ty + 1) && !o(tx - 1, ty) && !o(tx + 1, ty)))) continue;
+        if (hunt.anchors.some((a) => a.x === tx && a.y === ty)) continue;
+        if (hunt.figs.some((f) => Math.floor(f.x / T) === tx && Math.floor((f.y - 10) / T) === ty)) continue;
+        cand.push({ tx, ty });
+      }
+    }
+    if (!cand.length) return;
+    const b = cand[(Math.random() * cand.length) | 0];
+    hunt.blocks.push({ ...b, t: hunt.h.block.hold });
+    burst(b.tx * T + T / 2, b.ty * T + T / 2, 14, '150,90,220');
+    toast(HUNT_TEXT.block);
+  }
+  function clearBlocks() {
+    if (!hunt.blocks.length) return;
+    for (const b of hunt.blocks) burst(b.tx * T + T / 2, b.ty * T + T / 2, 12, '220,200,255');
+    hunt.blocks = [];
+  }
   function updateHunt(dt) {
-    if (!hunt || hunt.done) return;
-    const h = hunt.h;
+    if (!hunt) return;
+    const h = hunt.h, M = h.madness;
+    hunt.shake = Math.max(0, hunt.shake - dt);
+    hunt.laugh = Math.max(0, hunt.laugh - dt);
+    hunt.stun = Math.max(0, hunt.stun - dt);
+    hunt.stunCd = Math.max(0, hunt.stunCd - dt);
+    hunt.calm = Math.max(0, hunt.calm - dt);
+    for (const a of hunt.anchors) a.cd = Math.max(0, a.cd - dt);
+    if (hunt.done) {                                    // пойман — безумие отпускает
+      hunt.mad = Math.max(0, hunt.mad - dt * 40);
+      hunt.blocks = []; hunt.taunt = null;
+      syncMadness();
+      return;
+    }
     hunt.scare = Math.max(0, hunt.scare - dt);
     hunt.wt = Math.max(0, hunt.wt - dt);
     hunt.confuse = Math.max(0, hunt.confuse - dt);
@@ -1694,6 +2203,54 @@
       hunt.confuse = h.confuseFor;
       toast(render(HUNT_TEXT.confuse));
     }
+
+    // издёвки: раз в 8–15 с, не поверх шёпота; в конце — смех
+    if (hunt.taunt) {
+      if ((hunt.taunt.t -= dt) <= 0) { hunt.taunt = null; laugh(); hunt.nextTaunt = rnd(h.taunt.every); }
+    } else if ((hunt.nextTaunt -= dt) <= 0 && !hunt.wt) startTaunt();
+
+    // перекрытия: держатся hold секунд
+    for (const b of hunt.blocks) b.t -= dt;
+    if (hunt.blocks.some((b) => b.t <= 0)) {
+      hunt.blocks = hunt.blocks.filter((b) => b.t > 0);
+      toast(HUNT_TEXT.unblock);
+    }
+    if ((hunt.nextBlock -= dt) <= 0) { hunt.nextBlock = rnd(h.block.every); blockPassage(); }
+
+    // якоря: возвращают рассудок, снимают перекрытия
+    for (const a of hunt.anchors) {
+      if (Math.hypot(a.px - hero.x, a.py - hero.y) > 52) { a.near = false; continue; }
+      if (a.near) continue;
+      a.near = true;
+      if (a.cd > 0) { toast(HUNT_TEXT.anchorTired); continue; }
+      a.cd = h.anchorCd;
+      hunt.mad = 0; hunt.calm = h.anchorCalm;
+      burst(a.px, a.py - 30, 18, '255,236,170');
+      toast(render(HUNT_TEXT.anchors[a.kind]));
+      clearBlocks();
+    }
+
+    // Безумие: растёт рядом с настоящим Гиданом и пока он говорит, иначе спадает
+    const real = hunt.figs.find((f) => f.real && !f.gone);
+    const watched = (real && Math.hypot(real.x - hero.x, real.y - hero.y) < M.attention * T) || hunt.taunt;
+    if (watched && !hunt.calm) hunt.mad = Math.min(100, hunt.mad + M.rise * dt);
+    else hunt.mad = Math.max(0, hunt.mad - M.fall * dt);
+    if (hunt.mad >= M.from && state.hp > 1) {           // медленно отнимает ОЗ, уворот не спасает, но не добивает
+      hunt.drain += (M.dps[0] + (M.dps[1] - M.dps[0]) * hunt.mad / 100) * dt;
+      if (hunt.drain >= 1) {
+        const d = Math.floor(hunt.drain);
+        hunt.drain -= d;
+        state.hp = Math.max(1, state.hp - d);
+        floaters.push({ x: hero.x, y: hero.y - 70, text: '−' + d, life: 0.7, color: '#c58aff' });
+      }
+      if (state.hp <= 1 && !hunt.stunCd) {               // на краю: теряет управление и слышит смех
+        hunt.stun = 1; hunt.stunCd = 8;
+        laugh();
+        toast(render(HUNT_TEXT.stun));
+      }
+    }
+    syncMadness();
+
     for (const f of hunt.figs) {
       f.ph += dt;
       if (f.gone) { f.alive -= dt * 2; continue; }
@@ -1722,6 +2279,10 @@
     }
     hunt.figs = hunt.figs.filter((f) => f.alive > 0);
   }
+  function syncMadness() {
+    state.flags.madness_level = Math.round(hunt.mad);
+    state.flags.madness_active = hunt.mad >= hunt.h.madness.from;
+  }
   function drawFigure(f, ox, oy) {
     const x = Math.round(f.x - ox), y = Math.round(f.y - oy);
     const sp = f.caught ? heroSprite(f.dir)
@@ -1733,9 +2294,29 @@
     if (!f.caught) { g.globalAlpha *= 0.4; g.drawImage(silhouette(sp, '#7a3cc0'), x - 32, y - 64 + Math.sin(f.ph * 2) * 2, 64, 64); }
     g.globalAlpha = 1;
   }
-  // тьма вокруг героя, вспышка испуга, шёпот и подсказка о путанице
+  // якорь: тёплое свечение (тусклое, пока перезаряжается) и сам предмет
+  function drawAnchor(a, ox, oy) {
+    const x = Math.round(a.px - ox), y = Math.round(a.py - oy);
+    const k = a.cd > 0 ? 0.25 : 1;
+    g.fillStyle = `rgba(255,236,170,${(0.25 + Math.sin(time * 3 + a.x) * 0.12) * k})`;
+    g.beginPath(); g.ellipse(x, y - 20, 34, 24, 0, 0, 6.28); g.fill();
+    g.globalAlpha = 0.5 + 0.5 * k;
+    if (a.kind === 'portrait') drawPortraitProp('dolita', x, y + 6, 0.7);
+    else if (a.kind === 'mirror') g.drawImage(MIRROR, x - 24, y - 70, 48, 72);
+    else if (a.kind === 'letter') g.drawImage(NOTE, x - 30, y - 46, 60, 50);
+    else g.drawImage(RIBBON, x - 24, y - 44, 48, 48);
+    g.globalAlpha = 1;
+  }
+  // тьма вокруг героя, фиолетовые края безумия, перекрытия, шёпот, издёвки
   function drawMind(ox, oy) {
     if (!hunt) return;
+    for (const b of hunt.blocks) {                       // перекрытый проход — колышущаяся тень
+      const X = b.tx * T - ox, Y = b.ty * T - oy;
+      g.fillStyle = `rgba(90,20,140,${0.55 + 0.2 * Math.sin(time * 6 + b.tx)})`;
+      g.fillRect(X, Y, T, T);
+      g.strokeStyle = `rgba(210,150,255,${0.5 + 0.3 * Math.sin(time * 9)})`; g.lineWidth = 3;
+      g.strokeRect(X + 4, Y + 4, T - 8, T - 8);
+    }
     const hx = hero.x - ox, hy = hero.y - 30 - oy;
     const r = hunt.done ? 420 : 250 + Math.sin(time * 2) * 12;
     const grd = g.createRadialGradient(hx, hy, r * 0.35, hx, hy, r);
@@ -1743,6 +2324,14 @@
     grd.addColorStop(1, 'rgba(4,2,10,.97)');
     g.fillStyle = grd;
     g.fillRect(0, 0, W, H);
+    if (hunt.mad > 0) {                                  // безумие окрашивает края в фиолетовый (#6a0dad)
+      const m = hunt.mad / 100;
+      const vg = g.createRadialGradient(W / 2, H / 2, H * (0.62 - 0.3 * m), W / 2, H / 2, W * 0.62);
+      vg.addColorStop(0, 'rgba(106,13,173,0)');
+      vg.addColorStop(1, `rgba(106,13,173,${0.7 * m})`);
+      g.fillStyle = vg;
+      g.fillRect(0, 0, W, H);
+    }
     if (hunt.scare) { g.fillStyle = `rgba(60,0,30,${hunt.scare * 0.6})`; g.fillRect(0, 0, W, H); }
     g.textAlign = 'center'; g.textBaseline = 'middle';
     if (hunt.wt) {
@@ -1752,11 +2341,126 @@
       g.fillStyle = '#d8b8ff'; g.fillText(hunt.whisper, W / 2, 150);
       g.globalAlpha = 1;
     }
+    if (hunt.taunt) {                                    // голос Гидана — без окна диалога
+      g.globalAlpha = Math.min(1, hunt.taunt.t * 2, (hunt.h.taunt.show - hunt.taunt.t) * 3);
+      g.font = 'italic 28px Georgia, serif';
+      wrapText(`Гидан: «${hunt.taunt.text}»`, W / 2, 200, 1000, 36, '#ffb0e8');
+      g.globalAlpha = 1;
+    }
+    if (hunt.laugh) {
+      g.globalAlpha = Math.min(1, hunt.laugh * 2);
+      g.font = 'bold italic 40px Georgia, serif';
+      g.fillStyle = '#000'; g.fillText(HUNT_TEXT.laugh, W / 2 + 3, 283);
+      g.fillStyle = '#ff6ad0'; g.fillText(HUNT_TEXT.laugh, W / 2, 280);
+      g.globalAlpha = 1;
+    }
     if (hunt.confuse) {
       g.font = 'bold 26px sans-serif';
       g.fillStyle = `rgba(255,120,200,${0.6 + 0.4 * Math.sin(time * 10)})`;
       g.fillText('⟲ мысли путаются: управление наоборот', W / 2, H - 60);
     }
+  }
+  // текст по центру в несколько строк, с тенью
+  function wrapText(text, x, y, maxW, lh, color) {
+    const words = text.split(' '), lines = [];
+    let cur = '';
+    for (const w of words) {
+      const t = cur ? cur + ' ' + w : w;
+      if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+    }
+    lines.push(cur);
+    lines.forEach((l, i) => {
+      g.fillStyle = '#000'; g.fillText(l, x + 2, y + i * lh + 2);
+      g.fillStyle = color; g.fillText(l, x, y + i * lh);
+    });
+  }
+  // полоска Безумия под ОЗ — как у яда
+  function drawMadness() {
+    if (!hunt || hunt.mad <= 0) return;
+    const X = 16, Y = 124, Wd = 200, m = hunt.mad / 100;
+    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y, Wd + 44, 22);
+    g.fillStyle = '#6a0dad'; g.beginPath(); g.arc(X + 15, Y + 11, 8, 0, 6.28); g.fill();
+    g.strokeStyle = '#e0b0ff'; g.lineWidth = 2;
+    g.beginPath(); g.arc(X + 15, Y + 11, 4 + Math.sin(time * 6), 0.5, 5.8); g.stroke();
+    g.fillStyle = '#25103a'; g.fillRect(X + 32, Y + 5, Wd, 12);
+    g.fillStyle = state.flags.madness_active ? '#b04aff' : '#7a3cc0'; g.fillRect(X + 32, Y + 5, Wd * m, 12);
+    g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = '#fff'; g.fillText(`Безумие ${Math.round(hunt.mad)}%`, X + 32 + Wd / 2, Y + 11);
+  }
+
+  // Покои после лабиринта (map.rooms): счётчик комнат, подсказки, метки, дверь
+  let rooms = null;
+  function startRooms() {
+    rooms = map.rooms ? { r: map.rooms, idle: 0, hinted: false, markers: false, last: -1, inside: null } : null;
+  }
+  function updateRooms(dt) {
+    if (!rooms) return;
+    const R = rooms.r, f = state.flags;
+    const n = R.list.filter((x) => f[x.flag]).length;
+    f.rooms_visited = n;
+    if (n !== rooms.last) { rooms.last = n; rooms.idle = 0; }
+    if (n >= R.need && !f.labyrinth_exit_unlocked) {
+      f.labyrinth_exit_unlocked = true;
+      burst(T / 2, 9 * T, 30, '255,255,255');
+      toast(ROOMS_TEXT.open);
+      save();
+    }
+    if (!f.labyrinth_exit_unlocked) {
+      rooms.idle += dt;
+      if (rooms.idle > R.hintAt && !rooms.hinted) { rooms.hinted = true; toast(ROOMS_TEXT.lost); }
+      if (rooms.idle > R.markersAt && !rooms.markers) { rooms.markers = true; toast(ROOMS_TEXT.markers); }
+    }
+    // зашёл в комнату — её название
+    const tx = hero.x / T, ty = (hero.y - 10) / T;
+    const room = R.list.find((x) => tx >= x.area[0] && tx < x.area[2] + 1 && ty >= x.area[1] && ty < x.area[3] + 1);
+    if ((room && room.id) !== rooms.inside) { rooms.inside = room && room.id; if (room) showArea(ROOMS_TEXT.names[room.id]); }
+  }
+  function drawRooms(ox, oy) {
+    if (!rooms) return;
+    const R = rooms.r, f = state.flags;
+    for (const y of [8, 9]) {                            // дверь: три печати или белый свет
+      const X = -ox, Y = y * T - oy;
+      if (f.labyrinth_exit_unlocked) {
+        g.fillStyle = `rgba(255,255,240,${0.45 + 0.25 * Math.sin(time * 4)})`; g.fillRect(X, Y, T, T);
+      } else {
+        g.fillStyle = 'rgba(40,10,60,.85)'; g.fillRect(X, Y, T, T);
+        g.fillStyle = '#9a5ad0'; g.fillRect(X + 26, Y + 8, 12, 48);
+      }
+    }
+    // тьма покоев
+    const hx = hero.x - ox, hy = hero.y - 30 - oy;
+    const grd = g.createRadialGradient(hx, hy, 160, hx, hy, 640);
+    grd.addColorStop(0, 'rgba(6,4,12,0)'); grd.addColorStop(1, 'rgba(6,4,12,.85)');
+    g.fillStyle = grd; g.fillRect(0, 0, W, H);
+    // метки над неосмотренным (через две минуты блужданий)
+    if (rooms.markers) {
+      for (const x of R.list) {
+        if (f[x.flag]) continue;
+        const n = npcs.find((o) => o.id === x.key);
+        if (!n) continue;
+        const X = n.px - ox, Y = n.py - oy - 120 + Math.sin(time * 5) * 6;
+        g.fillStyle = '#ffd86a';
+        g.beginPath(); g.moveTo(X - 14, Y - 14); g.lineTo(X + 14, Y - 14); g.lineTo(X, Y + 6); g.fill();
+      }
+    }
+  }
+  // счётчик комнат: «Комнаты: n/3» и три огонька
+  function drawRoomsHud() {
+    if (!rooms) return;
+    const R = rooms.r, f = state.flags;
+    const X = 16, Y = 124;
+    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y, 288, 34);
+    g.font = 'bold 18px sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.fillStyle = f.labyrinth_exit_unlocked ? '#f4dca0' : '#e0d0ff';
+    g.fillText(f.labyrinth_exit_unlocked ? 'Дверь открыта ←' : `Комнаты: ${f.rooms_visited || 0}/${R.need}`, X + 10, Y + 17);
+    R.list.forEach((x, i) => {
+      const cx = X + 196 + i * 30;
+      g.fillStyle = f[x.flag] ? '#ffd86a' : '#3a2a4a';
+      g.beginPath(); g.arc(cx, Y + 17, 10, 0, 6.28); g.fill();
+      g.fillStyle = f[x.flag] ? '#2a1d0b' : '#9a8ab0';
+      g.font = 'bold 12px sans-serif'; g.textAlign = 'center';
+      g.fillText(ROOMS_TEXT.names[x.id].split(' ').pop()[0], cx, Y + 18);
+    });
   }
 
   // Пустота мета-сцены: светлое пятно в центре, по краям тьма
@@ -1778,6 +2482,9 @@
     mode = 'ending';
     $('ending-title').textContent = render(e.title);
     $('ending-text').textContent = render(e.text);
+    $('ending').classList.toggle('green', e.style === 'green');          // Прощение: тьма и зелёные буквы, без титров
+    $('btn-ending').hidden = e.style === 'green';
+    if (e.style === 'green') setTimeout(() => { $('btn-ending').hidden = false; }, 4000);
     screen('ending');
   }
 
@@ -1827,11 +2534,13 @@
 
   // Атака: автонаводка на ближайшего врага, мышь — в сторону курсора
   function attack(aimX, aimY) {
-    if (mode !== 'play' || hero.cd > 0) return;
+    if (mode !== 'play' || hero.cd > 0 || hero.casting) return;
     const w = WEAPONS[state.hero.weapon];
     const el = state.flags.light_element;
+    if (w.ammo && hero.ammo < 1) { hero.cd = 0.3; return toast('Стрелы кончились — новая через пару секунд'); }
+    if (w.manaCost && hero.mana < w.manaCost) { hero.cd = 0.3; return toast('Не хватает маны'); }
     hero.cd = w.cooldown * (el === 'storm' ? 0.75 : 1);
-    const dmg = w.dmg + (el === 'sun' ? 1 : 0);
+    const dmg = (w.dmg + (el === 'sun' ? 1 : 0)) * dmgMul();
     const hx = hero.x, hy = hero.y - 26;
     let ang;
     if (aimX != null) ang = Math.atan2(aimY - hy, aimX - hx);
@@ -1855,14 +2564,45 @@
         da = Math.atan2(Math.sin(da), Math.cos(da));
         if (Math.hypot(dx, dy) < w.range + 26 && Math.abs(da) < 1.35) hitEnemy(e, dmg, ang);
       }
+    } else if (w.cast) {                               // посох: каст стоя, потом снаряд
+      hero.mana -= w.manaCost;
+      hero.casting = { t: w.cast * castMul(), ang, dmg };
     } else {
-      const sp = w.type === 'arrow' ? 620 : 360;
-      shots.push({ x: hx + Math.cos(ang) * 20, y: hy + Math.sin(ang) * 20, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-        life: w.range / sp, dmg, kind: w.type, ang });
+      hero.ammo -= 1;
+      fireShot(ang, dmg, w);
     }
   }
+  function fireShot(ang, dmg, w) {
+    const hx = hero.x, hy = hero.y - 26;
+    const sp = w.type === 'arrow' ? 620 : 360;           // у стрелы — время полёта, стены и укрытия её ловят
+    shots.push({ x: hx + Math.cos(ang) * 20, y: hy + Math.sin(ang) * 20, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+      life: w.range / sp, dmg, kind: w.type, ang });
+  }
+  // Рывок: в сторону движения (или взгляда), 0.3 с неуязвимости, перезарядка падает с уровнем
+  function dash() {
+    if (mode !== 'play' || hero.dash || hero.dashCd > 0 || hero.casting) return;
+    if (hunt && hunt.stun > 0) return;
+    const v = moveVector();
+    let ax = v.x, ay = v.y;
+    if (v.len < 0.15) [ax, ay] = { right: [1, 0], left: [-1, 0], down: [0, 1], up: [0, -1] }[hero.dir];
+    const l = Math.hypot(ax, ay) || 1;
+    hero.dash = { t: DASH.time, vx: ax / l * DASH.speed, vy: ay / l * DASH.speed };
+    hero.dodge = dashInv();
+    hero.dashCd = dashCd();
+    hero.kx = hero.ky = 0;
+  }
 
-  function hitEnemy(e, dmg, ang) {
+  function hitEnemy(e, dmg, ang, ranged) {
+    if (e.k.dodge && e.st !== 'rest' && !e.dash && Math.random() < e.k.dodge) {   // Аэдел уходит в сторону рывком
+      enemyDash(e, ang + (Math.random() < 0.5 ? 1.57 : -1.57));
+      e.dashCd = Math.max(e.dashCd, 0.8);
+      floaters.push({ x: e.x, y: e.y - 70, text: FIGHT_TEXT.dodge, life: 0.7, color: '#9ad8ff' });
+      return;
+    }
+    if (e.k.ghost && ranged) dmg *= 1.5;             // призраки боятся света и магии
+    if (e.k.weakSpirit && (blessed('spirit') || skill('spirit') >= 1)) dmg *= e.k.weakSpirit;
+    if (ranged && e.k.resist) dmg *= 1 - e.k.resist * (skill('power') >= 3 ? 0.5 : 1);  // боссы держат стрелы и магию; «Пробой» — вполовину
+    dmg = Math.round(dmg * 10) / 10;
     e.hp -= dmg;
     e.hit = 0.15;
     if (!e.k.static) { e.vx = Math.cos(ang) * (e.k.boss ? 120 : 320); e.vy = Math.sin(ang) * (e.k.boss ? 120 : 320); }
@@ -1870,7 +2610,12 @@
     if (e.k.boss && e.st === 'idle') e.st = 'chase';
     floaters.push({ x: e.x, y: e.y - 60, text: String(dmg), life: 0.8, color: '#fff2c4' });
     burst(e.x, e.y - 24, 8, elemColor());
-    if (e.hp <= 0) { e.dead = 0.001; burst(e.x, e.y - 20, 18, '120,110,100'); }
+    if (e.hp <= 0) {
+      e.dead = 0.001; burst(e.x, e.y - 20, 18, '120,110,100'); gainXp(e.k.xp || 0, e.k.mana || 0);
+      if (e.k.copies) for (const c of enemies) if (c.kind === 'dane_copy' && !c.dead) { c.dead = 0.001; burst(c.x, c.y - 30, 10, '150,220,255'); }
+      const gold = state.map === 'arena' ? 0 : e.k.gold ?? (e.k.boss ? 30 : 0);   // на арене — только опыт и мана
+      if (gold) { state.flags.gold = (state.flags.gold || 0) + gold; floaters.push({ x: e.x, y: e.y - 84, text: `+${gold} 💰`, life: 1.1, color: '#ffd86a' }); updateHud(); }
+    }
   }
 
   function burst(x, y, n, rgb) {
@@ -1880,8 +2625,16 @@
     }
   }
 
-  function hurtHero(dmg, fromX, fromY) {
-    if (hero.inv > 0) return;
+  function hurtHero(dmg, fromX, fromY, src) {
+    if (hero.inv > 0 || hero.dodge > 0) return;
+    if (skill('agility') >= 3 && Math.random() < 0.15) {        // «Уворот» Полианны
+      hero.inv = 0.4;
+      floaters.push({ x: hero.x, y: hero.y - 70, text: 'Уворот!', life: 0.8, color: '#9ad8ff' });
+      return;
+    }
+    if (inv('ribbon')) dmg *= 0.85;                             // Красная лента
+    if (src === 'priest' && inv('dagger')) dmg *= 0.6;          // Священный кинжал
+    dmg = Math.max(1, Math.round(dmg));
     state.hp = Math.max(0, state.hp - dmg);
     hero.inv = 0.9;
     const a = Math.atan2(hero.y - fromY, hero.x - fromX);
@@ -1893,7 +2646,9 @@
 
   // Герой пал — очнётся в деревне с полными ОЗ, волки вернутся
   function heroDown() {
-    const r = map.respawn || { map: 'village', at: [16.5, 7.6], dir: 'up', d: 'hero_down' };
+    const dr = state.map === 'arena' && state.flags.duel_ret;                 // проиграл вызов — туда, откуда бросил перчатку
+    if (dr) { state.flags.duel_ret = null; curEnc = null; enemies = []; ebolts = []; }
+    const r = dr ? { ...dr, d: 'duel_lost' } : map.respawn || { map: 'village', at: [16.5, 7.6], dir: 'up', d: 'hero_down' };
     mode = 'fade';
     fade(() => {
       state.hp = maxHp();
@@ -1904,19 +2659,57 @@
 
   function useFlask() {
     if (mode !== 'play' || !state.flags.got_flask) return;
-    if (!state.flags.has_water_flask) return toast('Бутылка пуста — набери воды в Живительном ручье');
-    if (state.hp >= maxHp()) return toast('ОЗ и так полные');
-    state.hp = Math.min(maxHp(), state.hp + FLASK_HEAL);
+    if (!state.flags.has_water_flask) return toast(BAG_TEXT.flaskEmpty);
+    if (state.hp >= maxHp()) return toast(BAG_TEXT.full);
+    const v = healHero(FLASK_HEAL);
     state.flags.has_water_flask = false;
-    floaters.push({ x: hero.x, y: hero.y - 70, text: '+' + FLASK_HEAL, life: 1, color: '#9cf0a0' });
-    burst(hero.x, hero.y - 28, 16, '120,230,140');
-    toast(`🧪 +${FLASK_HEAL} ОЗ. Бутылка опустела`);
+    if (curEnc && flaskRefill > 0) { flaskRefill = 0; flaskT = 8; }     // в бою Сосуд наполнится сам — один раз
+    toast(`🧪 +${v} ОЗ. Сосуд жизни опустел` + (flaskT > 0 ? ' — наполнится через 8 с' : ''));
     save();
+  }
+  // Q: сначала Сосуд, потом малое зелье, потом среднее
+  function quickHeal() {
+    if (mode !== 'play') return;
+    if (state.flags.got_flask && state.flags.has_water_flask) return useFlask();
+    if (inv('potion_s')) return useItem('potion_s');
+    if (inv('potion_m')) return useItem('potion_m');
+    if (state.flags.got_flask) return useFlask();
+  }
+  function useItem(id) {
+    const it = ITEMS[id];
+    if (id === 'flask') return useFlask();
+    if (!it || !inv(id)) return false;
+    if (it.heal) {
+      if (state.hp >= maxHp()) { toast(BAG_TEXT.full); return false; }
+      const v = healHero(it.heal);
+      toast(`${it.icon} ${it.name}: +${v} ОЗ`);
+    } else if (it.buff) {
+      if (it.buff.dmg) buffs.dmg = it.buff.time;
+      if (it.buff.speed) buffs.speed = it.buff.time;
+      burst(hero.x, hero.y - 28, 14, '255,216,106');
+      toast(`${it.icon} ${it.name}: ${it.desc}`);
+    } else return false;
+    state.flags['inv_' + id] = inv(id) - 1;
+    save();
+    return true;
   }
 
   function updateCombat(dt) {
     hero.cd = Math.max(0, hero.cd - dt);
     hero.inv = Math.max(0, hero.inv - dt);
+    hero.dodge = Math.max(0, hero.dodge - dt);
+    hero.dashCd = Math.max(0, hero.dashCd - dt);
+    for (const t of hero.trail) t.life -= dt;
+    hero.trail = hero.trail.filter((t) => t.life > 0);
+    const w = WEAPONS[state.hero.weapon];
+    if (w.ammo) hero.ammo = Math.min(maxAmmo(w), hero.ammo + dt / w.regen);
+    if (w.manaCost) hero.mana = Math.min(maxMana(), hero.mana + dt * w.manaRegen * manaRegenMul());
+    buffs.dmg = Math.max(0, buffs.dmg - dt); buffs.speed = Math.max(0, buffs.speed - dt);
+    if (flaskT > 0 && (flaskT -= dt) <= 0) {
+      flaskT = 0;
+      if (state.flags.got_flask && !state.flags.has_water_flask) { state.flags.has_water_flask = true; toast('🧪 Сосуд жизни снова полон'); }
+    }
+    if (hero.casting && (hero.casting.t -= dt) <= 0) { const c = hero.casting; hero.casting = null; fireShot(c.ang, c.dmg, w); }
     if (hero.swing && (hero.swing.t += dt) > 0.22) hero.swing = null;
     if (state.flags.light_element === 'radiance' && state.hp > 0 && state.hp < maxHp()) state.hp = Math.min(maxHp(), state.hp + dt * 0.5);
 
@@ -1928,12 +2721,13 @@
       for (const e of enemies) {
         if (e.dead || s.life <= 0) continue;
         if (Math.hypot(e.x - s.x, e.y - 22 - s.y) < (s.kind === 'magic' ? 34 : 28)) {
-          hitEnemy(e, s.dmg, s.ang);
+          hitEnemy(e, s.dmg, s.ang, true);
           s.life = 0;
           if (s.kind === 'magic') burst(s.x, s.y, 12, elemColor());
         }
       }
     }
+    for (const b of ebolts) if (b.wave) for (const s of shots) if (Math.hypot(b.x - s.x, b.y - s.y) < (b.r || 40)) { s.life = 0; burst(s.x, s.y, 5, b.rgb); }
     shots = shots.filter((s) => s.life > 0);
 
     for (const e of enemies) updateEnemy(e, dt);
@@ -1946,9 +2740,15 @@
 
     // снаряды врагов
     for (const b of ebolts) {
+      if (b.homing) {                                  // сгусток мага доворачивает к герою
+        const want = Math.atan2(hero.y - 24 - b.y, hero.x - b.x), cur = Math.atan2(b.vy, b.vx), sp = Math.hypot(b.vx, b.vy);
+        const da = Math.atan2(Math.sin(want - cur), Math.cos(want - cur));
+        const a = cur + Math.max(-b.homing * dt, Math.min(b.homing * dt, da));
+        b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp;
+      }
       b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
       if (isSolid(tileAt(Math.floor(b.x / T), Math.floor((b.y + 20) / T)))) b.life = 0;
-      if (b.life > 0 && Math.hypot(hero.x - b.x, hero.y - 24 - b.y) < 26) { b.life = 0; hurtHero(b.dmg, b.x, b.y); burst(b.x, b.y, 8, b.rgb); }
+      if (b.life > 0 && Math.hypot(hero.x - b.x, hero.y - 24 - b.y) < 26) { b.life = 0; hurtHero(b.dmg, b.x, b.y, b.src); burst(b.x, b.y, 8, b.rgb); }
     }
     ebolts = ebolts.filter((b) => b.life > 0);
     updateHazard(dt);
@@ -1986,6 +2786,10 @@
     if (!en) return;
     curEnc = en;
     enemies = en.enemies.filter((e) => check(e.if)).map(spawnEnemy);
+    flaskRefill = 1; flaskT = 0;
+    if (state.flags.got_flask && !state.flags.has_water_flask) {   // пустой Сосуд в начале боя наполняется сразу
+      flaskRefill = 0; state.flags.has_water_flask = true; toast('🧪 Сосуд жизни наполнился красной водой');
+    }
   }
 
   // Затопление пола: зона мигает (предупреждение), затем заливается — стоять в ней больно
@@ -2001,7 +2805,7 @@
     if (hz.phase === 'flood' && inHazard(hero.x, hero.y - 8)) {
       hz.tick -= dt;
       if (hz.tick <= 0) {
-        hz.tick = 0.4;
+        hz.tick = BEAT;
         state.hp = Math.max(0, state.hp - h.dmg);
         floaters.push({ x: hero.x, y: hero.y - 70, text: '−' + h.dmg, life: 0.7, color: '#ff6a7a' });
         burst(hero.x, hero.y - 6, 5, '170,10,30');
@@ -2023,9 +2827,19 @@
         g.fillRect(X, Y, Wd, Hd);
         g.strokeStyle = 'rgba(255,60,80,.7)'; g.lineWidth = 3; g.strokeRect(X + 2, Y + 2, Wd - 4, Hd - 4);
       } else {
-        const a = Math.min(1, (h.flood - hz.t) * 4, hz.t * 3);
+        const a = Math.min(1, (h.flood - hz.t) * 4, hz.t * 3), beat = 1 - (time % BEAT) / BEAT;
         g.fillStyle = `rgba(120,6,20,${0.72 * a})`;
         g.fillRect(X, Y, Wd, Hd);
+        g.strokeStyle = `rgba(255,90,110,${0.35 * a})`; g.lineWidth = 2;   // волны по поверхности
+        for (let yy = Y + 20; yy < Y + Hd; yy += 40) {
+          g.beginPath();
+          for (let xx = X; xx <= X + Wd; xx += 16) g.lineTo(xx, yy + Math.sin(xx * 0.05 + time * 4 + yy) * 4);
+          g.stroke();
+        }
+        g.fillStyle = `rgba(255,170,180,${0.25 * a * beat})`;            // отражения вспыхивают в такт
+        for (let i = 0; i < Wd * Hd / 9000; i++) g.fillRect(X + ((i * 97 + Y) % Wd), Y + ((i * 53 + X) % Hd), 18, 3);
+        g.strokeStyle = `rgba(255,120,140,${0.5 * a * beat})`; g.lineWidth = 2;
+        g.beginPath(); g.ellipse(X + Wd / 2, Y + Hd / 2, 20 + (1 - beat) * Wd * 0.35, 8 + (1 - beat) * Hd * 0.2, 0, 0, 6.28); g.stroke();
         g.fillStyle = `rgba(230,60,80,${0.5 * a})`;
         for (let yy = Y + 12; yy < Y + Hd; yy += 32) for (let xx = X + ((yy / 32) % 2) * 20; xx < X + Wd; xx += 48) {
           g.fillRect(xx + Math.sin(time * 3 + yy) * 6, yy, 14, 2);
@@ -2037,21 +2851,80 @@
   // Выстрел врага: веер кровавых сгустков в сторону героя
   function fireBolts(e) {
     const r = e.k.ranged, a0 = Math.atan2(hero.y - 24 - (e.y - 30), hero.x - e.x);
+    if (r.wave) {                                    // волна: ряд точек поперёк удара, каждая гаснет о стену или колонну
+      const id = ++waveId, mid = (r.wave - 1) / 2, nx = -Math.sin(a0), ny = Math.cos(a0);
+      for (let i = 0; i < r.wave; i++) {
+        const o = (i - mid) * 22, back = (i - mid) * (i - mid) * 3;   // края чуть отстают — дуга
+        ebolts.push({ x: e.x + nx * o - Math.cos(a0) * back, y: e.y - 30 + ny * o - Math.sin(a0) * back, vx: Math.cos(a0) * r.speed, vy: Math.sin(a0) * r.speed,
+          life: 4, dmg: r.dmg, rgb: r.color, wave: id, wi: i, r: 30, src: e.kind });
+      }
+      return;
+    }
     for (let i = 0; i < r.count; i++) {
       const a = a0 + (i - (r.count - 1) / 2) * r.spread;
-      ebolts.push({ x: e.x, y: e.y - 30, vx: Math.cos(a) * r.speed, vy: Math.sin(a) * r.speed, life: 2.5, dmg: r.dmg, rgb: r.color || '208,24,44' });
+      ebolts.push({ x: e.x, y: e.y - 30, vx: Math.cos(a) * r.speed, vy: Math.sin(a) * r.speed, life: 2.5, dmg: r.dmg, rgb: r.color || '208,24,44', homing: r.homing, src: e.kind });
     }
   }
 
+  // рывок врага (Аэдел): короткий бросок со шлейфом
+  function enemyDash(e, ang) {
+    const d = e.k.dash;
+    e.dash = { t: d.time, vx: Math.cos(ang) * d.speed, vy: Math.sin(ang) * d.speed };
+    e.dashCd = d.cd;
+  }
   function updateEnemy(e, dt) {
     if (e.dead) { e.dead += dt; return; }
     const k = e.k;
     e.hit = Math.max(0, e.hit - dt);
     if (k.static) return;                              // механизм: стоит и ждёт удара
+    for (const t of e.trail || []) t.life -= dt;
+    if (e.trail) e.trail = e.trail.filter((t) => t.life > 0);
+    if (k.life && (e.life = (e.life ?? k.life) - dt) <= 0) { e.dead = 0.001; burst(e.x, e.y - 30, 10, '150,220,255'); return; }   // копия тает
+    if (k.copies) {                                    // Дэйн: призрачные копии
+      e.copyT = (e.copyT ?? k.copies.every * 0.5) - dt;
+      if (e.copyT <= 0 && e.st !== 'idle') {
+        e.copyT = k.copies.every;
+        for (let i = 0; i < k.copies.n; i++) {
+          const a = Math.random() * 6.28;
+          const c = spawnEnemy({ kind: 'dane_copy', x: (e.x + Math.cos(a) * 120) / T - 0.5, y: (e.y + Math.sin(a) * 120 - T + 6) / T });
+          c.st = 'chase';
+          enemies.push(c);
+        }
+        burst(e.x, e.y - 30, 20, '150,220,255');
+      }
+    }
+    if (k.dash) {
+      e.dashCd = Math.max(0, (e.dashCd ?? 1) - dt);
+      if (e.dash) {
+        e.dash.t -= dt;
+        if (!boxBlocked(e.x + e.dash.vx * dt, e.y, k.w, k.h)) e.x += e.dash.vx * dt;
+        if (!boxBlocked(e.x, e.y + e.dash.vy * dt, k.w, k.h)) e.y += e.dash.vy * dt;
+        (e.trail = e.trail || []).push({ x: e.x, y: e.y, dir: e.dir, life: 0.25 });
+        if (e.dash.t <= 0) e.dash = null;
+        return;
+      }
+    }
     e.t -= dt;
     e.cast -= dt;
     const dx = hero.x - e.x, dy = hero.y - e.y, dist = Math.hypot(dx, dy);
     let mx = 0, my = 0;
+    const ranged = state.hero.weapon !== 'sword';
+    const keep = k.keep && k.boss && ranged ? k.keep * 0.5 : k.keep;           // босс не даёт стрелку держать дистанцию
+    const lungeAt = k.boss && ranged ? 260 : 150;
+    const speed = k.speed * (k.boss && ranged ? 1.15 : 1);
+    if (k.blink) {                                    // маг: герой рядом — отпрыгивает
+      e.blinkCd = (e.blinkCd ?? 1) - dt;
+      if (dist < 130 && e.blinkCd <= 0 && e.st !== 'windup') {
+        e.blinkCd = k.blink;
+        for (let i = 0; i < 12; i++) {
+          const a = Math.random() * 6.28, nx = e.x + Math.cos(a) * 240, ny = e.y + Math.sin(a) * 240;
+          if (!boxBlocked(nx, ny, k.w, k.h) && Math.hypot(nx - hero.x, ny - hero.y) > 200) {
+            burst(e.x, e.y - 30, 12, k.ranged.color); e.x = nx; e.y = ny; burst(e.x, e.y - 30, 12, k.ranged.color);
+            break;
+          }
+        }
+      }
+    }
     switch (e.st) {
       case 'idle':                                     // бродит, пока не заметит героя
         e.wander += (Math.random() - 0.5) * dt * 3;
@@ -2060,11 +2933,13 @@
         if (dist < k.aggro) e.st = 'chase';
         break;
       case 'chase':
-        if (k.keep) {                                  // стрелок держит дистанцию и ходит по кругу
-          const dir = dist < k.keep - 40 ? -1 : dist > k.keep + 60 ? 1 : 0;
-          mx = (dx * dir - dy * 0.6 * e.side) / dist * k.speed; my = (dy * dir + dx * 0.6 * e.side) / dist * k.speed;
-        } else if (dist > 40) { mx = dx / dist * k.speed; my = dy / dist * k.speed; }
-        if (k.lunge && dist < 150) { e.st = 'windup'; e.atk = 'lunge'; e.t = k.windup; e.lx = dx / dist; e.ly = dy / dist; }
+        if (keep) {                                    // стрелок держит дистанцию и ходит по кругу
+          const dir = dist < keep - 40 ? -1 : dist > keep + 60 ? 1 : 0;
+          mx = (dx * dir - dy * 0.6 * e.side) / dist * speed; my = (dy * dir + dx * 0.6 * e.side) / dist * speed;
+        } else if (dist > 40) { mx = dx / dist * speed; my = dy / dist * speed; }
+        if (k.ranged && k.ranged.wave && e.cast <= 0 && dist > 120) { e.st = 'windup'; e.atk = 'cast'; e.t = k.ranged.windup; e.cast = k.ranged.every; break; }   // волна — до самой стены
+        if (k.dash && dist > k.dash.at && e.dashCd <= 0) { enemyDash(e, Math.atan2(dy, dx)); break; }   // Аэдел сокращает дистанцию рывком
+        if (k.lunge && dist < lungeAt) { e.st = 'windup'; e.atk = 'lunge'; e.t = k.windup; e.lx = dx / dist; e.ly = dy / dist; }
         else if (k.ranged && e.cast <= 0 && dist < 560) { e.st = 'windup'; e.atk = 'cast'; e.t = k.ranged.windup; e.cast = k.ranged.every; }
         break;
       case 'windup':                                   // присел перед прыжком или готовит заклинание — «!»
@@ -2075,7 +2950,7 @@
         break;
       case 'lunge':
         mx = e.lx * k.lunge; my = e.ly * k.lunge;
-        if (dist < 44) hurtHero(k.dmg, e.x, e.y);
+        if (dist < 44) hurtHero(k.dmg, e.x, e.y, e.kind);
         if (e.t <= 0) { e.st = 'rest'; e.t = k.rest; }
         break;
       case 'rest':
@@ -2096,8 +2971,13 @@
       const ox = e.x - o.x, oy = e.y - o.y, d = Math.hypot(ox, oy);
       if (d < 48 && d > 0) { mx += ox / d * 80; my += oy / d * 80; }
     }
-    if (!boxBlocked(e.x + mx * dt, e.y, k.w, k.h)) e.x += mx * dt;
-    if (!boxBlocked(e.x, e.y + my * dt, k.w, k.h)) e.y += my * dt;
+    if (k.ghost) {                                   // призрак: сквозь стены, но в пределах карты
+      const mw = map.tiles[0].length * T, mh = map.tiles.length * T;
+      e.x = clamp(e.x + mx * dt, T / 2, mw - T / 2); e.y = clamp(e.y + my * dt, T, mh - T / 2);
+    } else {
+      if (!boxBlocked(e.x + mx * dt, e.y, k.w, k.h)) e.x += mx * dt;
+      if (!boxBlocked(e.x, e.y + my * dt, k.w, k.h)) e.y += my * dt;
+    }
     if (Math.abs(mx) + Math.abs(my) > 5) {
       const ax = e.st === 'windup' ? dx : mx, ay = e.st === 'windup' ? dy : my;
       e.dir = Math.abs(ax) > Math.abs(ay) ? (ax > 0 ? 'right' : 'left') : (ay > 0 ? 'down' : 'up');
@@ -2147,9 +3027,10 @@
     if (!ex) { exitLock = false; return; }
     if (exitLock) return;                 // только что пришли на эту клетку — ждём, пока сойдёт
     if (chase && chase.run) { stepBack(); return toast('Не упусти воровку!'); }
+    if (curEnc && curEnc.lock && enemies.length) { stepBack(); return toast(FIGHT_TEXT.doorsLocked); }
     exitLock = true;
     if (!check(ex.if)) { stepBack(); if (ex.else) startDialogue(ex.else); return; }
-    if (ex.to) fade(() => enterMap(ex.to, ex.at, ex.dir));
+    if (ex.to) fade(() => enterMap(ex.to, ex.at, ex.dir), null, MAPS[ex.to].entry);
     else if (ex.d) { stepBack(); startDialogue(ex.d); }
   }
   // отойти на шаг от выхода (назад по направлению движения)
@@ -2159,8 +3040,12 @@
     exitLock = false;
   }
 
-  let fading = 0, fadeCb = null, fadeColor = '0,0,0';
-  function fade(cb, color) { if (fading) return; fading = 0.001; fadeCb = cb; fadeColor = color === 'white' ? '255,255,255' : '0,0,0'; mode = 'fade'; }
+  // переход: 1.5 с затемнения с названием локации или 2 с полос letterbox (style 'letterbox')
+  let fading = 0, fadeCb = null, fadeColor = '0,0,0', fadeStyle = null;
+  function fade(cb, color, style) {
+    if (fading) return;
+    fading = 0.001; fadeCb = cb; fadeColor = color === 'white' ? '255,255,255' : '0,0,0'; fadeStyle = style || null; mode = 'fade';
+  }
 
   function snapCamera() {
     const mw = map.tiles[0].length * T, mh = map.tiles.length * T;
@@ -2176,18 +3061,331 @@
     cam.y += (ty - cam.y) * k;
   }
 
+  // ---------------------------------------------------------------- Атмосфера: туман, свет, частицы, дождь, передний план
+  // Передний план (рисуется вдвое крупнее, якорь — низ по центру)
+  function leafy(cols, flowers) {
+    return art(48, 28, (x) => {
+      px(x, '#3a2616', 4, 20, 40, 3); px(x, '#3a2616', 20, 14, 3, 8);
+      const blobs = [[10, 16, 8], [22, 12, 10], [34, 15, 9], [16, 8, 7], [30, 7, 7], [40, 20, 6], [6, 22, 5]];
+      blobs.forEach(([cx, cy, r], i) => {
+        x.fillStyle = cols[i % cols.length];
+        for (let yy = -r; yy <= r; yy++) for (let xx = -r; xx <= r; xx++) if (xx * xx + yy * yy <= r * r) x.fillRect(cx + xx, cy + yy, 1, 1);
+      });
+      for (let i = 0; i < 18; i++) px(x, flowers && i % 3 === 0 ? flowers : cols[cols.length - 1], (i * 17) % 44 + 2, (i * 11) % 22 + 2, 2, 2);
+    });
+  }
+  const FG_ART = {
+    branch: leafy(['#1c3f1b', '#24521f', '#2f6b2c', '#3d8237']),
+    nbranch: leafy(['#1a2620', '#22342a', '#2b4234', '#38563f'], '#b48ae0'),
+    chain: art(6, 48, (x) => { for (let i = 0; i < 12; i++) px(x, i % 2 ? '#5a5a66' : '#8a8a9a', i % 2 ? 1 : 2, i * 4, i % 2 ? 4 : 2, 4); }),
+    cloth: art(16, 56, (x) => {
+      px(x, '#5a3a22', 0, 0, 16, 3);
+      for (let c = 1; c < 15; c++) px(x, c % 4 === 0 ? '#5a0610' : c % 4 === 1 ? '#a01024' : '#7a0a1a', c, 3, 1, 44 + ((c * 7) % 9));
+    }),
+    lantern: art(10, 20, (x) => {
+      px(x, '#2a2a30', 4, 0, 2, 6); px(x, '#3a3040', 1, 6, 8, 2); px(x, '#f4c070', 2, 8, 6, 8); px(x, '#fff0c0', 3, 9, 2, 5);
+      px(x, '#3a3040', 1, 16, 8, 2);
+    }),
+    arch: art(40, 28, (x) => {
+      x.fillStyle = '#1a1014'; x.fillRect(0, 0, 40, 28);
+      x.globalCompositeOperation = 'destination-out';
+      x.beginPath(); x.ellipse(40, 28, 34, 22, 0, 0, 6.28); x.fill();
+      x.globalCompositeOperation = 'source-over';
+      x.strokeStyle = '#4a3036'; x.lineWidth = 2; x.beginPath(); x.ellipse(40, 28, 34, 22, 0, Math.PI, Math.PI * 1.5); x.stroke();
+    }),
+    curtain: art(14, 60, (x) => {
+      for (let c = 0; c < 14; c++) px(x, c % 3 === 0 ? '#2a1640' : c % 3 === 1 ? '#4a2a70' : '#3a2058', c, 0, 1, 60 - Math.max(0, 6 - c) * 2);
+      px(x, '#c9a84a', 0, 34, 14, 2);
+    }),
+    gazebo: art(64, 22, (x) => {
+      px(x, '#e8e0f0', 4, 10, 56, 6); px(x, '#b8a8d0', 4, 15, 56, 2);
+      for (let i = 0; i < 10; i++) px(x, '#f4f0fa', 30 - i * 3, i, 4 + i * 6, 1);
+      px(x, '#7a5aa0', 4, 16, 56, 2); for (let i = 0; i < 7; i++) px(x, '#7a5aa0', 6 + i * 8, 18, 3, 4);
+    }),
+  };
+  const BANNERS = {};
+  function bannerArt(c) {
+    const [cloth, trim, sign] = { nokt: ['#2a1d3d', '#9a72d0', '#c8c0d8'], lum: ['#efe6d0', '#d4af4a', '#d4af4a'], red: ['#7a0a1a', '#c9a84a', '#e8dcc0'] }[c];
+    return art(14, 44, (x) => {
+      px(x, '#5a4028', 0, 0, 14, 2); px(x, cloth, 1, 2, 12, 36); px(x, trim, 1, 2, 1, 36); px(x, trim, 12, 2, 1, 36);
+      for (let i = 0; i < 6; i++) px(x, cloth, 1 + i * 2, 38, 2, 6 - Math.abs(3 - i));
+      px(x, sign, 5, 12, 4, 4); px(x, sign, 6, 10, 2, 8); px(x, sign, 3, 13, 8, 2);
+    });
+  }
+  // размер элемента переднего плана в пикселях мира
+  function fgBox(f) {
+    if (f.t === 'line') return { l: f.x * T, r: f.x2 * T, t: f.y * T - 60, b: f.y * T };
+    if (f.t === 'beam') return { l: 0, r: map.tiles[0].length * T, t: f.y * T - 28, b: f.y * T };
+    if (f.t === 'awning') return { l: f.x * T - 70, r: f.x * T + 70, t: f.y * T - 36, b: f.y * T };
+    const im = f.t === 'banner' ? (BANNERS[f.c] ||= bannerArt(f.c)) : FG_ART[f.t];
+    const w = im.width * 2, h = im.height * 2;
+    return { l: f.x * T - w / 2, r: f.x * T + w / 2, t: f.y * T - h, b: f.y * T, im };
+  }
+
+  // Мягкие пятна тумана и частицы
+  const blobs = {};
+  function blob(rgb) {
+    return blobs[rgb] ||= art(128, 128, (x) => {
+      const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(0.55, `rgba(${rgb},.45)`); gr.addColorStop(1, `rgba(${rgb},0)`);
+      x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+    });
+  }
+  let fx = {}, puffs = [], parts = [], emit = {};
+  let fxA = 1, avgDt = 1 / 60;                       // просадка FPS — гасим альфу, а не количество
+  let rainK = 0;                                     // сила дождя 0…1, нарастает за 2 с
+  let lbox = 0, lboxWant = 0;                        // letterbox в ключевых сценах
+  const MAX_PARTS = 100;
+  function startFx() {
+    fx = LOCATION_FX[state.map] || {};
+    parts = []; emit = {};
+    puffs = [];
+    const f = fx.fog;
+    if (!f) return;
+    const mw = map.tiles[0].length * T, mh = map.tiles.length * T;
+    let spots = null;
+    if (f.where === 'water') {                       // туман только над водой
+      spots = [];
+      map.tiles.forEach((row, ty) => [...row].forEach((c, tx) => { if (c === '~' || c === 'F') spots.push([tx, ty]); }));
+    }
+    for (let layer = 0; layer < 3; layer++) {
+      const n = spots ? Math.min(6, Math.ceil(spots.length / 2)) : Math.min(16, Math.ceil(mw * mh / (T * T * 26)));
+      for (let i = 0; i < n; i++) {
+        const s = spots && spots[(Math.random() * spots.length) | 0];
+        puffs.push({
+          x: s ? (s[0] + Math.random()) * T : Math.random() * mw, y: s ? (s[1] + Math.random()) * T : Math.random() * mh,
+          r: (spots ? 1 + Math.random() : 2.2 + Math.random() * 2.4) * T * (1 + layer * 0.35), layer, ci: i,
+          a: f.a[0] + Math.random() * (f.a[1] - f.a[0]), ph: Math.random() * 6.28, home: !!s,
+        });
+      }
+    }
+  }
+  function addPart(p) { if (parts.length < MAX_PARTS) parts.push(p); }
+  function spawnPart(type, ox, oy) {
+    const rx = ox + Math.random() * W, ry = oy + Math.random() * H, R = Math.random;
+    switch (type) {
+      case 'pollen': return addPart({ type, x: rx, y: ry, vx: 8 + R() * 10, vy: -4 + R() * 8, life: 5, max: 5, s: 2, c: '255,240,150' });
+      case 'dust': return addPart({ type, x: rx, y: ry, vx: -4 + R() * 8, vy: -6 + R() * 4, life: 5, max: 5, s: 2, c: '240,230,220' });
+      case 'petal': return addPart({ type, x: ox - 20 + R() * W * 0.8, y: oy - 10, vx: 30 + R() * 30, vy: 25 + R() * 20, life: 9, max: 9, s: 4, c: '255,170,210', rot: R() * 6 });
+      case 'firefly': return addPart({ type, x: rx, y: ry, vx: 0, vy: 0, life: 6, max: 6, s: 3, c: '210,255,120', ph: R() * 6 });
+      case 'wisp': return addPart({ type: 'firefly', x: rx, y: ry, vx: 0, vy: 0, life: 6, max: 6, s: 3, c: '150,220,255', ph: R() * 6 });
+      case 'feather': return addPart({ type: 'petal', x: rx, y: oy - 10, vx: -10 + R() * 20, vy: 22 + R() * 12, life: 12, max: 12, s: 4, c: '225,240,255', rot: R() * 6 });
+      case 'drip': return addPart({ type, x: rx, y: oy, vx: 0, vy: 120, life: 1.6 + R(), max: 2.6, s: 3, c: '170,10,30' });
+      case 'glitch': return addPart({ type, x: rx, y: ry, vx: 0, vy: 0, life: 0.12 + R() * 0.25, max: 0.37, s: 4 + R() * 12, c: ['190,90,255', '90,220,255', '255,60,160'][(R() * 3) | 0] });
+      case 'bird': {
+        const left = R() < 0.5;
+        return addPart({ type, x: left ? ox - 20 : ox + W + 20, y: oy + 40 + R() * H * 0.5, vx: left ? 140 : -140, vy: 0, life: 11, max: 11, s: 6, c: '40,32,30', ph: R() * 6 });
+      }
+      case 'ember': {
+        const l = (fx.lights || [])[(R() * (fx.lights || []).length) | 0];
+        if (!l) return;
+        return addPart({ type, x: l[0] * T + R() * 20 - 10, y: l[1] * T, vx: -10 + R() * 20, vy: -40 - R() * 30, life: 1.4, max: 1.4, s: 2, c: '255,140,60' });
+      }
+    }
+  }
+  function updateFx(dt) {
+    avgDt += (dt - avgDt) * 0.05;
+    fxA = Math.max(0.4, Math.min(1, fxA + (avgDt > 1 / 45 ? -dt * 0.5 : dt * 0.25)));
+    lbox += Math.sign(lboxWant - lbox) * Math.min(Math.abs(lboxWant - lbox), dt / 0.6);
+    if (!map) return;
+    const want = fx.rain && state.flags.rain_on ? 1 : 0;
+    rainK += Math.sign(want - rainK) * Math.min(Math.abs(want - rainK), dt / 2);
+    const ox = cam.x, oy = cam.y;
+    for (const [type, rate] of Object.entries(fx.parts || {})) {
+      emit[type] = (emit[type] || 0) + rate * dt;
+      while (emit[type] >= 1) { emit[type] -= 1; spawnPart(type, ox, oy); }
+    }
+    for (const c of fx.chimneys || []) {           // дым из труб
+      if (Math.random() < dt * 2.5) addPart({ type: 'smoke', x: c[0] * T, y: c[1] * T, vx: 10 + Math.random() * 8, vy: -26, life: 3, max: 3, s: 8, c: '200,200,205' });
+    }
+    if (rainK > 0.05 && Math.random() < dt * 30 * rainK) {
+      addPart({ type: 'splash', x: ox + Math.random() * W, y: oy + Math.random() * H, vx: 0, vy: 0, life: 0.3, max: 0.3, s: 4, c: '200,220,255' });
+    }
+    for (const p of parts) {
+      p.life -= dt;
+      if (p.type === 'firefly') { p.ph += dt; p.vx += Math.cos(p.ph * 1.3) * 30 * dt; p.vy += Math.sin(p.ph * 0.9) * 30 * dt; p.vx *= 0.98; p.vy *= 0.98; }
+      if (p.type === 'drip') p.vy += 500 * dt;
+      if (p.type === 'smoke') p.s += dt * 7;
+      if (p.type === 'bird') p.vy = Math.sin(time * 3 + p.ph) * 20;
+      if (p.type === 'petal' || p.type === 'pollen') p.vx += Math.sin(time + p.y * 0.01) * 6 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.type === 'drip' && p.life <= 0) addPart({ type: 'splash', x: p.x, y: p.y, vx: 0, vy: 0, life: 0.3, max: 0.3, s: 4, c: p.c });
+    }
+    parts = parts.filter((p) => p.life > 0);
+  }
+
+  function renderFog(ox, oy) {
+    const f = fx.fog;
+    if (f) {
+      const mw = map.tiles[0].length * T;
+      const pulse = f.pulse ? 0.65 + 0.35 * Math.max(0, Math.sin(time * 2.6)) : 1;    // орган: туман дышит в такт
+      const cyc = f.colors ? (time * 0.15) % f.colors.length : 0;
+      for (const p of puffs) {
+        const speed = f.speed * (0.6 + p.layer * 0.45);
+        let x = p.home ? p.x + Math.sin(time * 0.3 + p.ph) * T : ((p.x + time * speed) % (mw + 2 * p.r)) - p.r;
+        const px2 = x - ox * (0.9 + p.layer * 0.1), py2 = p.y + Math.sin(time * 0.4 + p.ph) * 12 - oy;
+        if (px2 < -p.r * 2 || px2 > W + p.r * 2 || py2 < -p.r || py2 > H + p.r) continue;
+        const a = p.a * pulse * fxA * (0.8 + 0.2 * Math.sin(time * 0.7 + p.ph));
+        if (f.colors) {                              // лабиринт: туман меняет цвет
+          const i = Math.floor(cyc + p.ci * 0.37) % f.colors.length, k = (cyc + p.ci * 0.37) % 1;
+          g.globalAlpha = a * (1 - k); g.drawImage(blob(f.colors[i]), px2 - p.r, py2 - p.r * 0.6, p.r * 2, p.r * 1.2);
+          g.globalAlpha = a * k; g.drawImage(blob(f.colors[(i + 1) % f.colors.length]), px2 - p.r, py2 - p.r * 0.6, p.r * 2, p.r * 1.2);
+        } else {
+          g.globalAlpha = a; g.drawImage(blob(f.rgb), px2 - p.r, py2 - p.r * 0.6, p.r * 2, p.r * 1.2);
+        }
+      }
+      g.globalAlpha = 1;
+    }
+    if (fx.oddShadow && state) {                     // тень, которая идёт не за героем
+      const sx = hero.x - ox + Math.cos(time * 0.7) * 46, sy = hero.y - oy + Math.sin(time * 0.9) * 16;
+      g.fillStyle = 'rgba(0,0,0,.4)';
+      g.beginPath(); g.ellipse(sx, sy - 2, 24, 8, 0, 0, 6.28); g.fill();
+    }
+    if (rainK > 0) {                                 // рябь в лужах
+      for (const [px3, py3] of fx.puddles || []) {
+        const X = px3 * T - ox, Y = py3 * T - oy;
+        g.fillStyle = `rgba(60,80,110,${0.35 * rainK})`;
+        g.beginPath(); g.ellipse(X, Y, 44, 16, 0, 0, 6.28); g.fill();
+        for (let i = 0; i < 2; i++) {
+          const k = (time * 0.9 + i * 0.5 + px3) % 1;
+          g.strokeStyle = `rgba(200,220,255,${(1 - k) * 0.5 * rainK})`; g.lineWidth = 1.5;
+          g.beginPath(); g.ellipse(X + (i ? 12 : -10), Y, 6 + k * 22, 2 + k * 7, 0, 0, 6.28); g.stroke();
+        }
+      }
+    }
+  }
+
+  function drawParts(ox, oy) {
+    for (const p of parts) {
+      const x = p.x - ox, y = p.y - oy, a = Math.min(1, p.life / p.max * 3, (p.max - p.life) * 4) * fxA;
+      if (p.type === 'smoke') { g.globalAlpha = a * 0.3 * (p.life / p.max); g.drawImage(blob(p.c), x - p.s, y - p.s, p.s * 2, p.s * 2); continue; }
+      if (p.type === 'firefly') {
+        const k = 0.5 + 0.5 * Math.sin(p.ph * 6);
+        g.globalAlpha = a * k * 0.5; g.drawImage(blob(p.c), x - 10, y - 10, 20, 20);
+        g.globalAlpha = a * k; g.fillStyle = `rgb(${p.c})`; g.fillRect(x - 1.5, y - 1.5, 3, 3); continue;
+      }
+      if (p.type === 'bird') {
+        g.globalAlpha = a; g.strokeStyle = `rgb(${p.c})`; g.lineWidth = 2;
+        const w = Math.sin(time * 12 + p.ph) * 4;
+        g.beginPath(); g.moveTo(x - 7, y - 3 + w); g.lineTo(x, y); g.lineTo(x + 7, y - 3 + w); g.stroke(); continue;
+      }
+      if (p.type === 'splash') {
+        g.globalAlpha = a * 0.7; g.strokeStyle = `rgb(${p.c})`; g.lineWidth = 1;
+        const k = 1 - p.life / p.max;
+        g.beginPath(); g.ellipse(x, y, 2 + k * 7, 1 + k * 2.5, 0, 0, 6.28); g.stroke(); continue;
+      }
+      g.globalAlpha = a;
+      g.fillStyle = `rgb(${p.c})`;
+      if (p.type === 'petal') { g.save(); g.translate(x, y); g.rotate(p.rot + time * 2); g.fillRect(-3, -1.5, 6, 3); g.restore(); continue; }
+      if (p.type === 'drip') { g.fillRect(x - 1, y - 5, 2, 6); continue; }
+      g.fillRect(x - p.s / 2, y - p.s / 2, p.s, p.s);
+    }
+    g.globalAlpha = 1;
+  }
+
+  // свет: свечи, окна, фонари, орган — пульсирующие пятна 'lighter'; косые лучи
+  function renderLights(ox, oy) {
+    const lights = (fx.lights || []).slice();
+    for (const f of fx.fg || []) if (f.t === 'lantern') lights.push([f.x, f.y - 0.1, 1, '255,200,120', 0.3]);
+    g.globalCompositeOperation = 'lighter';
+    lights.forEach(([x, y, r, rgb, pul], i) => {
+      if (fx.candles && state.flags.organ_fight && Math.sin(time * 2.3 + i * 7.1) > 0.82) return;   // свеча гаснет и загорается снова
+      const X = x * T - ox, Y = y * T - oy, R = r * T * (1 + (pul || 0) * 0.25 * Math.sin(time * (3 + i * 0.7) + i)) * (fx.candles ? 0.85 + Math.random() * 0.2 : 1);
+      if (X < -R || X > W + R || Y < -R || Y > H + R) return;
+      const gr = g.createRadialGradient(X, Y, 0, X, Y, R);
+      gr.addColorStop(0, `rgba(${rgb},${0.22 * fxA})`); gr.addColorStop(1, `rgba(${rgb},0)`);
+      g.fillStyle = gr; g.fillRect(X - R, Y - R, R * 2, R * 2);
+    });
+    for (const [x, y] of fx.rays || []) {
+      const X = x * T - ox, Y = y * T - oy, a = (0.07 + 0.03 * Math.sin(time * 0.8 + x)) * fxA;
+      const gr = g.createLinearGradient(X, Y, X + 160, Y + 420);
+      gr.addColorStop(0, `rgba(255,240,200,${a})`); gr.addColorStop(1, 'rgba(255,240,200,0)');
+      g.fillStyle = gr;
+      g.beginPath(); g.moveTo(X, Y); g.lineTo(X + 50, Y); g.lineTo(X + 230, Y + 420); g.lineTo(X + 120, Y + 420); g.closePath(); g.fill();
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+
+  function renderForeground(ox, oy) {
+    const hb = { l: hero.x - 18, r: hero.x + 18, t: hero.y - 62, b: hero.y };
+    for (const f of fx.fg || []) {
+      const b = fgBox(f);
+      if (b.r - ox < 0 || b.l - ox > W || b.b - oy < 0 || b.t - oy > H + 40) continue;
+      const behind = hb.r > b.l && hb.l < b.r && hb.b > b.t && hb.t < b.b;
+      g.globalAlpha = behind ? 0.4 : 1;              // герой за объектом — тот прозрачнеет
+      const sway = f.t === 'branch' || f.t === 'nbranch' || f.t === 'cloth' || f.t === 'banner' ? Math.sin(time * 1.2 + f.x) * 2 : 0;
+      if (f.t === 'line') {                          // бельё на верёвке
+        const x1 = f.x * T - ox, x2 = f.x2 * T - ox, y = f.y * T - 56 - oy;
+        g.strokeStyle = '#6a5a48'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(x1, y); g.quadraticCurveTo((x1 + x2) / 2, y + 18, x2, y); g.stroke();
+        const cols = ['#d8d0c0', '#7a9ac0', '#c07a7a', '#e0c890', '#9ac08a'];
+        for (let i = 0, n = Math.floor((x2 - x1) / 34); i < n; i++) {
+          const cx = x1 + 14 + i * 34, cy = y + 4 + Math.sin(i / Math.max(1, n - 1) * Math.PI) * 15;
+          g.fillStyle = cols[(i + f.x) % cols.length | 0];
+          g.fillRect(cx + Math.sin(time * 2 + i) * 2, cy, 20, 24 + (i % 2) * 6);
+        }
+      } else if (f.t === 'beam') {
+        g.fillStyle = '#2a1a10'; g.fillRect(b.l - ox, b.t - oy, b.r - b.l, 28); g.fillStyle = '#4a3020'; g.fillRect(b.l - ox, b.t - oy, b.r - b.l, 6);
+      } else if (f.t === 'awning') {
+        for (let i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#e8e0d0' : f.c; g.fillRect(b.l - ox + i * 20, b.t - oy, 20, 30); }
+        for (let i = 0; i < 7; i++) { g.fillStyle = i % 2 ? '#e8e0d0' : f.c; g.beginPath(); g.arc(b.l - ox + i * 20 + 10, b.t - oy + 30, 10, 0, Math.PI); g.fill(); }
+      } else {
+        g.save();
+        g.translate(f.x * T - ox, f.y * T - oy);
+        if (f.flip) g.scale(-1, 1);
+        if (sway) g.rotate(sway * 0.01);
+        g.drawImage(b.im, -b.im.width, -b.im.height * 2, b.im.width * 2, b.im.height * 2);
+        g.restore();
+      }
+    }
+    g.globalAlpha = 1;
+    drawParts(ox, oy);
+    renderLights(ox, oy);
+    if (rainK > 0) {                                 // дождь: косые струи и холодный оттенок
+      g.fillStyle = `rgba(30,50,80,${0.18 * rainK})`; g.fillRect(0, 0, W, H);
+      g.strokeStyle = `rgba(190,210,240,${0.4 * rainK * fxA})`; g.lineWidth = 1.5;
+      g.beginPath();
+      for (let i = 0; i < 140; i++) {
+        const sx = (i * 97.3) % 1, sy = (i * 57.9) % 1, sp = 900 + (i % 7) * 60;
+        const y = (sy * H + time * sp) % (H + 40) - 20, x = (sx * (W + 200) - (time * sp * 0.25) % (W + 200) + W + 200) % (W + 200) - 100;
+        g.moveTo(x, y); g.lineTo(x - 6, y + 22);
+      }
+      g.stroke();
+    }
+    if (fx.vignette) {                               // виньетка: сила зависит от локации
+      const gr = g.createRadialGradient(W / 2, H / 2, H * 0.38, W / 2, H / 2, W * 0.72);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${0.85 * fx.vignette})`);
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    }
+  }
+
   // ---------------------------------------------------------------- Рисование
   function draw() {
     g.fillStyle = '#0b0908';
     g.fillRect(0, 0, W, H);
     if (!map) { drawCrack(); return; }
-
     const ox = Math.round(cam.x), oy = Math.round(cam.y);
+    g.save();
+    if (zoom.k !== 1) {                              // наезд камеры на точку (органный балкон)
+      const fx0 = zoom.x - ox, fy0 = zoom.y - oy, p = Math.min(1, (zoom.k - 1) / 0.4);   // точка плывёт к центру кадра
+      g.translate(fx0 + (W / 2 - fx0) * p, fy0 + (H * 0.42 - fy0) * p); g.scale(zoom.k, zoom.k); g.translate(-fx0, -fy0);
+    }
+    renderGround(ox, oy);
+    renderFog(ox, oy);
+    const objs = [];
+    renderMid(objs, ox, oy);
+    renderEntities(objs, ox, oy);
+    renderForeground(ox, oy);
+    g.restore();
+    if (dim > 0) { g.fillStyle = `rgba(20,0,4,${Math.min(0.6, dim * 0.5)})`; g.fillRect(0, 0, W, H); }
+    renderUI(ox, oy);
+  }
+
+  // земля: тайлы, блики воды, затопление пола
+  function renderGround(ox, oy) {
     const rows = map.tiles.length, cols = map.tiles[0].length;
     const x0 = Math.max(0, Math.floor(ox / T)), y0 = Math.max(0, Math.floor(oy / T));
     const x1 = Math.min(cols - 1, Math.floor((ox + W) / T)), y1 = Math.min(rows - 1, Math.floor((oy + H) / T));
-
-    // земля
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         let t = map.tiles[ty][tx];
@@ -2211,19 +3409,36 @@
         }
       }
     }
-
     drawHazard(ox, oy);
+    if (curEnc && curEnc.lock && enemies.length) {   // бой: выходы затянуты льдом
+      for (const ex of map.exits || []) {
+        const X = ex.x * T - ox, Y = ex.y * T - oy;
+        g.fillStyle = `rgba(140,210,255,${0.45 + 0.1 * Math.sin(time * 3)})`; g.fillRect(X, Y, T, T);
+        g.strokeStyle = 'rgba(230,248,255,.8)'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(X + 8, Y + 8); g.lineTo(X + T - 8, Y + T - 8); g.moveTo(X + T - 8, Y + 8); g.lineTo(X + 8, Y + T - 8); g.stroke();
+      }
+    }
+  }
 
-    // объекты по глубине (нижняя кромка)
-    const objs = [];
-    for (let ty = y0; ty <= Math.min(rows - 1, y1 + 1); ty++) {
+  // средний слой: деревья, колонны, мебель, статуи — в общий список глубины
+  function renderMid(objs, ox, oy) {
+    const rows = map.tiles.length, cols = map.tiles[0].length;
+    const x0 = Math.max(0, Math.floor(ox / T)), y0 = Math.max(0, Math.floor(oy / T));
+    const x1 = Math.min(cols - 1, Math.floor((ox + W) / T)), y1 = Math.min(rows - 1, Math.floor((oy + H) / T));
+    for (let ty = y0; ty <= Math.min(rows - 1, y1 + 2); ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         const t = map.tiles[ty][tx];
         if (t === 'T') objs.push({ y: ty * T + T, draw: () => g.drawImage(TREE, tx * T - ox, ty * T - oy - 32, 64, 96) });
         if (t === 'P') objs.push({ y: ty * T + T - 4, draw: () => g.drawImage(PILLAR, tx * T - ox, ty * T - oy - 64, 64, 128) });
       }
     }
-    for (const n of npcs) objs.push({ y: n.prop === 'note' ? n.py - 30 : n.py, draw: () => drawNpc(n, ox, oy) });
+    for (const n of npcs) if (n.prop) objs.push({ y: n.prop === 'note' ? n.py - 30 : n.py, draw: () => drawNpc(n, ox, oy) });
+    if (hunt) for (const a of hunt.anchors) objs.push({ y: a.py, draw: () => drawAnchor(a, ox, oy) });
+  }
+
+  // персонажи: сортировка вместе со средним слоем по нижней кромке — герой ниже объекта рисуется поверх, выше — за ним
+  function renderEntities(objs, ox, oy) {
+    for (const n of npcs) if (!n.prop) objs.push({ y: n.py, draw: () => drawNpc(n, ox, oy) });
     for (const e of enemies) objs.push({ y: e.y, draw: () => drawEnemy(e, ox, oy) });
     objs.push({ y: hero.y, draw: () => drawHero(ox, oy) });
     if (chase) objs.push({ y: chase.y, draw: () => drawThief(ox, oy) });
@@ -2233,11 +3448,14 @@
     drawGhost(ox, oy);
     drawCombatFx(ox, oy);
     drawFireflies(ox, oy);
+  }
+
+  // интерфейс поверх мира: тьма лабиринта, трещина, подсказка «E», полоски, мини-игры, letterbox, переход
+  function renderUI(ox, oy) {
     drawMind(ox, oy);
+    drawRooms(ox, oy);
     if (map.vignette) drawVignette(ox, oy);
     drawCrack();
-
-    // подсказка «E»
     if (near && mode === 'play') {
       const X = near.px - ox, Y = near.py - oy - 84 + Math.sin(time * 5) * 3;
       g.fillStyle = '#e2b65a';
@@ -2247,14 +3465,27 @@
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText('E', X, Y + 1);
     }
-
-    if (state && mode !== 'title' && mode !== 'create') { drawBars(); drawChaseTimer(); drawBossBar(); }
+    if (lbox > 0) {                                  // киношные полосы в ключевых сценах
+      g.fillStyle = '#000';
+      g.fillRect(0, 0, W, 90 * lbox); g.fillRect(0, H - 90 * lbox, W, 90 * lbox);
+    }
+    if (state && mode !== 'title' && mode !== 'create') { drawBars(); drawMadness(); drawRoomsHud(); drawChaseTimer(); drawBossBar(); drawPathIcon(); }
     if (mode === 'mini') drawMini();
-
-    // затемнение при переходе
-    if (fading) {
-      g.fillStyle = `rgba(${fadeColor},${fading < 1 ? fading : Math.max(0, 2 - fading)})`;
-      g.fillRect(0, 0, W, H);
+    if (fading) {                                    // переход: затемнение (или полосы letterbox) с названием локации
+      const k = fading < 1 ? fading : Math.max(0, 2 - fading);
+      if (fadeStyle === 'letterbox') {
+        g.fillStyle = '#000';
+        g.fillRect(0, 0, W, H / 2 * k); g.fillRect(0, H - H / 2 * k, W, H / 2 * k);
+      } else {
+        g.fillStyle = `rgba(${fadeColor},${k})`;
+        g.fillRect(0, 0, W, H);
+      }
+      if (fading > 1 && fadeColor !== '255,255,255') {
+        g.globalAlpha = Math.min(1, (2 - fading) * 2.5, (fading - 1) * 6);
+        g.font = '44px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillStyle = '#e2c98a'; g.fillText(map.title, W / 2, H / 2);
+        g.globalAlpha = 1;
+      }
     }
   }
 
@@ -2277,13 +3508,24 @@
   }
 
   function shadow(x, y, w) {
-    g.fillStyle = 'rgba(0,0,0,.28)';
-    g.beginPath(); g.ellipse(x, y, w, w * 0.32, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.28)';                   // чуть смещена — свет сверху слева
+    g.beginPath(); g.ellipse(x + 4, y + 2, w, w * 0.32, 0, 0, Math.PI * 2); g.fill();
   }
 
   function drawHero(ox, oy) {
     const x = Math.round(hero.x - ox), y = Math.round(hero.y - oy);
+    for (const t of hero.trail) {                    // шлейф рывка
+      const tp = heroSprite(t.dir);
+      if (!ready(tp)) continue;
+      g.globalAlpha = t.life * 2;
+      g.drawImage(silhouette(tp, '#9ad8ff'), Math.round(t.x - ox) - 32, Math.round(t.y - oy) - 64, 64, 64);
+    }
+    g.globalAlpha = 1;
     shadow(x, y - 2, 20);
+    if (hero.casting) {                              // каст: светящийся круг под героем
+      g.strokeStyle = `rgba(${elemColor()},.8)`; g.lineWidth = 3;
+      g.beginPath(); g.ellipse(x, y - 4, 30 * (1 - hero.casting.t / 0.25) + 10, 12, 0, 0, 6.28); g.stroke();
+    }
     const bob = hero.moving ? Math.abs(Math.sin(hero.walk)) * 4 : Math.sin(time * 2) * 1;
     const sp = heroSprite(hero.dir);
     if (!ready(sp)) return;
@@ -2293,16 +3535,57 @@
     g.globalAlpha = 1;
   }
 
+  // голубая волна меча: соседние живые точки одной волны — одна светящаяся дуга
+  function drawWaves(ox, oy) {
+    const groups = {};
+    for (const b of ebolts) if (b.wave && b.life > 0) (groups[b.wave] = groups[b.wave] || []).push(b);
+    g.lineCap = 'round';
+    for (const pts of Object.values(groups)) {
+      pts.sort((a, b) => a.wi - b.wi);
+      const rgb = pts[0].rgb;
+      for (const [w, a] of [[22, 0.25], [11, 0.75], [4, 1]]) {
+        g.strokeStyle = a === 1 ? 'rgba(235,250,255,.95)' : `rgba(${rgb},${a})`; g.lineWidth = w;
+        g.beginPath();
+        pts.forEach((p, i) => {
+          if (i && p.wi === pts[i - 1].wi + 1) g.lineTo(p.x - ox, p.y - oy); else g.moveTo(p.x - ox, p.y - oy);
+        });
+        if (pts.length === 1) g.lineTo(pts[0].x - ox + 1, pts[0].y - oy);
+        g.stroke();
+      }
+    }
+    g.lineCap = 'butt';
+  }
+
   function drawEnemy(e, ox, oy) {
     const x = Math.round(e.x - ox), y = Math.round(e.y - oy);
     const sp = e.k.art ? ART[e.k.art] : img(`assets/sprites/${e.k.sprite || e.kind}_${e.dir}.png`);
     if (!e.k.art && !ready(sp)) return;
+    for (const t of e.trail || []) {                  // шлейф рывка
+      g.globalAlpha = t.life * 2;
+      g.drawImage(silhouette(img(`assets/sprites/${e.k.sprite || e.kind}_${t.dir}.png`), '#7ac8ff'), Math.round(t.x - ox) - 32, Math.round(t.y - oy) - 64, 64, 64);
+    }
+    g.globalAlpha = 1;
+    if (e.k.ghost) {                                  // призрак: полупрозрачный, парит, без тени
+      g.globalAlpha = (e.dead ? Math.max(0, 1 - e.dead / 0.6) : 1) * (0.55 + 0.15 * Math.sin(time * 4 + e.wander));
+      const fy = y - 10 + Math.sin(time * 3 + e.wander) * 4;
+      g.drawImage(silhouette(sp, e.k.tint), x - 32, fy - 64, 64, 64);
+      g.globalAlpha *= 0.5; g.drawImage(sp, x - 32, fy - 64, 64, 64);
+      if (e.hit > 0) { g.globalAlpha = 1; g.drawImage(silhouette(sp, '#ffffff'), x - 32, fy - 64, 64, 64); }
+      g.globalAlpha = 1;
+      if (!e.dead && e.st === 'windup') { g.fillStyle = '#9ad8ff'; g.font = 'bold 34px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText('!', x, fy - 70); }
+      return;
+    }
     if (e.dead) g.globalAlpha = Math.max(0, 1 - e.dead / 0.6);
     shadow(x, y - 2, 24);
     const crouch = e.st === 'windup' ? 6 : 0;
     const hop = e.st === 'lunge' ? 10 : (e.st === 'chase' ? Math.abs(Math.sin(time * 12 + e.wander)) * 3 : 0);
     const sh = e.dead ? 64 * (1 - e.dead / 1.2) : 64;
     g.drawImage(sp, x - 32, y - sh + crouch - hop, 64, sh - crouch);
+    if (e.k.tint) {
+      g.globalAlpha *= 0.45 + 0.15 * Math.sin(time * 5);
+      g.drawImage(silhouette(sp, e.k.tint), x - 32, y - sh + crouch - hop, 64, sh - crouch);
+      g.globalAlpha = e.dead ? Math.max(0, 1 - e.dead / 0.6) : 1;
+    }
     if (e.hit > 0) g.drawImage(silhouette(sp, '#ffffff'), x - 32, y - sh + crouch - hop, 64, sh - crouch);
     g.globalAlpha = 1;
     if (e.dead) return;
@@ -2345,7 +3628,9 @@
         g.fillStyle = '#fff'; g.fillRect(x - 3, y - 3, 6, 6);
       }
     }
+    drawWaves(ox, oy);
     for (const b of ebolts) {
+      if (b.wave) continue;
       const x = b.x - ox, y = b.y - oy;
       g.fillStyle = `rgba(${b.rgb},.35)`; g.beginPath(); g.arc(x, y, 14, 0, 6.28); g.fill();
       g.fillStyle = `rgb(${b.rgb})`; g.beginPath(); g.arc(x, y, 8, 0, 6.28); g.fill();
@@ -2388,15 +3673,81 @@
     g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(X + 4, Y + 4, Wd * hp / max, 4);
     g.font = 'bold 16px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillStyle = '#fff'; g.fillText(`ОЗ ${Math.ceil(hp)} / ${max}`, X + 4 + Wd / 2, Y + 14);
+    // опыт до следующего уровня
+    const L = lvl(), x0 = xpFor(L), x1 = xpFor(L + 1), xp = state.flags.xp || 0;
+    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y + 26, Wd + 8, 10);
+    g.fillStyle = '#e2b65a'; g.fillRect(X + 4, Y + 29, Wd * Math.min(1, (xp - x0) / (x1 - x0)), 4);
+    // запас стрел, мана посоха, готовность рывка
+    const w = WEAPONS[state.hero.weapon];
+    let rx = X;
+    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y + 38, Wd + 8, 22);
+    const ammoN = maxAmmo(w);
+    if (ammoN) {
+      for (let i = 0; i < ammoN; i++) {
+        const part = Math.max(0, Math.min(1, hero.ammo - i));
+        g.fillStyle = part >= 1 ? '#f4dca0' : '#4a3f33';
+        g.fillRect(X + 8 + i * 16, Y + 42, 4, 14);
+        if (part > 0 && part < 1) { g.fillStyle = '#a08a60'; g.fillRect(X + 8 + i * 16, Y + 56 - 14 * part, 4, 14 * part); }
+        g.fillStyle = part >= 1 ? '#c8423a' : '#3a2f25'; g.fillRect(X + 6 + i * 16, Y + 42, 8, 3);
+      }
+      rx = X + 8 + ammoN * 16;
+    } else if (w.manaCost) {
+      g.fillStyle = '#1a2440'; g.fillRect(X + 4, Y + 43, 150, 12);
+      g.fillStyle = hero.mana >= w.manaCost ? '#5a9aff' : '#3a5a9a'; g.fillRect(X + 4, Y + 43, 150 * hero.mana / maxMana(), 12);
+      g.font = 'bold 11px sans-serif'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(`Мана ${Math.floor(hero.mana)}`, X + 79, Y + 50);
+      rx = X + 162;
+    }
+    g.font = 'bold 13px sans-serif'; g.textAlign = 'left';
+    g.fillStyle = hero.dashCd > 0 ? '#7d7062' : '#9ad8ff';
+    g.fillText(hero.dashCd > 0 ? `Рывок ${hero.dashCd.toFixed(1)}` : 'Рывок ⇧', rx + 6, Y + 50);
+    g.textAlign = 'center';
     if (state.flags.got_flask) {
       const fx = X + Wd + 22, full = state.flags.has_water_flask;
       g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(fx - 4, Y - 6, 62, 38);
       g.fillStyle = '#b9dbe6'; g.fillRect(fx + 4, Y + 2, 14, 24); g.fillRect(fx + 8, Y - 3, 6, 6);
-      if (full) { g.fillStyle = '#5ad0ff'; g.fillRect(fx + 6, Y + 8, 10, 16); }
+      if (full) { g.fillStyle = '#d0283c'; g.fillRect(fx + 6, Y + 8, 10, 16); }
+      else if (flaskT > 0) { g.fillStyle = '#7a1824'; g.fillRect(fx + 6, Y + 24 - 16 * (1 - flaskT / 8), 10, 16 * (1 - flaskT / 8)); }
       g.fillStyle = full ? '#f4dca0' : '#7d7062';
       g.font = 'bold 18px sans-serif'; g.textAlign = 'left';
       g.fillText('Q', fx + 28, Y + 14);
+      const pots = inv('potion_s') + inv('potion_m');
+      if (pots) { g.font = 'bold 12px sans-serif'; g.fillStyle = '#e8a0b0'; g.fillText('+' + pots, fx + 28, Y + 30); }
     }
+    drawStatusIcons(X + Wd + 96, Y - 6);
+  }
+  // Индикатор пути: после храма — выбранный путь, до него — ведущий счётчик path_* (при равенстве — «не выбран»)
+  function leadPath() {
+    const f = state.flags;
+    if (f.temple_path) return f.temple_path;
+    const c = ['hope', 'power', 'hate'].map((k) => [k, f['path_' + k] || 0]).sort((a, b) => b[1] - a[1]);
+    return c[0][1] > c[1][1] ? c[0][0] : 'none';
+  }
+  function drawPathIcon() {
+    const p = PATHS[leadPath()] || PATHS.none, x = W - 150, y = 40;
+    g.fillStyle = 'rgba(10,8,6,.7)'; g.beginPath(); g.arc(x, y, 22, 0, 6.29); g.fill();
+    g.strokeStyle = p.color; g.lineWidth = 3; g.stroke();
+    g.fillStyle = p.color; g.font = 'bold 22px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(p.icon, x, y + 1);
+    g.font = 'bold 13px sans-serif'; g.fillStyle = 'rgba(0,0,0,.7)'; g.fillText(p.name, x + 1, y + 35);
+    g.fillStyle = p.color; g.fillText(p.name, x, y + 34);
+  }
+  // Благословения, проклятия и еда — значки справа от Сосуда (на пути Ненависти благословения тусклые)
+  function drawStatusIcons(x, y) {
+    const list = [];
+    for (const k in BLESSINGS) if (BLESSINGS[k].icon && state.flags['bless_' + k]) list.push({ icon: BLESSINGS[k].icon, on: blessed(k), c: '#e2b65a' });
+    for (const k in CURSES) if (state.flags['curse_' + k]) list.push({ icon: CURSES[k].icon, on: true, c: '#a0304a' });
+    if (buffs.dmg > 0) list.push({ icon: ITEMS.pie.icon, on: true, c: '#9cf0a0', t: buffs.dmg });
+    if (buffs.speed > 0) list.push({ icon: ITEMS.gingerbread.icon, on: true, c: '#9cf0a0', t: buffs.speed });
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    list.forEach((s, i) => {
+      const cx = x + i * 40 + 18, cy = y + 19;
+      g.globalAlpha = s.on ? 1 : 0.35;
+      g.fillStyle = 'rgba(10,8,6,.75)'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.29); g.fill();
+      g.strokeStyle = s.c; g.lineWidth = 2; g.stroke();
+      g.font = '18px sans-serif'; g.fillStyle = '#fff'; g.fillText(s.icon, cx, cy + 1);
+      if (s.t) { g.font = 'bold 11px sans-serif'; g.fillStyle = '#9cf0a0'; g.fillText(Math.ceil(s.t), cx, cy + 26); }
+      g.globalAlpha = 1;
+    });
   }
 
   function drawNpc(n, ox, oy) {
@@ -2407,10 +3758,26 @@
     if (n.prop === 'pew') { g.drawImage(PEW, x - 96, y - 40, 192, 64); return; }
     if (n.prop === 'mirror') { g.drawImage(MIRROR, x - 36, y - 104, 72, 108); return; }
     if (n.prop === 'desk') { g.drawImage(DESK, x - 96, y - 82, 192, 112); return; }
-    if (n.prop === 'organ') { g.drawImage(state.flags.organ_broken ? ORGAN_BROKEN : ORGAN, x - 192, y - 160, 384, 192); return; }
+    if (n.prop === 'organ') {
+      g.drawImage(state.flags.organ_broken ? ORGAN_BROKEN : ORGAN, x - 192, y - 160, 384, 192);
+      if (state.flags.organ_fight && !state.flags.organ_broken) {      // Долита играет: трубы вспыхивают по очереди в такт
+        const step = Math.floor(time / BEAT), beat = 1 - (time % BEAT) / BEAT;
+        g.globalCompositeOperation = 'lighter';
+        for (const i of [step % 15, 14 - (step % 15)]) {
+          const h = 28 - 3 * Math.abs(7 - i), X = x - 192 + (4 + i * 6) * 4, Y = y - 160 + (30 - h) * 4;
+          g.fillStyle = `rgba(255,70,80,${0.55 * beat})`; g.fillRect(X, Y, 16, h * 4);
+          g.drawImage(blob('255,60,70'), X - 24, Y - 40, 64, 64);
+        }
+        g.globalCompositeOperation = 'source-over';
+      }
+      return;
+    }
     if (n.prop === 'nthrone') { g.drawImage(NTHRONE, x - 48, y - 108, 96, 112); return; }
     if (n.prop === 'table') { g.drawImage(TABLE, x - 192, y - 100, 384, 128); return; }
     if (n.prop === 'arch') { g.drawImage(ARCH, x - 96, y - 176, 192, 192); return; }
+    if (n.prop === 'commode') { shadow(x, y - 2, 44); g.drawImage(COMMODE, x - 48, y - 46, 96, 48); return; }
+    if (n.prop === 'stand') { shadow(x, y - 2, 20); g.drawImage(STAND, x - 24, y - 62, 48, 64); return; }
+    if (n.prop === 'portrait') { drawPortraitProp(n.who, x, y); return; }
     if (n.prop === 'nhouse') { g.drawImage(NHOUSE, x - 72, y - 128, 144, 132); return; }
     if (n.prop === 'stall') { g.drawImage(stalls[n.color] ||= stallArt(n.color), x - 48, y - 80, 96, 84); return; }
     if (n.prop === 'statue') {
@@ -2450,6 +3817,11 @@
     }
     const sp = img(`assets/sprites/${n.sprite}_${dir}.png`);
     if (ready(sp)) g.drawImage(sp, x - 32, Math.round(y - 64 + Math.sin(time * 2 + n.px) * 1), 64, 64);
+    if (n.tint && ready(sp)) {
+      g.globalAlpha = 0.4 + 0.15 * Math.sin(time * 4);
+      g.drawImage(silhouette(sp, n.tint), x - 32, Math.round(y - 64 + Math.sin(time * 2 + n.px) * 1), 64, 64);
+      g.globalAlpha = 1;
+    }
     if (n.menace && state.flags.void_raise && ready(sp)) {          // подняли оружие: багровое свечение
       g.globalAlpha = 0.25 + 0.15 * Math.sin(time * 8);
       g.drawImage(silhouette(sp, '#ff1030'), x - 32, Math.round(y - 64), 64, 64);
@@ -2484,6 +3856,7 @@
     apply(l);
     if (map && (l.set || l.add)) refreshNpcs();      // персонажи появляются/исчезают прямо по ходу сцены
     if (l.fx === 'flash') flash();
+    if (l.fx === 'red') { flash('#c0102a'); dim = 1.6; }
     const ch = CHARACTERS[l.who] || { name: l.who, portrait: '' };
     const portrait = ch.portrait ? render(ch.portrait) : '';
     const pimg = $('dlg-portrait');
@@ -2551,6 +3924,8 @@
 
   function endDialogue() {
     $('dialog').hidden = true;
+    lboxWant = 0;
+    zoom.want = 1;
     const p = pending;
     pending = {};
     if (map) {
@@ -2561,11 +3936,155 @@
     updateHud();
     if (mode === 'dialog') mode = 'play';
     save();
-    if (p.scene) fade(() => enterMap(p.scene.scene, p.scene.at, p.scene.dir), p.scene.fx === 'flash' ? 'white' : null);
+    if (p.scene) fade(() => enterMap(p.scene.scene, p.scene.at, p.scene.dir), p.scene.fx === 'flash' ? 'white' : null, MAPS[p.scene.scene].entry);
     else if (p.mini) startMini(p.mini);
     else if (p.ending) showEnding(p.ending);
     else if (p.lock) lockGame();
+    else if (p.ui) openPanel(p.ui);
+    else if (p.duelEnd) endDuel();
   }
+
+  // ---------------------------------------------------------------- Перчатка вызова: бой на арене и возврат в мир
+  function startDuel(id) {
+    const d = DUELS.list[id], f = state.flags;
+    f.duel_ret = { map: state.map, at: [hero.x / T - 0.5, (hero.y + 6) / T - 1], dir: hero.dir };
+    panel = null; screen(null); mode = 'play';
+    fade(() => {
+      enterMap('arena', [7.5, 8], 'up');
+      curEnc = { lock: true, duel: id, onClear: { add: { mana_points: 1, ['duel_' + id + '_won']: 1 }, toast: DUELS.won, d: 'duel_won' } };
+      enemies = d.enemies.map(([kind, x, y]) => Object.assign(spawnEnemy({ kind, x, y }), { st: 'chase' }));
+      flaskRefill = 1; flaskT = 0;
+      if (f.got_flask && !f.has_water_flask) { flaskRefill = 0; f.has_water_flask = true; }
+      setTimeout(() => startDialogue('duel_start'), 600);
+    });
+  }
+  function endDuel() {
+    const r = state.flags.duel_ret || { map: 'village', at: [16.5, 7.6], dir: 'up' };
+    state.flags.duel_ret = null;
+    curEnc = null; enemies = []; ebolts = [];
+    fade(() => enterMap(r.map, r.at, r.dir));
+  }
+
+  // ---------------------------------------------------------------- Окна: сумка, лавка Дариан, дерево Полианны
+  function openPanel(kind, back) {
+    if (mode !== 'play' && mode !== 'pause') return;
+    panel = { kind, back: back || (mode === 'pause' ? 'pause' : 'play'), msg: kind === 'shop' ? SHOP.hello : kind === 'duel' ? DUELS.hello : '' };
+    mode = 'panel';
+    for (const k in keys) keys[k] = false;
+    stick.x = stick.y = 0;
+    screen('panel');
+    renderPanel();
+  }
+  function closePanel() {
+    const back = panel ? panel.back : 'play';
+    panel = null;
+    if (back === 'pause') { mode = 'pause'; screen('pause'); }
+    else { mode = 'play'; screen(null); }
+    updateHud();
+    save();
+  }
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function row(icon, title, desc, on, btn) {
+    return `<div class="ach${on ? ' on' : ''}"><div class="ach-icon">${icon}</div><div class="prow-body"><div class="ach-title">${esc(title)}</div>`
+      + `<div class="ach-desc">${esc(desc)}</div></div>${btn ? `<button data-act="${btn.act}"${btn.off ? ' disabled' : ''}>${esc(btn.text)}</button>` : ''}</div>`;
+  }
+  function renderPanel() {
+    const f = state.flags, list = $('panel-list');
+    const head = `💰 ${f.gold || 0}   ✦ ${f.mana_points || 0}   ❤ ${Math.ceil(state.hp)} / ${maxHp()}`;
+    let html = '', cols = 2;
+    if (panel.kind === 'bag') {
+      $('panel-title').textContent = BAG_TEXT.title;
+      const gifts = [], items = [];
+      if (f.got_flask) gifts.push(row(ITEMS.flask.icon, ITEMS.flask.name + (f.has_water_flask ? '' : ' (пуст)'), ITEMS.flask.desc, f.has_water_flask,
+        { act: 'use:flask', text: BAG_TEXT.use, off: !f.has_water_flask }));
+      for (const [id, it] of Object.entries(ITEMS)) {
+        if (id === 'flask' || !inv(id)) continue;
+        if (it.gift) gifts.push(row(it.icon, it.name, it.desc, true));
+        else if (it.duel) gifts.push(row(it.icon, it.name, it.desc, true, { act: 'use:' + id, text: BAG_TEXT.use }));
+        else items.push(row(it.icon, `${it.name} ×${inv(id)}`, it.desc, true, { act: 'use:' + id, text: BAG_TEXT.use }));
+      }
+      const bl = Object.keys(BLESSINGS).filter((k) => BLESSINGS[k].icon && f['bless_' + k])
+        .map((k) => row(BLESSINGS[k].icon, BLESSINGS[k].name, blessed(k) ? BLESSINGS[k].desc : BLESSINGS.off, blessed(k)));
+      const cu = Object.keys(CURSES).filter((k) => f['curse_' + k]).map((k) => row(CURSES[k].icon, CURSES[k].name, CURSES[k].desc, true));
+      const sec = (t, a) => (a.length ? `<div class="psec">${esc(t)}</div>` + a.join('') : '');
+      html = sec(BAG_TEXT.items, items) + sec(BAG_TEXT.gifts, gifts) + sec(BAG_TEXT.bless, bl) + sec(BAG_TEXT.curses, cu);
+      if (!html) html = `<div class="psec">${esc(BAG_TEXT.empty)}</div>`;
+    } else if (panel.kind === 'shop') {
+      $('panel-title').textContent = SHOP.title;
+      for (const id of SHOP.items) {
+        const it = ITEMS[id], left = it.limit ? it.limit - (f.potato_today || 0) : null;
+        const desc = it.desc + (inv(id) ? ` В сумке: ${inv(id)}.` : '') + (left != null ? ` Осталось сегодня: ${left}.` : '');
+        html += row(it.icon, it.name, desc, true, { act: 'buy:' + id, text: `Купить · ${it.price} 💰`, off: (f.gold || 0) < it.price || left === 0 });
+      }
+    } else if (panel.kind === 'duel') {
+      $('panel-title').textContent = DUELS.title;
+      for (const [id, d] of Object.entries(DUELS.list)) {
+        if (!check(d.if)) continue;
+        const ready = !d.ready || check(d.ready), won = f['duel_' + id + '_won'] || 0;
+        html += row(d.icon, d.name, ready ? (won ? `Побед: ${won}` : 'Ещё не вызывал{|а}') : render(d.refuse), ready,
+          { act: 'duel:' + id, text: ready ? 'Вызвать' : 'Отказ' });
+      }
+      if (!html) html = `<div class="psec">${esc(DUELS.empty)}</div>`;
+    } else {
+      $('panel-title').textContent = SKILLS.title;
+      cols = 3;
+      const br = Object.entries(SKILLS.branches);
+      html = br.map(([b, d]) => `<div class="pcolh">${d.icon} ${esc(d.name)} · ${skill(b)}/3</div>`).join('');
+      for (let t = 0; t < 3; t++) {
+        for (const [b, d] of br) {
+          const have = skill(b) > t, next = skill(b) === t, cost = SKILLS.cost[t];
+          html += row(have ? '✓' : t + 1, d.tiers[t].name, d.tiers[t].desc, have,
+            have ? null : { act: `learn:${b}`, text: `Изучить · ${cost} ✦`, off: !next || (f.mana_points || 0) < cost });
+        }
+      }
+    }
+    list.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    list.innerHTML = html;
+    list.innerHTML = list.innerHTML.replace(/\{([^{}|]*)\|([^{}]*)\}/g, (m, a, b) => render(m));
+    $('panel-sub').textContent = (panel.msg ? render(panel.msg) + '   ·   ' : '') + head;
+  }
+  $('panel-list').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-act]');
+    if (!b || b.disabled || mode !== 'panel') return;
+    const [act, id] = b.dataset.act.split(':'), f = state.flags;
+    if (act === 'use' && id === 'glove') { panel.kind = 'duel'; panel.msg = DUELS.hello; renderPanel(); return; }
+    if (act === 'duel') {
+      const d = DUELS.list[id];
+      if (d.ready && !check(d.ready)) panel.msg = d.refuse;
+      else if (curEnc || enemies.length || hunt || state.map === 'arena') panel.msg = DUELS.busy;
+      else return startDuel(id);
+    } else if (act === 'use') {
+      const was = mode;
+      mode = 'play';                                   // useFlask/useItem работают в игре
+      if (id === 'flask') useFlask(); else useItem(id);
+      mode = was;
+      panel.msg = '';
+    } else if (act === 'buy') {
+      const it = ITEMS[id];
+      if ((f.gold || 0) < it.price) panel.msg = SHOP.noGold;
+      else if (it.limit && (f.potato_today || 0) >= it.limit) panel.msg = SHOP.noPotato;
+      else {
+        f.gold -= it.price;
+        f['inv_' + id] = inv(id) + 1;
+        if (it.limit) f.potato_today = (f.potato_today || 0) + 1;
+        panel.msg = SHOP.bought[Math.floor(Math.random() * SHOP.bought.length)];
+      }
+    } else if (act === 'learn') {
+      const t = skill(id), cost = SKILLS.cost[t];
+      if (t >= 3) return;
+      if ((f.mana_points || 0) < cost) panel.msg = SKILLS.noMana;
+      else {
+        f.mana_points -= cost;
+        f['skill_' + id] = t + 1;
+        panel.msg = SKILLS.learned[t];
+        const w = WEAPONS[state.hero.weapon];
+        hero.ammo = Math.min(maxAmmo(w), hero.ammo); hero.mana = Math.min(maxMana(), hero.mana);
+      }
+    }
+    save();
+    renderPanel();
+  });
+  $('btn-panel-close').addEventListener('click', closePanel);
 
   function dialogKey(e) {
     if (dlg.choices.length && dlg.typed >= dlg.full.length) {
@@ -2606,7 +4125,7 @@
 
   // ---------------------------------------------------------------- Экраны
   function screen(name) {
-    for (const id of ['title', 'create', 'pause', 'ending', 'locked', 'achievements']) $(id).hidden = id !== name;
+    for (const id of ['title', 'create', 'pause', 'ending', 'locked', 'achievements', 'panel']) $(id).hidden = id !== name;
   }
 
   function toTitle() {
@@ -2621,7 +4140,7 @@
   }
 
   function pause(on) {
-    if (on && mode === 'play') { mode = 'pause'; screen('pause'); }
+    if (on && mode === 'play') { mode = 'pause'; screen('pause'); $('btn-duel-pause').hidden = !inv('glove'); }
     else if (!on && mode === 'pause') { mode = 'play'; screen(null); }
   }
 
@@ -2639,6 +4158,8 @@
   $('btn-back').addEventListener('click', toTitle);
   $('btn-ending').addEventListener('click', toTitle);
   $('btn-resume').addEventListener('click', () => pause(false));
+  $('btn-bag-pause').addEventListener('click', () => openPanel('bag', 'pause'));
+  $('btn-duel-pause').addEventListener('click', () => openPanel('duel', 'pause'));
   $('btn-to-title').addEventListener('click', toTitle);
   $('btn-wipe').addEventListener('click', () => {
     if (!confirm('Стереть сохранение?')) return;
@@ -2717,7 +4238,8 @@
     attack((e.clientX - r.left) / r.width * W + cam.x, (e.clientY - r.top) / r.height * H + cam.y);
   });
   $('btn-atk').addEventListener('pointerdown', (e) => { e.preventDefault(); if (mode === 'mini') miniPress(); else attack(); });
-  $('btn-flask').addEventListener('pointerdown', (e) => { e.preventDefault(); useFlask(); });
+  $('btn-flask').addEventListener('pointerdown', (e) => { e.preventDefault(); quickHeal(); });
+  $('btn-dash').addEventListener('pointerdown', (e) => { e.preventDefault(); dash(); });
   $('btn-act').addEventListener('pointerdown', (e) => {
     e.preventDefault();
     if (mode === 'dialog') { if (dlg.choices.length && dlg.typed >= dlg.full.length) return; advance(); }
@@ -2871,15 +4393,22 @@
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (fading) {                                  // затемнение → смена карты → проявление
-      fading += dt * 3.5;
+      fading += dt * (fadeStyle === 'letterbox' ? 1 : 2 / 1.5);
       if (fading >= 1 && fadeCb) { const cb = fadeCb; fadeCb = null; cb(); }
       if (fading >= 2) { fading = 0; if (mode === 'fade') mode = 'play'; }
     }
     update(dt);
+    updateFx(dt);
+    zoom.k += Math.sign(zoom.want - zoom.k) * Math.min(Math.abs(zoom.want - zoom.k), dt * 0.2);   // 1.0 → 1.4 за 2 с
+    dim = Math.max(0, dim - dt * 0.5);
     typeTick(dt);
     if (crack) crack.t += dt;
-    const shake = crack && crack.t < 0.6 ? (0.6 - crack.t) * 30 : 0;      // экран трясёт после удара
-    g.setTransform(1, 0, 0, 1, (Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    let shake = crack && crack.t < 0.6 ? (0.6 - crack.t) * 30 : 0;        // экран трясёт после удара
+    if (hunt && hunt.shake) shake = Math.max(shake, 16);                 // смех Гидана
+    const sway = hunt && hunt.taunt && mode === 'play' ? 1 : 0;          // «пьяная» камера, пока Гидан болтает
+    const rot = sway * Math.sin(time * 1.7) * 0.012, c = Math.cos(rot), sn = Math.sin(rot);
+    const sx = sway * Math.sin(time * 2.3) * 10 + (Math.random() - 0.5) * shake, sy = sway * Math.cos(time * 1.9) * 6 + (Math.random() - 0.5) * shake;
+    g.setTransform(c, sn, -sn, c, sx + W / 2 - (c * W / 2 - sn * H / 2), sy + H / 2 - (sn * W / 2 + c * H / 2));
     if (mode === 'create') { time += dt; drawPreview(); }
     draw();
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -2897,7 +4426,7 @@
 
   // Для отладки и автотестов
   window.PG = { get state() { return state; }, get mode() { return mode; }, get enemies() { return enemies; }, get npcs() { return npcs; }, get chase() { return chase; },
-    get curEnc() { return curEnc; }, get mini() { return mini; }, get ffly() { return ffly; }, get hunt() { return hunt; }, miniPress, hz, hero, enterMap, startDialogue, attack, useFlask, maxHp, MAPS, ELEMENTS };
+    get curEnc() { return curEnc; }, get mini() { return mini; }, get ffly() { return ffly; }, get hunt() { return hunt; }, get rooms() { return rooms; }, get fxInfo() { return { parts: parts.length, fxA, rainK, lbox, puffs: puffs.length }; }, draw, miniPress, hz, hero, enterMap, startDialogue, attack, useFlask, useItem, quickHeal, openPanel, closePanel, maxHp, dmgMul, maxMana, healMul, buffs, zoom, get ebolts() { return ebolts; }, startDuel, leadPath, MAPS, ELEMENTS };
 
   toTitle();
   nextFrame(frame);

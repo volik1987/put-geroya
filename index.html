@@ -117,11 +117,21 @@
       <div class="menu"><button id="btn-ach-back">Назад</button></div>
     </section>
 
+    <!-- Сумка, лавка Дариан, дерево Полианны (тексты — ITEMS, SHOP, SKILLS в dialogues.js) -->
+    <section id="panel" class="overlay dim" hidden>
+      <h2 id="panel-title"></h2>
+      <div id="panel-sub" class="note"></div>
+      <div id="panel-list" class="ach-list panel-list"></div>
+      <div class="menu"><button id="btn-panel-close">Закрыть</button></div>
+    </section>
+
     <!-- Пауза -->
     <section id="pause" class="overlay dim" hidden>
       <h2>Пауза</h2>
       <div class="menu">
         <button id="btn-resume">Продолжить</button>
+        <button id="btn-bag-pause">🎒 Сумка</button>
+        <button id="btn-duel-pause" hidden>🥊 Вызов на бой</button>
         <button id="btn-ach-pause">🏆 Достижения</button>
         <button id="btn-to-title">В главное меню</button>
         <button id="btn-wipe" class="ghost">Стереть сохранение</button>
@@ -134,6 +144,7 @@
       <button id="btn-atk" class="atk">⚔</button>
       <button id="btn-act" class="act">E</button>
       <button id="btn-flask" class="flask">🧪</button>
+      <button id="btn-dash" class="dash-btn">⇧</button>
       <button id="btn-menu" class="menu-btn">☰</button>
     </div>
   </div>

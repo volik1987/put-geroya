@@ -128,6 +128,10 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
   position: absolute; right: 80px; bottom: 260px; width: 96px; height: 96px; border-radius: 50%;
   font-size: 44px; background: rgba(60, 120, 160, .75); border: 4px solid #b9dbe6;
 }
+.dash-btn {
+  position: absolute; right: 250px; bottom: 30px; width: 110px; height: 110px; border-radius: 50%;
+  font-size: 50px; font-weight: bold; color: #fff; background: rgba(70, 140, 200, .75); border: 4px solid #9ad8ff;
+}
 .menu-btn {
   position: absolute; right: 24px; top: 20px; width: 80px; height: 80px; font-size: 40px;
   background: rgba(20, 16, 12, .6); border: 3px solid #5c4a35; border-radius: 10px; color: #f1e7d6;
@@ -191,3 +195,24 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 #achievements .ach { padding: 7px 12px; }
 #achievements .ach-icon { width: 44px; height: 44px; font-size: 26px; }
 #achievements .ach-desc { font-size: 15px; }
+
+/* Сумка, лавка, дерево способностей */
+#panel { gap: 10px; }
+#panel .ach-list { max-height: 520px; gap: 8px; align-content: start; }
+#panel .ach { padding: 8px 12px; }
+#panel .ach-icon { width: 44px; height: 44px; font-size: 24px; }
+#panel .ach-desc { font-size: 15px; }
+#panel .note { color: #f4dca0; font-size: 19px; }
+.prow-body { flex: 1; min-width: 0; }
+.panel-list .psec { grid-column: 1 / -1; color: #e2b65a; font-size: 18px; letter-spacing: 1px; margin-top: 4px; }
+.panel-list .psec + .psec { margin-top: 0; }
+#panel .ach button { min-height: 44px; padding: 6px 14px; font-size: 17px; white-space: nowrap; }
+#panel .ach button:disabled { opacity: .45; cursor: default; }
+.panel-list .pcolh { color: #e2b65a; font-size: 21px; text-align: center; }
+
+/* Концовка Прощения: тьма и зелёные буквы, без титров */
+#ending.green { background: #000; }
+#ending.green h2 { color: #3cff6a; font-family: 'Courier New', monospace; font-size: 64px; text-shadow: 0 0 24px rgba(60, 255, 106, .5); animation: fadein 3s; }
+#ending.green .ending-text { display: none; }
+#ending.green button { background: transparent; border-color: #1e6a30; color: #3cff6a; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
