@@ -37,6 +37,15 @@
       </div>
     </div>
 
+    <!-- Письмо на весь экран: пергамент, цвет чернил, подпись, кнопки (тексты — LETTERS в dialogues.js) -->
+    <section id="letter" class="letter" hidden>
+      <div class="letter-paper">
+        <div id="letter-text" class="letter-text"></div>
+        <div id="letter-sign" class="letter-sign"></div>
+      </div>
+      <div id="letter-btns" class="letter-btns"></div>
+    </section>
+
     <!-- Титул -->
     <section id="title" class="overlay">
       <h1>Путь Героя</h1>
@@ -84,6 +93,7 @@
     <section id="ending" class="overlay" hidden>
       <h2 id="ending-title"></h2>
       <p id="ending-text" class="sub ending-text"></p>
+      <div id="ending-npcs" class="ending-npcs"></div>
       <div class="menu">
         <button id="btn-ending" class="primary">В главное меню</button>
       </div>

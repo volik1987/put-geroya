@@ -216,3 +216,27 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 #ending.green .ending-text { display: none; }
 #ending.green button { background: transparent; border-color: #1e6a30; color: #3cff6a; }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- Письмо на весь экран (патч v2.5): пергамент и цвет чернил --------------- */
+.letter { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: rgba(6, 4, 3, .84); animation: fadein .7s; z-index: 10; }
+.letter[hidden] { display: none; }
+.letter-paper { width: 480px; height: 620px; box-sizing: border-box; padding: 78px 64px 64px;
+  background: url(assets/locations/letter.jpg) center / 100% 100% no-repeat; image-rendering: pixelated;
+  display: flex; flex-direction: column; justify-content: center; }
+.letter-text { font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 23px; line-height: 1.45; white-space: pre-line; }
+.letter-sign { margin-top: 20px; text-align: right; font-family: Georgia, serif; font-style: italic; font-size: 30px; }
+.ink-gold .letter-text, .ink-gold .letter-sign { color: #a07220; text-shadow: 0 1px 0 rgba(96, 66, 22, .55), 0 0 6px rgba(214, 170, 70, .35); }
+.ink-red .letter-text, .ink-red .letter-sign { color: #9c0f1e; text-shadow: 0 1px 0 rgba(70, 0, 10, .4); }
+.ink-purple .letter-text, .ink-purple .letter-sign { color: #5a2a8e; text-shadow: 0 1px 0 rgba(40, 10, 70, .4); }
+.letter-btns { display: flex; gap: 16px; }
+.letter-btns button { min-height: 56px; min-width: 180px; padding: 8px 24px; font-size: 22px; cursor: pointer;
+  background: #2b231b; border: 3px solid #5c4a35; border-radius: 6px; color: #f1e7d6; box-shadow: 0 4px 0 #1a140f; }
+.letter-btns button:hover, .letter-btns button:focus-visible { border-color: #e2b65a; outline: none; }
+
+/* --- Концовки: фон-картинка и персонажи (патч v2.5) ------------------------ */
+#ending { background-size: cover; background-position: center; }
+.ending-npcs { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+.ending-npcs:empty { display: none; }
+.ending-npcs img { width: 112px; height: 112px; image-rendering: pixelated; filter: drop-shadow(0 6px 4px rgba(0, 0, 0, .6)); }
+#ending.green .ending-npcs { display: none; }

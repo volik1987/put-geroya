@@ -53,7 +53,10 @@ def sheet(src, out_dir, name, right_idx=1):
     im = key(Image.open(src), soft=False)
     w, h = im.size
     cells = split4(im)
-    picked = {'down': cells[0], 'right': cells[right_idx], 'up': cells[3]}
+    flip = str(right_idx).endswith('L')                 # «2L» — в клетке 2 фигура смотрит влево
+    r = cells[int(str(right_idx).rstrip('L'))]
+    if flip: r = r.transpose(Image.FLIP_LEFT_RIGHT)
+    picked = {'down': cells[0], 'right': r, 'up': cells[3]}
     picked['left'] = picked['right'].transpose(Image.FLIP_LEFT_RIGHT)
     boxes = {k: c.getbbox() for k, c in picked.items()}
     bw = max(b[2] - b[0] for b in boxes.values())
@@ -82,6 +85,6 @@ def portrait(src, dst):
 
 if __name__ == '__main__':
     if sys.argv[1] == 'sheet':
-        sheet(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]) if len(sys.argv) > 5 else 1)
+        sheet(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] if len(sys.argv) > 5 else 1)
     else:
         portrait(sys.argv[2], sys.argv[3])
