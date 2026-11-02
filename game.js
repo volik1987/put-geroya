@@ -53,7 +53,7 @@
     captain: { sprite: 'nokt_captain', xp: 15, gold: 5, hp: 22, speed: 80, aggro: 600, dmg: 16, windup: 0.7, lunge: 430, lungeT: 0.3, rest: 1.0, w: 40, h: 20 },
     // ---------- Патч v2.5
     // Вожак Стаи: кровавый волк у ручья — крупнее, быстрее, бьёт больнее
-    wolf_leader: { sprite: 'blood_wolf', boss: 'Вожак Стаи', scale: 1.5, xp: 30, gold: 15, resist: 0.2, hp: 40, speed: 125, aggro: 700, dmg: 14, windup: 0.5, lunge: 560, lungeT: 0.32, rest: 0.6, w: 56, h: 24 },
+    wolf_leader: { sprite: 'white_wolf', boss: 'Вожак Стаи', scale: 1.5, xp: 30, gold: 15, resist: 0.2, hp: 40, speed: 125, aggro: 700, dmg: 14, windup: 0.5, lunge: 560, lungeT: 0.32, rest: 0.6, w: 56, h: 24 },
     bandit: { sprite: 'bandit', xp: 7, gold: 4, hp: 11, speed: 100, aggro: 600, dmg: 11, windup: 0.5, lunge: 440, lungeT: 0.26, rest: 0.75, w: 34, h: 18 },
     // Двуручник с голубым огнём: все удары — волны (ranged) и дуги вблизи (arc) до стены; волны сбивают стрелы героя
     knight_fire: { sprite: 'dark_knight_sword', boss: 'Тёмный рыцарь', fire: true, xp: 50, resist: 0.3, hp: 60, speed: 120, aggro: 900, rest: 0.6, w: 34, h: 18, dodge: 0.15,
@@ -66,7 +66,7 @@
       ranged: { every: 2.7, windup: 0.62, speed: 370, dmg: 10, wave: 9, color: '110,190,255' },
       arc: { every: 2.5, windup: 0.5, speed: 410, dmg: 11, wave: 9, bend: 9, spreadOut: 0.07, color: '110,190,255' },
       phases: [
-        { at: 0.7, sprite: 'aedel_sword', boss: 'Аэдел Анима', dodge: 0.5, speed: 160, text: '…', d: 'aedel_helm_off', achieve: 'ice_crack', burst: '210,235,255',
+        { at: 0.7, sprite: 'aedel', boss: 'Аэдел Анима', dodge: 0.5, speed: 160, text: '…', d: 'aedel_helm_off', achieve: 'ice_crack', burst: '210,235,255',
           dash: { speed: 920, time: 0.18, cd: 2.2, at: 300 },
           ranged: { every: 2.1, windup: 0.5, speed: 430, dmg: 14, wave: 9, waves: 2, fan: 0.45, color: '120,200,255' },
           arc: { every: 1.9, windup: 0.42, speed: 460, dmg: 15, wave: 11, bend: 9, spreadOut: 0.08, color: '120,200,255' },
@@ -147,10 +147,8 @@
         { id: 'emb_gidan', sprite: 'gidan', x: 11.2, y: 10, dir: 'up', if: [{ flag: 'ambassador' }, { not: 'negotiation_seen' }], talk: [{ d: 'gidan_after' }] },
         { id: 'emb_aedel', sprite: 'aedel', x: 8.8, y: 10, dir: 'up', if: [{ flag: 'ambassador' }, { not: 'negotiation_seen' }] },
         { id: 'emb_dolita', sprite: 'dolita', x: 8.1, y: 10.6, dir: 'up', if: [{ flag: 'ambassador' }, { not: 'negotiation_seen' }] },
-        ...crowd('lsq', [[5, 4.5, 0, 'right'], [6.2, 5.2, 1, 'right'], [4.5, 6.3, 2, 'right'], [5.6, 7.2, 3, 'right'], [4.7, 8.1, 4, 'up'],
-          [6.6, 8.6, 5, 'up'], [7.4, 9.7, 0, 'up'], [7.6, 4.4, 1, 'down'], [8.2, 8.9, 2, 'right'], [6.4, 10, 3, 'up'],
-          [15, 4.5, 4, 'left'], [13.8, 5.2, 5, 'left'], [16.2, 5.2, 0, 'left'], [14.5, 7.2, 1, 'left'], [15.3, 8.1, 2, 'up'],
-          [13.4, 8.6, 3, 'up'], [12.6, 9.7, 4, 'up'], [12.4, 4.4, 5, 'down'], [11.8, 8.9, 0, 'left'], [14, 10, 1, 'up']], { dark: 0.35, whisper: true }),
+        ...crowd('lsq', [[5, 4.5, 0, 'right'], [4.5, 6.6, 2, 'right'], [6.6, 8.6, 5, 'up'], [7.6, 4.4, 1, 'down'], [6.2, 10, 3, 'up'],
+          [15, 4.5, 4, 'left'], [16.2, 6.4, 0, 'left'], [13.4, 8.6, 3, 'up'], [12.4, 4.4, 5, 'down'], [14.2, 10, 1, 'up']], { dark: 0.35, whisper: true }),
       ],
       // маги Света — по вызову
       encounters: [{
@@ -201,6 +199,7 @@
         ...crowd('feast_b', [[6.2, 4.9, 0, 'down'], [7.2, 4.9, 1, 'down'], [8.15, 4.9, 2, 'down'], [12.8, 4.9, 3, 'down'], [13.8, 4.9, 4, 'down']],
           { models: ['townsman', 'townswoman', 'oldman', 'merchant', 'keeper'], if: { flag: 'feast' } }),
         ...crowd('feast_f', [[7, 6.9, 5, 'up'], [8.6, 7, 1, 'up'], [11.6, 7, 3, 'up'], [13.2, 6.9, 0, 'up']], { if: { flag: 'feast' } }),
+        { id: 'f_thief', sprite: 'thief', x: 10.1, y: 7.1, dir: 'up', w: 22, h: 10, if: { flag: 'feast' } },
       ],
       onEnter: [
         { if: { eq: ['power_scene', 'lumina'] }, d: 'power_lumina' },
@@ -230,7 +229,7 @@
       ],
       spawn: [9, 6],
       exits: [
-        ...[5, 6, 7].map((y) => ({ x: 0, y, to: 'royal_palace', at: [18, 7], dir: 'left' })),
+        ...[5, 6, 7].map((y) => ({ x: 0, y, d: 'coach_gone' })),                 // кучер уехал — только вперёд
         ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'forest', at: [1, 5], dir: 'right' })),
         ...[10, 11].map((x) => ({ x, y: 0, if: { flag: 'elder_rewarded' }, to: 'mountains', at: [9, 10], dir: 'up', else: 'north_locked' })),
       ],
@@ -245,13 +244,12 @@
             { if: { flag: 'wolf_quest' }, d: 'elder_wait' },
             { d: 'elder_quest' },
           ] },
-        ...crowd('vil', [[1, 4.6, 0, 'right'], [8, 4.7, 1, 'down'], [9, 6.9, 2, 'left'], [13, 4.7, 3, 'down'], [16.4, 6.8, 4, 'up'],
-          [18, 4.7, 5, 'down'], [19.4, 6.4, 0, 'left'], [12, 8.4, 1, 'up'], [3, 4.7, 2, 'down'], [15.6, 4.8, 3, 'left']], { dark: 0.15 }),
+        ...crowd('vil', [[8, 4.7, 1, 'down'], [16.4, 6.8, 4, 'up'], [19, 4.7, 5, 'down'], [11.6, 8.4, 2, 'up']], { dark: 0.15 }),
       ],
       onEnter: [{ if: { not: 'village_seen' }, d: 'village_intro' }],
     },
 
-    // Лес на востоке: 15 тёмных волков тремя волнами
+    // Лес на востоке: первая поляна — семь волков, вторая (forest_glade) — шесть; все стоят на местах с самого начала
     forest: {
       title: 'Восточный лес',
       bg: 'forest',
@@ -272,19 +270,48 @@
       spawn: [1, 5],
       exits: [
         ...[5, 6].map((y) => ({ x: 0, y, to: 'village', at: [19, 6], dir: 'left' })),
+        ...[5, 6].map((y) => ({ x: 20, y, to: 'forest_glade', at: [1, 5.5], dir: 'right' })),
+      ],
+      npcs: [],
+      encounters: [
+        { if: { not: 'forest_w1' }, lock: true, onClear: { set: { forest_w1: true }, d: 'forest_glade_clear' },
+          enemies: [{ kind: 'wolf', x: 8, y: 3 }, { kind: 'wolf', x: 12, y: 3.6 }, { kind: 'wolf', x: 15.5, y: 5.2 }, { kind: 'wolf', x: 14, y: 7.6 },
+            { kind: 'wolf', x: 10, y: 8.2 }, { kind: 'wolf', x: 6, y: 7.4 }, { kind: 'wolf', x: 17.4, y: 3.6 }] },
+      ],
+      respawn: { map: 'village', at: [17, 6], dir: 'right', d: 'hero_down' },
+      onEnter: [{ if: { not: 'forest_seen' }, d: 'forest_intro' }],
+    },
+
+    forest_glade: {
+      title: 'Восточный лес · Вторая поляна',
+      bg: 'forest_glade',
+      tiles: [
+        '#####################',
+        '#####################',
+        '#######.......#######',
+        '####.....###.......##',
+        '###.................#',
+        '..............###....',
+        '..............###....',
+        '####...............##',
+        '######......##...####',
+        '#######....##########',
+        '#####################',
+        '#####################',
+      ],
+      spawn: [1, 5.5],
+      exits: [
+        ...[5, 6].map((y) => ({ x: 0, y, to: 'forest', at: [19, 5.5], dir: 'left' })),
         ...[5, 6].map((y) => ({ x: 20, y, to: 'stream', at: [1, 5], dir: 'right' })),
       ],
       npcs: [],
       encounters: [
-        { if: { not: 'forest_w1' }, onClear: { set: { forest_w1: true } },
-          enemies: [{ kind: 'wolf', x: 8, y: 3 }, { kind: 'wolf', x: 12, y: 4 }, { kind: 'wolf', x: 15, y: 6 }, { kind: 'wolf', x: 10, y: 8 }, { kind: 'wolf', x: 6, y: 7 }] },
-        { if: [{ flag: 'forest_w1' }, { not: 'forest_w2' }], onClear: { set: { forest_w2: true } },
-          enemies: [{ kind: 'wolf', x: 16, y: 3 }, { kind: 'wolf', x: 17, y: 6 }, { kind: 'wolf', x: 14, y: 8 }, { kind: 'wolf', x: 5, y: 3 }, { kind: 'wolf', x: 4, y: 7 }] },
-        { if: [{ flag: 'forest_w2' }, { not: 'forest_cleared' }], onClear: { set: { forest_cleared: true }, d: 'forest_cleared' },
-          enemies: [{ kind: 'wolf', x: 10, y: 3 }, { kind: 'wolf', x: 7, y: 5 }, { kind: 'wolf', x: 13, y: 5 }, { kind: 'wolf', x: 9, y: 8 }, { kind: 'wolf', x: 12, y: 8 }] },
+        { if: [{ flag: 'forest_w1' }, { not: 'forest_cleared' }], lock: true, onClear: { set: { forest_cleared: true }, d: 'forest_cleared' },
+          enemies: [{ kind: 'wolf', x: 9, y: 2.6 }, { kind: 'wolf', x: 15.4, y: 3.4 }, { kind: 'wolf', x: 12, y: 4.6 },
+            { kind: 'wolf', x: 17.6, y: 7.2 }, { kind: 'wolf', x: 8, y: 8.2 }, { kind: 'wolf', x: 5.4, y: 4.4 }] },
       ],
-      respawn: { map: 'village', at: [17, 6], dir: 'right', d: 'hero_down' },
-      onEnter: [{ if: { not: 'forest_seen' }, d: 'forest_intro' }],
+      respawn: { map: 'forest', at: [18, 5.5], dir: 'right', d: 'hero_down' },
+      onEnter: [{ if: [{ flag: 'forest_w1' }, { not: 'glade_seen' }], d: 'glade_intro' }],
     },
 
     stream: {
@@ -305,7 +332,7 @@
         '#####################',
       ],
       spawn: [1, 5],
-      exits: [...[4, 5, 6].map((y) => ({ x: 0, y, to: 'forest', at: [19, 5], dir: 'left' }))],
+      exits: [...[4, 5, 6].map((y) => ({ x: 0, y, to: 'forest_glade', at: [19, 5.5], dir: 'left' }))],
       npcs: [
         { id: 'spring', prop: 'spot', glow: '160,230,255', x: 11.9, y: 5.6,
           talk: [
@@ -316,7 +343,7 @@
         { id: 'note_1', prop: 'note', x: 9, y: 7.2, if: [{ flag: 'wolves_dead' }, { not: 'note_1_taken' }],
           talk: [{ d: 'note_1' }] },
       ],
-      // у ручья ждёт Вожак Стаи — кровавый волк
+      // у ручья ждёт Вожак Стаи — белый волк с красными глазами
       encounters: [{
         if: [{ flag: 'forest_cleared' }, { not: 'wolves_dead' }], lock: true,
         enemies: [{ kind: 'wolf_leader', x: 8, y: 4 }],
@@ -416,9 +443,9 @@
       ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'mountains', at: [9, 1], dir: 'down' })),
       ...[9, 10, 11].map((x) => ({ x, y: 2, to: 'trade_city', at: [10, 10], dir: 'up' })),
     ],
-    gateOpen: { if: { flag: 'north_gate_open' }, rect: [9.15, 1.9, 2.7, 3.55] },
+    gateOpen: { if: { flag: 'north_gate_open' }, rect: [9.15, 1.9, 2.7, 3.55], arch: 0.6 },
     gateShadow: { src: [8.7, 1.1, 3.6, 4.4], alpha: 0.55, squash: 0.62 },
-    runners: [{ if: { not: 'knight_seen' }, sprite: 'dark_knight_sword', from: [10, 1], near: 9.2, path: [[14, 1], [23, 1]], speed: 75, set: 'knight_seen', shadow: 5.6 }],
+    runners: [{ if: { not: 'knight_seen' }, sprite: 'dark_knight_sword', from: [10, 5.2], near: 9.2, path: [[11.8, 5.2]], speed: 75, set: 'knight_seen', fade: true }],
     npcs: [
       // у ворот, пока путь не выбран
       { id: 'captain', sprite: 'nokt_captain', x: 10, y: 6.3, dir: 'down', if: [{ not: 'gate_passed' }, { not: 'gate_fight' }], w: 60,
@@ -460,6 +487,7 @@
       '########.....########',
       '########.....########',
     ],
+    fgCrop: [[130, 515, 548, 768], [895, 525, 1250, 768]],   // крыши нижних домов перекрывают героя
     spawn: [10, 10],
     exits: [
       ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'north_gate', at: [10, 6], dir: 'down' })),
@@ -470,47 +498,37 @@
       { id: 'merchant', sprite: 'merchant', x: 4.4, y: 6.6, dir: 'right', talk: [{ d: 'merchant' }] },
       { id: 'keeper', sprite: 'keeper', x: 10, y: 3.6, dir: 'down',
         talk: [{ if: { flag: 'theft_done' }, d: 'keeper_after' }, { d: 'keeper' }] },
-      { id: 'st_gilion', prop: 'statue', color: '#9a5ce0', x: 6, y: 4.2, talk: [{ d: 'statue_gilion' }] },
-      { id: 'st_maria', prop: 'statue', color: '#d02a3a', x: 14, y: 4.2, talk: [{ d: 'statue_maria' }] },
-      { id: 'st_eola', prop: 'statue', color: '#3cc46a', x: 6, y: 8.2, talk: [{ d: 'statue_eola' }] },
-      { id: 'st_dillad', prop: 'statue', color: '#5ab8f0', x: 14, y: 8.2, talk: [{ d: 'statue_dillad' }] },
+      // молебенные камни: фиолетовая руна — Гилион (Разум), синяя — Диллад (Дух), зелёная — Эола (Чувства), красная — Мария (Кровь)
+      { id: 'st_gilion', prop: 'statue', rune: 'gilion', glowRgb: '190,120,255', x: 6, y: 4.2, talk: [{ d: 'statue_gilion' }] },
+      { id: 'st_maria', prop: 'statue', rune: 'maria', glowRgb: '255,70,80', x: 14, y: 4.2, talk: [{ d: 'statue_maria' }] },
+      { id: 'st_eola', prop: 'statue', rune: 'eola', glowRgb: '90,255,120', x: 6, y: 7.3, talk: [{ d: 'statue_eola' }] },
+      { id: 'st_dillad', prop: 'statue', rune: 'dillad', glowRgb: '90,200,255', x: 14, y: 7.3, talk: [{ d: 'statue_dillad' }] },
       // записка Д.Т. и красный бриллиант — только если на Северных вратах никого не убил
       { id: 'note_2', prop: 'note', gem: true, x: 12, y: 9.2, if: [{ flag: 'gate_passed' }, { not: 'gate_fight' }, { not: 'note_2_taken' }],
         talk: [{ d: 'note_2' }] },
       // воровка: оборванка, серые глаза, коричневые волосы
       { id: 'thief_sq', sprite: 'thief', x: 13, y: 6.6, dir: 'left', if: { not: 'theft_run' } },
-      ...crowd('bsq', [[4.6, 4.4, 0, 'down'], [16, 4.6, 1, 'left'], [8, 8.6, 2, 'up'], [16.6, 6.6, 3, 'left'], [7.4, 3.6, 4, 'down'],
-        [12.6, 8.8, 5, 'up']], { dark: 0.2, hue0: 200, if: { not: { path: 'hate' } } }),
+      ...crowd('bsq', [[4.6, 4.4, 0, 'down'], [16.6, 6.6, 3, 'left'], [8.6, 7.8, 2, 'up'], [12.4, 3.4, 4, 'down']],
+        { dark: 0.2, hue0: 200, if: { not: { path: 'hate' } } }),
       ...crowd('bsqh', [[17, 7.2, 3, 'left']], { dark: 0.45 }),
     ],
     // дошёл до фонтана — у героя крадут кошель, воровка удирает направо
-    triggers: [{ if: { not: 'theft_run' }, maxY: 8.4 * 64, d: 'theft' }],
+    triggers: [{ if: { not: 'theft_run' }, maxY: 8.4 * 64, approach: 'thief_sq', d: 'theft' }],
     runners: [{ if: [{ flag: 'theft_run' }, { not: 'theft_done' }], sprite: 'thief', from: [13, 6.6], path: [[17, 7.4], [21.5, 7.4]], speed: 300, set: 'thief_fled_square' }],
     onEnter: [{ if: { not: 'city_seen' }, d: 'city_intro' }],
   };
 
-  // Трущобы: три коротких переулка — просто бег за воровкой. На пути Ненависти в последнем она загнана в угол.
+  // Трущобы: один переулок — бег за воровкой. На пути Ненависти она загнана в угол.
   const SLUM_TILES = ['#####################', '#####################', '#####################', '#####################', '#####################',
     '.....................', '.....................', '.....................',
     '#####################', '#####################', '#####################', '#####################'];
-  const slumRunner = (extra) => ({ if: [{ flag: 'theft_run' }, { not: 'theft_done' }, ...(extra || [])], sprite: 'thief', from: [4, 6], path: [[21.5, 6]], speed: 290, wait: 0.15 });
   MAPS.slums1 = {
     title: 'Берт · Трущобы', bg: 'slums1', tiles: SLUM_TILES, spawn: [1, 6],
-    exits: [...[5, 6, 7].map((y) => ({ x: 0, y, to: 'trade_city', at: [19, 7], dir: 'left' })), ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'slums2', at: [1, 6], dir: 'right' }))],
-    npcs: [], runners: [slumRunner()],
-  };
-  MAPS.slums2 = {
-    title: 'Берт · Трущобы', bg: 'slums2', tiles: SLUM_TILES, spawn: [1, 6],
-    exits: [...[5, 6, 7].map((y) => ({ x: 0, y, to: 'slums1', at: [19, 6], dir: 'left' })), ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'slums3', at: [1, 6], dir: 'right' }))],
-    npcs: [], runners: [slumRunner()],
-  };
-  MAPS.slums3 = {
-    title: 'Берт · Трущобы', bg: 'slums3', tiles: SLUM_TILES, spawn: [1, 6],
-    exits: [...[5, 6, 7].map((y) => ({ x: 0, y, to: 'slums2', at: [19, 6], dir: 'left' })), ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'trade_street', at: [1, 7], dir: 'right' }))],
+    exits: [...[5, 6, 7].map((y) => ({ x: 0, y, to: 'trade_city', at: [19, 7], dir: 'left' })), ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'trade_street', at: [1, 7], dir: 'right' }))],
     npcs: [
       { id: 'thief_cornered', sprite: 'thief', x: 18, y: 6, dir: 'left', if: [{ flag: 'theft_run' }, { not: 'theft_done' }, { path: 'hate' }], talk: [{ d: 'thief_cornered' }] },
     ],
-    runners: [slumRunner([{ not: { path: 'hate' } }])],
+    runners: [{ if: [{ flag: 'theft_run' }, { not: 'theft_done' }, { not: { path: 'hate' } }], sprite: 'thief', from: [4, 6], path: [[21.5, 6]], speed: 290, wait: 0.15 }],
   };
 
   // Торговая улица: передний план — дорога и стена, в дома не войти, но в двери можно постучать
@@ -519,15 +537,15 @@
     bg: 'trade_street',
     tiles: [
       '#####################', '#####################', '#####################', '#####################', '#####################', '#####################',
-      '......##.##..........',
+      '......###.##.........',
       '.....................',
       '#####################',
       '#####################', '#####################', '#####################',
     ],
     spawn: [1, 7],
     exits: [
-      ...[6, 7].map((y) => ({ x: 0, y, to: 'slums3', at: [19, 6], dir: 'left' })),
-      { x: 8, y: 6, to: 'polianna_shop', at: [10, 9], dir: 'up' },               // полог шатра Полианны
+      ...[6, 7].map((y) => ({ x: 0, y, to: 'slums1', at: [19, 6], dir: 'left' })),
+      { x: 9, y: 6, to: 'polianna_shop', at: [10, 9], dir: 'up' },               // полог шатра Полианны
       // погоня: воровка свернула в тупик за углом; потом этот же край ведёт обратно на площадь
       ...[6, 7].map((y) => ({ x: 20, y, if: [{ flag: 'theft_run' }, { not: 'theft_done' }, { not: { path: 'hate' } }], to: 'alley', at: [10, 10], dir: 'up' })),
       ...[6, 7].map((y) => ({ x: 20, y, to: 'trade_city', at: [17, 7], dir: 'left' })),
@@ -537,8 +555,7 @@
       { id: 'door1', prop: 'spot', x: 4, y: 5.6, talk: [{ d: 'house_door' }] },
       { id: 'door2', prop: 'spot', x: 12.6, y: 5.6, talk: [{ d: 'bakery_door' }] },
       { id: 'door3', prop: 'spot', x: 19, y: 5.6, talk: [{ d: 'house_door2' }] },
-      ...crowd('bst', [[0.6, 5.9, 0, 'right'], [1.8, 5.9, 1, 'left'], [3, 5.9, 2, 'down'], [5.2, 6.9, 3, 'down'], [11.4, 6.9, 4, 'left'],
-        [11.3, 5.9, 5, 'down'], [15.6, 5.9, 0, 'left'], [16.8, 5.9, 1, 'down'], [18, 5.9, 2, 'down'], [20, 5.9, 3, 'left']],
+      ...crowd('bst', [[2.2, 5.9, 1, 'down'], [5.6, 6.9, 3, 'right'], [11.4, 6.9, 4, 'left'], [17.2, 5.9, 2, 'down']],
       { dark: 0.15, hue0: 120, if: { not: { path: 'hate' } } }),
     ],
     onEnter: [{ if: [{ flag: 'theft_run' }, { not: 'theft_done' }, { not: 'street_lost' }], d: 'thief_lost' }],
@@ -559,7 +576,7 @@
     ],
     fgCrop: [[385, 262, 1000, 425]],
     spawn: [10, 9],
-    exits: [...[9, 10, 11].map((x) => ({ x, y: 10, to: 'trade_street', at: [8, 7], dir: 'down' }))],
+    exits: [...[9, 10, 11].map((x) => ({ x, y: 10, to: 'trade_street', at: [9, 7], dir: 'down' }))],
     npcs: [
       { id: 'polianna_shop', sprite: 'polianna', x: 10, y: 3.25, dir: 'down', w: 0, h: 0 },
       { id: 'polianna', prop: 'spot', x: 10, y: 6.2, talk: [{ d: 'polianna' }] },
@@ -637,46 +654,9 @@
     spawn: [1, 5],
     exits: [
       ...[5, 6].map((y) => ({ x: 0, y, to: 'bert_gate', at: [10, 6], dir: 'down' })),
-      ...[5, 6].map((y) => ({ x: 20, y, to: 'demin', at: [8, 9.9], dir: 'up' })),
+      ...[5, 6].map((y) => ({ x: 20, y, to: 'blood_entrance', at: [10, 10], dir: 'up' })),
     ],
     npcs: [],
-  };
-
-  // Демин — город двух богов: собор Марии (вверху справа) и Орден Диллада (внизу справа); дорога на север — к Лесу чувств
-  MAPS.demin = {
-    title: 'Демин · Город двух богов',
-    bg: 'demin',
-    tiles: [
-      '##########..#########',
-      '#########....########',
-      '########.....########',
-      '######..........#####',
-      '#####............####',
-      '####.....#.......####',
-      '###........#......###',
-      '####.......#...##.###',
-      '#####.#.......#######',
-      '#######......########',
-      '#######...###########',
-      '#######...###########',
-    ],
-    fgCrop: [[575, 225, 650, 405], [700, 265, 820, 480]],     // статуи Марии и Диллада — герой может зайти за них
-    spawn: [8, 9.9],
-    exits: [
-      ...[7, 8, 9].map((x) => ({ x, y: 11, to: 'demin_road', at: [19, 5], dir: 'left' })),
-      ...[14, 15].map((x) => ({ x, y: 3, to: 'blood_entrance', at: [10, 10], dir: 'up' })),
-      { x: 17, y: 7, to: 'order_corridor1', at: [1, 6], dir: 'right' },
-      ...[10, 11].map((x) => ({ x, y: 0, if: { flag: 'temple_done' }, to: 'feelings_forest', at: [10, 10], dir: 'up', else: 'demin_north_locked' })),
-    ],
-    npcs: [
-      { id: 'st_maria_d', prop: 'spot', x: 9, y: 5.9, talk: [{ d: 'statue_maria' }] },
-      { id: 'st_dillad_d', prop: 'spot', x: 11, y: 7.9, talk: [{ d: 'statue_dillad' }] },
-      // прохожий подсказывает дорогу (вместо таблички)
-      { id: 'demin_local', sprite: 'oldman', hue: 2, x: 6, y: 4.9, dir: 'right', talk: [{ d: 'sign_demin' }] },
-      ...crowd('dem', [[12.4, 3.9, 0, 'down'], [7.4, 7.9, 1, 'up'], [9.6, 8.9, 3, 'left'], [14.6, 4.9, 4, 'down'], [5.4, 6.9, 5, 'right']],
-        { dark: 0.25, hue0: 300, if: { not: { path: 'hate' } } }),
-    ],
-    onEnter: [{ if: { not: 'demin_visited' }, d: 'demin_intro' }],
   };
 
   // ============================================================ Храм Крови (Демин): высокие двери, три коридора с витражами Марии, молебенный зал
@@ -697,25 +677,32 @@
     spawn: [10, 10],
     exits: [
       ...[9, 10, 11].map((x) => ({ x, y: 4, to: 'blood_corridor2', at: [1, 7], dir: 'right' })),
-      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'demin', at: [14, 4], dir: 'down' })),
+      // после храма тропа ведёт на север, к Лесу чувств; до того — обратно на лесную дорогу
+      ...[9, 10, 11].map((x) => ({ x, y: 11, if: { flag: 'temple_done' }, to: 'feelings_forest', at: [10, 10], dir: 'up' })),
+      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'demin_road', at: [19, 5.5], dir: 'left' })),
     ],
     npcs: [
       // четыре служителя в красных плащах с капюшонами
-      { id: 'cult1', sprite: 'cultist', x: 7, y: 5.3, dir: 'down', talk: [{ d: 'cultist_door' }] },
-      { id: 'cult2', sprite: 'cultist', x: 13, y: 5.3, dir: 'down', talk: [{ d: 'cultist_door' }] },
-      { id: 'cult3', sprite: 'cultist', x: 4.6, y: 8, dir: 'right', talk: [{ d: 'cultist_whisper' }] },
-      { id: 'cult4', sprite: 'cultist', x: 15.4, y: 8, dir: 'left', talk: [{ d: 'cultist_whisper' }] },
+      { id: 'cult1', sprite: 'cultist', x: 7.4, y: 5.3, dir: 'down', talk: [{ d: 'cultist_door' }] },
+      { id: 'cult4', sprite: 'cultist', x: 15.6, y: 8.6, dir: 'left', talk: [{ d: 'cultist_whisper' }] },
     ],
     onEnter: [{ if: { not: 'blood_seen' }, d: 'blood_intro' }],
   };
   const CORRIDOR = ['#####################', '#####################', '#####################', '#####################', '#####################', '#####################',
     '.....................', '.....................', '.....................',
     '#####################', '#####################', '#####################'];
-  const cultists = (tag, xs) => xs.map((x, i) => ({ id: tag + i, sprite: 'cultist', x, y: i % 2 ? 8.2 : 5.5, dir: i % 2 ? 'up' : 'down', w: 22, h: 10, talk: [{ d: 'cultist_whisper' }] }));
   MAPS.blood_corridor2 = {
     title: 'Храм Крови · Коридор витражей', bg: 'blood_corridor2', tiles: CORRIDOR, spawn: [1, 7],
-    exits: [...[6, 7, 8].map((y) => ({ x: 0, y, to: 'blood_entrance', at: [10, 5], dir: 'down' })), ...[6, 7, 8].map((y) => ({ x: 20, y, to: 'temple_nave', at: [8.5, 14], dir: 'up' }))],
-    npcs: cultists('bc_', [3, 6, 9, 12, 15, 18]),
+    exits: [...[6, 7, 8].map((y) => ({ x: 0, y, to: 'blood_entrance', at: [10, 5], dir: 'down' })), ...[6, 7, 8].map((y) => ({ x: 20, y, to: 'temple_nave', at: [10, 10], dir: 'up' }))],
+    npcs: [],
+    // восемь служителей храма стоят вдоль стен с самого начала и нападают все разом
+    encounters: [{
+      if: { not: 'corridor_cleared' }, lock: true,
+      enemies: [[4.5, 6.1], [6.6, 8.1], [8.8, 6.2], [10.6, 8.2], [12.4, 6.1], [14.2, 8.1], [16.3, 6.2], [18.2, 7.4]].map(([x, y]) => ({ kind: 'cultist', x, y })),
+      onClear: { set: { corridor_cleared: true }, d: 'corridor_cleared' },
+    }],
+    respawn: { map: 'blood_entrance', at: [10, 6], dir: 'up', d: 'hero_down_temple' },
+    onEnter: [{ if: { not: 'corridor_seen' }, d: 'corridor_attack' }],
   };
 
   // ============================================================ Орден Диллада (Демин): коридоры с фресками, ледяной зал
@@ -725,9 +712,9 @@
     '#####################', '#####################', '#####################'];
   MAPS.order_corridor1 = {
     title: 'Орден Диллада · Галерея фресок', bg: 'dillad_corridor', tiles: ORDER_TILES, spawn: [1, 6],
-    exits: [...[5, 6, 7, 8].map((y) => ({ x: 0, y, to: 'demin', at: [16, 5.9], dir: 'up' })), ...[5, 6, 7, 8].map((y) => ({ x: 20, y, to: 'spirit_order', at: [10, 10], dir: 'up' }))],
-    // четверо у входа и шестеро вдоль галереи
-    npcs: warriors('oc1_', [[2.4, 4.7], [2.4, 8.1], [4.4, 4.7], [4.4, 8.1], [7.5, 4.7], [9.5, 8.1], [11.5, 4.7], [13.5, 8.1], [15.5, 4.7], [17.5, 8.1]]),
+    exits: [...[5, 6, 7, 8].map((y) => ({ x: 0, y, to: 'temple_nave', at: [18.4, 8], dir: 'left' })), ...[5, 6, 7, 8].map((y) => ({ x: 20, y, to: 'spirit_order', at: [10, 10], dir: 'up' }))],
+    // часовые вдоль галереи, вразбивку
+    npcs: warriors('oc1_', [[3.4, 4.7], [8.2, 8.1], [12.6, 4.7], [17.4, 8.1]]),
     onEnter: [{ if: { not: 'order_seen' }, d: 'order_intro' }],
   };
 
@@ -751,11 +738,11 @@
     ],
     spawn: [10, 10],
     exits: [
-      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'demin', at: [10, 1], dir: 'down' })),
+      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'blood_entrance', at: [10, 10], dir: 'up' })),
       ...[9, 10, 11].map((x) => ({ x, y: 0, to: 'feelings_tree', at: [10, 10], dir: 'up' })),
     ],
     // зелёные прозрачные горожане Люминоса бродят без цели
-    npcs: crowd('ffg', [[7, 2.6, 0], [13, 3.4, 1], [6.6, 5.4, 2], [14, 6.2, 3], [8, 8.2, 4], [12.4, 8.8, 5], [9.6, 4.4, 0], [11.6, 6.4, 1]],
+    npcs: crowd('ffg', [[7, 2.6, 0], [13, 3.4, 1], [6.6, 6.4, 2], [12.4, 8.8, 5], [9.6, 4.8, 4]],
       { ghost: '#5cff9a', wander: 1.3, models: ['townsman', 'townswoman', 'oldman', 'merchant', 'keeper', 'elder'] }),
     onEnter: [{ if: { not: 'ffor_seen' }, d: 'feelings_intro' }],
   };
@@ -787,63 +774,57 @@
   };
 
   // ============================================================ Этап 5. Храм Кровавой Марии
-  // X стена храма  q тёмный пол  E дверной проём  B книжный шкаф
+  // Неф: фон-картинка (готический зал, алтарь с Марией наверху), справа — дверь в органный зал / галерею Ордена
   MAPS.temple_nave = {
     title: 'Храм Кровавой Марии',
-    ground: 'q',
+    bg: 'temple_nave',
     tiles: [
-      'XXXXXXXXEEXXXXXXXX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqPqqqqrrqqqqPqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'EqqPqqqqrrqqqqPqqE',
-      'EqqqqqqqrrqqqqqqqE',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqPqqqqrrqqqqPqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqPqqqqrrqqqqPqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XqqqqqqqrrqqqqqqqX',
-      'XXXXXXXXEEXXXXXXXX',
+      '#####################',
+      '#####################',
+      '#####################',
+      '#####################',
+      '######.........######',
+      '####.............####',
+      '###...............###',
+      '###...............#.#',
+      '##..................#',
+      '##.................##',
+      '########.....########',
+      '#########...#########',
     ],
-    spawn: [8.5, 14],
+    spawn: [10, 10],
     exits: [
-      ...[8, 9].map((x) => ({ x, y: 15, to: 'blood_corridor2', at: [19, 7], dir: 'left' })),
-      { x: 17, y: 6, if: { flag: 'priest_fled' }, to: 'organ_hall', at: [1.3, 6.5], dir: 'right', else: 'door_locked' },
-      { x: 17, y: 7, if: { flag: 'priest_fled' }, to: 'organ_hall', at: [1.3, 6.5], dir: 'right', else: 'door_locked' },
+      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'blood_corridor2', at: [19, 7], dir: 'left' })),
+      // правая дверь: органный зал (пока Долита там), потом — галерея Ордена Диллада
+      ...[7, 8].map((y) => ({ x: 19, y, if: { flag: 'temple_done' }, to: 'order_corridor1', at: [1, 6], dir: 'right', else: 'order_door_locked' })),
+      ...[7, 8].map((y) => ({ x: 19, y, if: [{ flag: 'priest_fled' }, { not: 'temple_done' }], to: 'organ_hall', at: [1.3, 6.5], dir: 'right' })),
     ],
     npcs: [
-      { id: 'altar', prop: 'altar', x: 8.5, y: 2.1, talk: [{ d: 'altar_offer' }] },
-      { id: 'mirror', prop: 'mirror', x: 2, y: 1.2, talk: [{ d: 'mirror_hint' }] },
-      { id: 'pew1', prop: 'pew', x: 5.5, y: 9.6 }, { id: 'pew2', prop: 'pew', x: 5.5, y: 11.6 },
-      { id: 'pew3', prop: 'pew', x: 12.2, y: 9.6 }, { id: 'pew4', prop: 'pew', x: 12.2, y: 11.6 },
-      { id: 'priest', sprite: 'priest', x: 8.5, y: 3.4, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }, { not: 'priest_hope_fight' }],
+      { id: 'altar', prop: 'spot', glow: '255,60,60', x: 10, y: 4.6, talk: [{ d: 'altar_offer' }] },
+      { id: 'priest', sprite: 'priest', x: 10, y: 4.9, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }, { not: 'priest_hope_fight' }],
         talk: [
           { if: { flag: 'temple_done' }, d: 'priest_after_hope' },
           { if: { eq: ['temple_path', 'hope'] }, d: 'priest_hope' },
           { if: { eq: ['temple_path', 'power'] }, d: 'priest_power' },
           { d: 'priest_hate' },
         ] },
-      { id: 'tguard1', sprite: 'nokt_guard', x: 6.3, y: 3.8, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
-      { id: 'tguard2', sprite: 'nokt_guard', x: 10.7, y: 3.8, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
+      { id: 'tguard1', sprite: 'nokt_guard', x: 7.6, y: 5.6, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
+      { id: 'tguard2', sprite: 'nokt_guard', x: 12.6, y: 5.9, dir: 'down', if: [{ not: 'priest_fight' }, { not: 'priest_fled' }] },
     ],
     // Путь Власти: бой с Первосвященником; маги Тьмы — по вызову
     encounters: [{
       if: [{ flag: 'priest_fight' }, { not: 'priest_beaten' }],
-      enemies: [{ kind: 'priest', x: 8.5, y: 3.4 }, { kind: 'guard', x: 6.3, y: 3.4 }, { kind: 'guard', x: 10.7, y: 3.4 }],
+      enemies: [{ kind: 'priest', x: 10, y: 4.9 }, { kind: 'guard', x: 7.6, y: 5.6 }, { kind: 'guard', x: 12.6, y: 5.9 }],
       lock: true,
       onClear: { set: { priest_beaten: true, temple_done: true, temple_blood_cleared: true }, d: 'priest_beaten' },
     }, {
       // Надежда: показать силу и пощадить Первосвященника на последнем издыхании
       if: [{ flag: 'priest_hope_fight' }, { not: 'temple_done' }], lock: true,
-      enemies: [{ kind: 'priest', x: 8.5, y: 3.4 }],
+      enemies: [{ kind: 'priest', x: 10, y: 4.9 }],
       stopAt: 0.15,
-      onStop: { set: { priest_hope_fight: false }, d: 'priest_mercy', at: [8.5, 6], dir: 'up' },
+      onStop: { set: { priest_hope_fight: false }, d: 'priest_mercy', at: [10, 7.4], dir: 'up' },
     }],
-    respawn: { map: 'temple_nave', at: [8.5, 14], dir: 'up', d: 'hero_down_temple' },
+    respawn: { map: 'temple_nave', at: [10, 10], dir: 'up', d: 'hero_down_temple' },
     onEnter: [{ if: { not: 'temple_seen' }, d: 'temple_intro' }],
   };
 
@@ -868,8 +849,8 @@
     ],
     spawn: [1.3, 6.5],
     exits: [
-      { x: 0, y: 6, if: { not: 'organ_fight' }, to: 'temple_nave', at: [16, 6.5], dir: 'left', else: 'organ_no_escape' },
-      { x: 0, y: 7, if: { not: 'organ_fight' }, to: 'temple_nave', at: [16, 6.5], dir: 'left', else: 'organ_no_escape' },
+      { x: 0, y: 6, if: { not: 'organ_fight' }, to: 'temple_nave', at: [18.4, 8], dir: 'left', else: 'organ_no_escape' },
+      { x: 0, y: 7, if: { not: 'organ_fight' }, to: 'temple_nave', at: [18.4, 8], dir: 'left', else: 'organ_no_escape' },
     ],
     npcs: [
       { id: 'organ', prop: 'organ', x: 8.5, y: 1.9, w: 0, h: 0 },
@@ -931,7 +912,7 @@
   };
 
   // ============================================================ Этап 6. Столица Нокт (патч v2.5: фон-картинка)
-  // Торговая площадь с Полианной и Дариан; на север — Ворота дворца, на запад — Лунный сад, на юг — к Древу Чувств
+  // Торговая площадь с Полианной и Дариан; на север — Ворота дворца, на запад — Сад обретённых чувств, на юг — к Древу Чувств
 MAPS.nokt_capital = {
     rainStart: true,                                  // пришли в столицу — начинается дождь
     title: 'Нокт · Столица Ноктюрн',
@@ -945,9 +926,9 @@ MAPS.nokt_capital = {
       '#######...............####',
       '#######...............####',
       '######.....####.......####',
-      '######.....####.......####',
-      '#######....####.......####',
-      '#######....####.......####',
+      '#####......####.......####',
+      '#####.#....####.......####',
+      '#####.#....####.......####',
       '#######...............####',
       '#######...............####',
       '#########.........########',
@@ -956,10 +937,11 @@ MAPS.nokt_capital = {
       '##########.......#########',
       '##########.......#########',
     ],
+    fgCrop: [[285, 320, 470, 560, 712]],             // верх арки из роз — герой проходит под ней
     spawn: [13, 16],
     exits: [
       ...[10, 11, 12, 13, 14, 15, 16].map((x) => ({ x, y: 17, to: 'feelings_tree', at: [19, 6], dir: 'left' })),
-      ...[7, 8].map((y) => ({ x: 6, y, if: { flag: 'dolita_led' }, to: 'nokt_garden', at: [17, 5], dir: 'left', else: 'capital_west_locked' })),   // арка из роз
+      { x: 5, y: 8, if: { flag: 'dolita_led' }, to: 'nokt_garden', at: [19.4, 8], dir: 'left', else: 'capital_west_locked' },   // проём арки из роз
       ...[12, 13, 14].map((x) => ({ x, y: 0, to: 'palace_gate', at: [7.5, 12], dir: 'up' })),
     ],
     npcs: [
@@ -969,7 +951,7 @@ MAPS.nokt_capital = {
       { id: 'dolita_capital', sprite: 'dolita', x: 13, y: 12.5, dir: 'down', if: [{ not: 'dolita_led' }, { path: 'hope' }], talk: [{ d: 'capital_dolita' }] },
       { id: 'polianna', sprite: 'polianna', x: 8.6, y: 11.4, dir: 'right', talk: [{ d: 'polianna' }] },
       { id: 'darian', sprite: 'darian', x: 20.6, y: 12.2, dir: 'left', talk: [{ d: 'darian' }] },
-      ...crowd('noc', [[9, 5.6, 0, 'right'], [17.4, 5.8, 1, 'left'], [21, 8.4, 2, 'left'], [16.4, 9.8, 3, 'up'], [10.4, 12.6, 4, 'right'], [15.6, 13.6, 5, 'up']],
+      ...crowd('noc', [[9, 5.6, 0, 'right'], [21, 8.4, 2, 'left'], [15.6, 13.6, 5, 'up']],
         { dark: 0.25, hue0: 250, if: { not: { path: 'hate' } } }),
     ],
     onEnter: [
@@ -979,43 +961,51 @@ MAPS.nokt_capital = {
     ],
   };
 
-  // Сад у озера: мини-игры за пароль, позже — свадьба
+  // Сад обретённых чувств: белая беседка в центре, слева пруд с ивами; мини-игры за пароль, позже — свадьба
   MAPS.nokt_garden = {
-    title: 'Нокт · Лунный сад',
+    title: 'Нокт · Сад обретённых чувств',
     bg: 'nokt_garden',
     tiles: [
       '#####################',
-      '#######........######',
-      '#####...........#####',
-      '#######.............#',
-      '########............#',
-      '#######.........#.#.#',
-      '#######.......###.###',
-      '#######.......###.###',
-      '######........#######',
-      '######........#######',
-      '####.........########',
       '#####################',
+      '#####################',
+      '########.....####...#',
+      '#######..###.....#.##',
+      '#######..###.....#.##',
+      '######..#########..##',
+      '######...#.#.......#.',
+      '#####................',
+      '######..#...#.###....',
+      '#########...#####..##',
+      '#########...#####..##',
     ],
-    fgCrop: [[1015, 300, 1235, 430]],                // арка из роз над входом
-    spawn: [17, 5],
-    exits: [{ x: 17, y: 6, to: 'nokt_capital', at: [7, 7.6], dir: 'right' }],
+    fgCrop: [[560, 190, 760, 450], [1075, 255, 1245, 440]],   // беседка и арка из роз — за ними можно пройти
+    spawn: [19, 8],
+    exits: [
+      { x: 20, y: 8, to: 'nokt_capital', at: [5, 9.7], dir: 'down' },
+      ...[17, 18].map((x) => ({ x, y: 11, to: 'nokt_capital', at: [5, 9.7], dir: 'down' })),
+    ],
     npcs: [
-      { id: 'pw_dolita', sprite: 'dolita', x: 16.5, y: 3.4, dir: 'down', if: { eq: ['power_scene', 'wedding'] } },
-      { id: 'pw_gidan', sprite: 'gidan', x: 14, y: 4.2, dir: 'right', if: { eq: ['power_scene', 'wedding'] } },
-      { id: 'pw_aedel', sprite: 'aedel', x: 19, y: 4.4, dir: 'left', if: { eq: ['power_scene', 'wedding'] } },
-      { id: 'pw_guard', sprite: 'nokt_guard', x: 12.5, y: 5.2, dir: 'up', if: { eq: ['power_scene', 'wedding'] } },
-      { id: 'pd_stone', prop: 'stone', x: 12, y: 3.6, if: { eq: ['power_scene', 'dolita'] } },
-      { id: 'dolita_garden', sprite: 'dolita', x: 9, y: 8, dir: 'left', if: [{ not: 'wedding' }, { not: 'power_scene' }],
+      { id: 'pw_dolita', sprite: 'dolita', x: 9.55, y: 7.7, dir: 'down', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_gidan', sprite: 'gidan', x: 7.4, y: 8.4, dir: 'right', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_aedel', sprite: 'aedel', x: 10.45, y: 7.7, dir: 'down', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pw_guard', sprite: 'nokt_guard', x: 13.4, y: 8.6, dir: 'left', if: { eq: ['power_scene', 'wedding'] } },
+      { id: 'pd_stone', prop: 'stone', x: 13, y: 7.4, if: { eq: ['power_scene', 'dolita'] } },
+      { id: 'dolita_garden', sprite: 'dolita', x: 6.6, y: 7.4, dir: 'left', if: [{ not: 'wedding' }, { not: 'power_scene' }],
         talk: [{ if: { flag: 'palace_password' }, d: 'garden_after' }, { d: 'garden_games' }] },
-      // свадьба Долиты и Аэдела — в беседке из роз
-      { id: 'w_priest', sprite: 'priest', x: 17, y: 2.7, dir: 'down', if: { flag: 'wedding' } },
-      { id: 'w_dolita', sprite: 'dolita', x: 16.5, y: 3.4, dir: 'down', if: { flag: 'wedding' } },
-      { id: 'w_aedel', sprite: 'aedel', x: 17.5, y: 3.4, dir: 'down', if: { flag: 'wedding' } },
-      { id: 'w_gidan', sprite: 'gidan', x: 14, y: 4.2, dir: 'right', if: { flag: 'wedding' } },
-      { id: 'w_guard1', sprite: 'nokt_guard', x: 19, y: 4.4, dir: 'left', if: { flag: 'wedding' } },
-      { id: 'w_keeper', sprite: 'keeper', x: 12.5, y: 5.2, dir: 'up', if: { flag: 'wedding' } },
-      { id: 'w_elder', sprite: 'elder', x: 13.6, y: 5.6, dir: 'up', if: { flag: 'wedding' } },
+      // свадьба Долиты и Аэдела — в беседке; вокруг — весь двор и горожане
+      { id: 'w_priest', sprite: 'priest', x: 10, y: 6.95, dir: 'down', if: { flag: 'wedding' } },
+      { id: 'w_dolita', sprite: 'dolita', x: 9.55, y: 7.7, dir: 'down', if: { flag: 'wedding' } },
+      { id: 'w_aedel', sprite: 'aedel', x: 10.45, y: 7.7, dir: 'down', if: { flag: 'wedding' } },
+      { id: 'w_gidan', sprite: 'gidan', x: 7.4, y: 8.4, dir: 'right', if: { flag: 'wedding' } },
+      { id: 'w_guard1', sprite: 'nokt_guard', x: 13.4, y: 7.5, dir: 'left', if: { flag: 'wedding' } },
+      { id: 'w_keeper', sprite: 'keeper', x: 12.4, y: 8.7, dir: 'up', if: { flag: 'wedding' } },
+      { id: 'w_elder', sprite: 'elder', x: 8.6, y: 9.4, dir: 'up', if: { flag: 'wedding' } },
+      { id: 'w_polianna', sprite: 'polianna', x: 15.4, y: 8.2, dir: 'left', if: { flag: 'wedding' } },
+      { id: 'w_darian', sprite: 'darian', x: 6.4, y: 9.2, dir: 'right', if: { flag: 'wedding' } },
+      ...crowd('wed', [[11.4, 9.5, 0, 'up'], [14.2, 9.2, 1, 'up'], [16.6, 9.4, 2, 'left'], [18.2, 8.2, 3, 'left'], [9.8, 10.4, 4, 'up'],
+        [13.6, 7.3, 5, 'left'], [6.6, 7.5, 1, 'right'], [17.8, 10.4, 4, 'up'], [19.6, 9.4, 0, 'left'], [15.2, 7.1, 3, 'down'],
+        [7.2, 8.9, 2, 'up'], [11, 10.9, 5, 'up']], { hue0: 40, if: { flag: 'wedding' } }),
     ],
     onEnter: [
       { if: { eq: ['power_scene', 'wedding'] }, d: 'power_wedding' },
@@ -1052,10 +1042,10 @@ MAPS.spirit_order = {
     bg: 'dillad_hall',
     tiles: [
       '#####################', '#####################', '#####################', '#####################', '#####################',
-      '####.....####....####',
-      '###...............###',
-      '###...............###',
-      '###...............###',
+      '#####....####...#####',
+      '#####...........#####',
+      '#####...........#####',
+      '####.............####',
       '###...............###',
       '###...............###',
       '########.....########',
@@ -1358,6 +1348,9 @@ MAPS.palace_gate = {
     mountains: {
       fog: { rgb: '220,225,235', a: [0.07, 0.14], speed: 14 }, vignette: 0.3, parts: { dust: 4, bird: 0.3 },
     },
+    forest_glade: {
+      fog: { rgb: '200,230,200', a: [0.06, 0.12], speed: 7 }, vignette: 0.4, parts: { pollen: 3, firefly: 1 },
+    },
     stream: {
       fog: { rgb: '220,240,255', a: [0.06, 0.13], speed: 8 }, vignette: 0.2, parts: { pollen: 5 },
     },
@@ -1368,13 +1361,10 @@ MAPS.palace_gate = {
       fog: { rgb: '210,230,255', a: [0.05, 0.1], speed: 6 }, vignette: 0.2, parts: { bird: 0.4, dust: 4 },
     },
     slums1: { fog: { rgb: '150,140,130', a: [0.07, 0.13], speed: 5 }, vignette: 0.45, parts: { dust: 4 } },
-    slums2: { fog: { rgb: '150,140,130', a: [0.07, 0.13], speed: 5 }, vignette: 0.45, parts: { dust: 4 } },
-    slums3: { fog: { rgb: '150,140,130', a: [0.07, 0.13], speed: 5 }, vignette: 0.45, parts: { dust: 4 } },
     trade_street: { fog: { rgb: '230,210,180', a: [0.04, 0.08], speed: 5 }, vignette: 0.2, parts: { dust: 3, bird: 0.3 } },
     alley: { fog: { rgb: '140,130,150', a: [0.07, 0.13], speed: 4 }, vignette: 0.5, parts: { dust: 3 } },
     bert_gate: { fog: { rgb: '210,215,230', a: [0.05, 0.1], speed: 8 }, vignette: 0.25, parts: { dust: 3, bird: 0.3 } },
     demin_road: { fog: { rgb: '200,220,210', a: [0.06, 0.12], speed: 7 }, vignette: 0.35, parts: { pollen: 3 } },
-    demin: { fog: { rgb: '220,200,230', a: [0.05, 0.1], speed: 6 }, vignette: 0.25, parts: { petal: 2, bird: 0.3 } },
     blood_entrance: { fog: { rgb: '170,20,40', a: [0.07, 0.13], speed: 4, pulse: true }, vignette: 0.5, parts: { drip: 1, ember: 2 } },
     blood_corridor2: { fog: { rgb: '170,20,40', a: [0.07, 0.13], speed: 4, pulse: true }, vignette: 0.5, parts: { ember: 2 } },
     order_corridor1: { fog: { rgb: '170,215,255', a: [0.06, 0.12], speed: 5 }, vignette: 0.4, parts: { wisp: 2, dust: 3 } },
@@ -1383,9 +1373,8 @@ MAPS.palace_gate = {
     feelings_tree: { fog: { rgb: '170,130,255', a: [0.06, 0.12], speed: 5 }, vignette: 0.4, parts: { wisp: 2, firefly: 3, petal: 1 } },
     temple_nave: {
       fog: { rgb: '170,20,40', a: [0.08, 0.15], speed: 4, pulse: true }, vignette: 0.55,
-      lights: [[1.5, 2.2, 1.3, '255,120,70', 0.4], [16.5, 2.2, 1.3, '255,120,70', 0.4], [1.5, 9, 1.3, '255,120,70', 0.4], [16.5, 9, 1.3, '255,120,70', 0.4], [8.5, 2.2, 2.4, '255,60,60', 0.25]],
-      rays: [[4, 1], [12, 1]], parts: { drip: 2, ember: 3 },
-      fg: [{ t: 'cloth', x: 3.5, y: 2.2 }, { t: 'cloth', x: 14.5, y: 2.2 }, { t: 'arch', x: 1.2, y: 1.4 }, { t: 'arch', x: 16.8, y: 1.4, flip: 1 }, { t: 'cloth', x: 6, y: 1.6 }, { t: 'cloth', x: 11, y: 1.6 }],
+      lights: [[10, 3.4, 2.6, '255,60,60', 0.25], [4, 6, 1.4, '255,120,70', 0.3], [16, 6, 1.4, '255,120,70', 0.3]],
+      parts: { drip: 2, ember: 3 },
     },
     organ_hall: {
       fog: { rgb: '170,15,35', a: [0.09, 0.15], speed: 3, pulse: true }, vignette: 0.6, candles: true,
@@ -1412,7 +1401,7 @@ MAPS.palace_gate = {
     },
     nokt_garden: {
       fog: { rgb: '190,220,200', a: [0.05, 0.1], speed: 5 }, vignette: 0.3, rain: true,
-      lights: [[3, 4.5, 2.6, '150,190,255', 0.15], [17, 2.6, 1.8, '255,220,240', 0.3]], parts: { firefly: 4, petal: 4 },
+      lights: [[3, 7.5, 2.6, '150,190,255', 0.15], [10, 5.6, 2, '255,230,240', 0.25]], parts: { firefly: 4, petal: 4 },
     },
     palace_gate: {
       fog: { rgb: '150,180,220', a: [0.07, 0.14], speed: 12 }, vignette: 0.4, rain: true,
@@ -1435,7 +1424,7 @@ MAPS.palace_gate = {
 
   const PROP_SIZE = {
     throne: { w: 110, h: 50 }, stone: { w: 40, h: 18 }, sign: { w: 30, h: 14 },
-    house: { w: 140, h: 52 }, altar: { w: 150, h: 40 }, pew: { w: 150, h: 26 }, mirror: { w: 50, h: 20 }, desk: { w: 130, h: 34 }, nhouse: { w: 140, h: 52 }, stall: { w: 92, h: 34 }, statue: { w: 40, h: 22 }, spring: { w: 70, h: 30 }, note: { w: 0, h: 0 },
+    house: { w: 140, h: 52 }, altar: { w: 150, h: 40 }, pew: { w: 150, h: 26 }, mirror: { w: 50, h: 20 }, desk: { w: 130, h: 34 }, nhouse: { w: 140, h: 52 }, stall: { w: 92, h: 34 }, statue: { w: 64, h: 24 }, spring: { w: 70, h: 30 }, note: { w: 0, h: 0 },
     nthrone: { w: 110, h: 50 }, table: { w: 380, h: 56 }, arch: { w: 0, h: 0 }, feast: { w: 600, h: 34 },
     commode: { w: 90, h: 24 }, portrait: { w: 70, h: 16 }, stand: { w: 40, h: 18 }, spot: { w: 0, h: 0 },
   };
@@ -1964,6 +1953,14 @@ MAPS.palace_gate = {
     if (o.lock) pending.lock = true;                   // после диалога — «Ошибка 888»
     if (o.achieve) unlock(o.achieve);
     if (o.zoom) { zoom.x = o.zoom[0] * T + T / 2; zoom.y = o.zoom[1] * T; zoom.want = o.zoom[2]; }
+    if (o.dissolve) {
+      const e = o.dissolve === true ? enemies[0] : null, px = e ? e.x : o.dissolve[0] * T + T / 2, py = e ? e.y : o.dissolve[1] * T + T - 6;
+      for (let i = 0; i < 6; i++) setTimeout(() => {
+        for (let k = 0; k < 14; k++) sparks.push({ x: px + (Math.random() - 0.5) * 50, y: py - 90 + i * 12 + Math.random() * 20,
+          vx: (Math.random() - 0.5) * 70, vy: 40 + Math.random() * 90, life: 0.6 + Math.random() * 0.5, rgb: k % 3 ? '120,210,255' : '220,245,255' });
+      }, i * 110);
+      flash('#bfe8ff');
+    }
     if (o.letterbox) lboxWant = 1;                     // киношные полосы до конца диалога                  // достижение прямо на реплике
     if (o.thief) spawnThief();
     if (o.letter) pending.letter = o.letter;           // после диалога — письмо на весь экран (LETTERS)
@@ -2213,7 +2210,7 @@ MAPS.palace_gate = {
     updateFireflies(dt);
     updateHunt(dt);
     updateRooms(dt);
-    if (mode === 'play') checkTriggers();
+    if (mode === 'play') { checkTriggers(); updateBump(dt); }
     if (mode !== 'play') return;                       // герой пал или начался диалог
     followCamera(dt);
     saveTimer += dt;
@@ -2256,11 +2253,16 @@ MAPS.palace_gate = {
     if (Math.hypot(hero.x - chase.x, hero.y - chase.y) < c.catchDist) { chase = null; startDialogue(c.caught); return; }
     if (chase.i >= c.path.length) { chase = null; startDialogue(c.escaped); }
   }
+  // кадр бега: у воровки есть профиль на бегу (два шага), у остальных — обычный кадр направления
+  function runSprite(name, dir, running, ph) {
+    if (running && name === 'thief' && (dir === 'left' || dir === 'right')) return img(`assets/sprites/thief_run_${dir}_${Math.floor(ph) % 2 ? 'b' : 'a'}.png`);
+    return img(`assets/sprites/${name}_${dir}.png`);
+  }
   function drawThief(ox, oy) {
     if (!chase) return;
     const x = Math.round(chase.x - ox), y = Math.round(chase.y - oy);
     shadow(x, y - 2, 18);
-    const sp = img(`assets/sprites/${chase.c.sprite}_${chase.dir}.png`);
+    const sp = runSprite(chase.c.sprite, chase.dir, chase.run, time * 9);
     const bob = chase.run ? Math.abs(Math.sin(time * 14)) * 4 : 0;
     if (ready(sp)) g.drawImage(sp, x - 32, y - 64 - bob, 64, 64);
   }
@@ -2273,178 +2275,310 @@ MAPS.palace_gate = {
     g.fillText(txt, W / 2, 116);
   }
 
-  // ---------------------------------------------------------------- Мини-игры сада (этап 6)
-  // timing — нажать, когда стрелка в зелёной зоне (камушки, фонарик);
-  // memory — запомнить и повторить порядок цветов (венок, букет);
-  // catch — ловить светлячков по саду. Тексты и итоги — в dialogues.js (MINIGAMES).
-  const FLOWERS = [
-    { name: 'Роза', color: '#e8506a', key: '1' }, { name: 'Лилия', color: '#f4f0e0', key: '2' },
-    { name: 'Василёк', color: '#7aa8ff', key: '3' }, { name: 'Ромашка', color: '#f4d04a', key: '4' },
-  ];
+  // ---------------------------------------------------------------- Мини-игры сада (второй фикс-патч)
+  // skip  — камушки от первого лица: красная стрелка ходит по дуге, попал в зелёное — камешек летит далеко;
+  // weave — плетение венка: тапами держать падающую стрелку в зелёной зоне шкалы «аккуратность»;
+  // flies — светлячки: экран темнеет, ловить мелкие мерцающие точки кликом/тапом (или прицелом стрелками + пробел).
+  // Тексты и итоги — в dialogues.js (MINIGAMES).
   let mini = null;
+  const WREATH_COLORS = ['#9a7ae8', '#f4d04a', '#e8506a', '#7aa8ff', '#f4f0e0', '#ff9a4a'];
   function startMini(id) {
     const m = MINIGAMES[id];
     if (!m) return console.warn('Нет мини-игры', id);
-    mini = { id, m, t: 0, done: false };
-    if (m.type === 'timing') Object.assign(mini, { try: 0, total: 0, phase: 'aim', zone: 0.3 + Math.random() * 0.4, res: null });
-    if (m.type === 'memory') { Object.assign(mini, { round: 0, lives: m.lives, flash: 0 }); newRound(); }
-    if (m.type === 'catch') { startFireflies(m); mini = null; return; }
+    mini = { id, m, t: 0, done: false, phase: 'ready' };
+    if (m.type === 'skip') Object.assign(mini, { n: 0, total: 0, zone: 0.3 + Math.random() * 0.4, throwT: 0, splashes: [], res: null });
+    if (m.type === 'weave') Object.assign(mini, { y: 0.5, v: 0, c: 0.5, cWant: 0.5, h: 0.28, flowers: 0, inT: 0, outT: 0, acc: 1, torn: null });
+    if (m.type === 'flies') {
+      Object.assign(mini, { got: 0, left: m.time, cx: W / 2, cy: H / 2, pops: [],
+        flies: Array.from({ length: m.count }, (_, i) => ({ x: 120 + Math.random() * (W - 240), y: 110 + Math.random() * (H - 260),
+          a: Math.random() * 6.28, sp: m.speed * (0.7 + Math.random() * 0.6), ph: Math.random() * 6.28, seed: i * 1.37 })) });
+    }
     mode = 'mini';
+    $('hud').hidden = true;                          // плашка героя не перекрывает табло мини-игры
     for (const k in keys) keys[k] = false;
   }
-  function newRound() {
-    const len = mini.m.rounds[mini.round];
-    mini.seq = Array.from({ length: len }, () => (Math.random() * 4) | 0);
-    mini.phase = 'show'; mini.t = -0.6; mini.input = 0;
-  }
-  const miniPos = () => 0.5 + 0.5 * Math.sin(mini.t * (2.4 + mini.try * 0.7));   // стрелка ходит быстрее с каждой попыткой
-  function miniPress(choice) {
+  // стрелка камушков: туда-сюда по дуге, с каждым броском чуть быстрее
+  const skipPos = () => 0.5 + 0.5 * Math.sin(mini.t * (3.1 + mini.n * 0.22));
+  function miniPress() {
     if (!mini || mini.done) return;
     const m = mini.m;
-    if (m.type === 'timing' && mini.phase === 'aim') {
-      const d = Math.abs(miniPos() - mini.zone);
-      const pts = d < 0.06 ? m.score[0] : d < 0.16 ? m.score[1] : m.score[2];
-      mini.total += pts;
-      mini.res = { pts, grade: d < 0.06 ? 0 : d < 0.16 ? 1 : 2 };
-      mini.phase = 'result'; mini.rt = 0;
-    } else if (m.type === 'memory' && mini.phase === 'input' && choice != null) {
-      mini.pressed = { i: choice, t: 0.25 };
-      if (choice === mini.seq[mini.input]) {
-        mini.input++;
-        if (mini.input >= mini.seq.length) {
-          mini.round++;
-          if (mini.round >= m.rounds.length) return finishMini(true);
-          mini.phase = 'good'; mini.t = 0;
-        }
-      } else {
-        mini.lives--;
-        mini.flash = 0.5;
-        if (mini.lives <= 0) return finishMini(false);
-        mini.phase = 'oops'; mini.t = 0;
-      }
-    }
+    if (mini.phase === 'ready') return;
+    if (m.type === 'skip' && mini.phase === 'aim') {
+      const p = skipPos(), d = Math.abs(p - mini.zone);
+      const grade = d < m.green / 2 ? 0 : d < m.grey / 2 ? 1 : 2, skips = m.skips[grade];
+      mini.res = { grade, skips, p };
+      mini.total += skips;
+      mini.phase = 'fly'; mini.throwT = 0; mini.splashes = []; mini.bounced = 0;
+      mini.endX = W / 2 + (p - 0.5) * 360;
+    } else if (m.type === 'weave' && mini.phase === 'play') {
+      mini.v = Math.min(mini.v + m.kick, m.kick * 1.6);
+    } else if (m.type === 'flies' && mini.phase === 'play') catchFly(mini.cx, mini.cy);
+  }
+  function catchFly(x, y) {
+    const f = mini.flies.find((q) => !q.caught && Math.hypot(q.x - x, q.y - y) < mini.m.hit);
+    mini.pops.push({ x, y, t: 0, hit: !!f });
+    if (!f) return;
+    f.caught = true; mini.got++;
+    if (mini.got >= mini.m.need) finishMini(true);
   }
   function finishMini(win) {
     mini.done = true;
     mini.win = win;
     mini.phase = 'end'; mini.t = 0;
   }
+  // точка воды для камушка: s от 0 (у берега) до 1 (конец полёта) — уходит к горизонту
+  function skipPoint(s) {
+    const far = mini.res.skips / mini.m.skips[0];
+    const yEnd = H * (0.47 + (1 - far) * 0.24);
+    return { x: W / 2 + 60 + (mini.endX - W / 2 - 60) * s, y: H * 0.92 + (yEnd - H * 0.92) * Math.pow(s, 0.8) };
+  }
+  const depth = (y) => Math.max(0.08, (y - H * 0.4) / (H * 0.6));       // перспектива: чем выше к горизонту, тем мельче
   function updateMini(dt) {
     if (!mini) return;
     mini.t += dt;
-    mini.flash = Math.max(0, (mini.flash || 0) - dt);
-    if (mini.pressed && (mini.pressed.t -= dt) <= 0) mini.pressed = null;
     const m = mini.m;
     if (mini.phase === 'end') {
-      if (mini.t > 1.2) {
+      if (m.type === 'weave' && mini.torn) for (const f of mini.torn) { f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 300 * dt; f.r += f.vr * dt; }
+      if (mini.t > 1.6) {
         const d = mini.win ? m.win : m.fail;
         mini = null;
         mode = 'play';
+        updateHud();
         startDialogue(d);
       }
       return;
     }
-    if (m.type === 'timing' && mini.phase === 'result' && (mini.rt += dt) > 1.6) {
-      mini.try++;
-      if (mini.try >= m.tries) return finishMini(mini.total >= m.need);
-      mini.phase = 'aim'; mini.zone = 0.25 + Math.random() * 0.5; mini.res = null; mini.t = 0;
-    }
-    if (m.type === 'memory') {
-      if (mini.phase === 'show' && mini.t > mini.seq.length * 0.8) { mini.phase = 'input'; mini.t = 0; }
-      if ((mini.phase === 'good' || mini.phase === 'oops') && mini.t > 0.9) {
-        if (mini.phase === 'good') newRound();
-        else { mini.phase = 'show'; mini.t = -0.4; mini.input = 0; }      // ошибка — показать тот же порядок ещё раз
+    if (mini.phase === 'ready') { if (mini.t > 1.1) { mini.phase = m.type === 'skip' ? 'aim' : 'play'; mini.t = 0; } return; }
+    if (m.type === 'skip') {
+      for (const sp of mini.splashes) sp.t += dt;
+      if (mini.phase === 'fly') {
+        const dur = 0.55 + mini.res.skips * 0.22;
+        mini.throwT += dt;
+        const s = Math.min(1, mini.throwT / dur), k = mini.res.skips;
+        const hitAt = (i) => (0.25 + 0.75 * i / k);                       // первый удар о воду — на четверти пути
+        while (mini.bounced < k && s >= hitAt(mini.bounced)) {
+          const pt = skipPoint(hitAt(mini.bounced)); mini.bounced++;
+          mini.splashes.push({ x: pt.x, y: pt.y, t: 0, big: mini.bounced === k });
+        }
+        if (mini.throwT > dur + 0.9) {
+          mini.n++;
+          if (mini.n >= m.stones) return finishMini(mini.total >= m.stones * m.skips[0] - m.dolitaLess);
+          mini.phase = 'aim'; mini.t = 0; mini.res = null; mini.zone = 0.22 + Math.random() * 0.56;
+        }
       }
+    }
+    if (m.type === 'weave') {
+      const grav = m.gravity + mini.flowers * m.gravityUp;
+      mini.v -= grav * dt; mini.y += mini.v * dt;
+      if (mini.y > 1) { mini.y = 1; mini.v = Math.min(0, mini.v); }
+      mini.c += Math.sign(mini.cWant - mini.c) * Math.min(Math.abs(mini.cWant - mini.c), 0.25 * dt);   // зона плавно переезжает
+      const off = Math.abs(mini.y - mini.c), half = mini.h / 2;
+      if (off <= half && mini.y > 0) {
+        mini.outT = 0; mini.acc = 1 - off / half;
+        if ((mini.inT += dt) >= m.perFlower) {
+          mini.inT = 0; mini.flowers++; mini.grow = 0;
+          if (mini.flowers >= m.need) return finishMini(true);
+          mini.cWant = 0.25 + Math.random() * 0.5;
+          mini.h = Math.max(m.minZone, mini.h - m.shrink);
+        }
+      } else {
+        mini.acc = 0;
+        if ((mini.outT += dt) > m.grace || mini.y <= 0) {                // стрелка ушла — стебель порвался
+          mini.torn = Array.from({ length: Math.max(1, mini.flowers) }, (_, i) => {
+            const a = i / Math.max(1, mini.flowers) * 6.28 - 1.57;
+            return { x: WRX + Math.cos(a) * 130, y: WRY + Math.sin(a) * 130, vx: Math.cos(a) * (80 + Math.random() * 120), vy: Math.sin(a) * 120 - 160, r: 0, vr: (Math.random() - 0.5) * 8, c: WREATH_COLORS[i % WREATH_COLORS.length] };
+          });
+          return finishMini(false);
+        }
+      }
+      mini.grow = Math.min(1, (mini.grow ?? 1) + dt * 2.5);
+    }
+    if (m.type === 'flies') {
+      mini.left -= dt;
+      const ax = (keys.right ? 1 : 0) - (keys.left ? 1 : 0), ay = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+      mini.cx = Math.max(20, Math.min(W - 20, mini.cx + ax * 520 * dt)); mini.cy = Math.max(20, Math.min(H - 20, mini.cy + ay * 520 * dt));
+      for (const f of mini.flies) {
+        if (f.caught) continue;
+        f.ph += dt * 5;
+        f.a += Math.sin(time * 1.3 + f.seed) * dt * 2.4 + (Math.random() - 0.5) * dt * 2;
+        const sp = f.sp * (1 + (m.time - mini.left) / m.time * 0.6);        // к концу быстрее
+        f.x += Math.cos(f.a) * sp * dt; f.y += Math.sin(f.a) * sp * dt;
+        if (f.x < 60 || f.x > W - 60) { f.a = Math.PI - f.a; f.x = Math.max(60, Math.min(W - 60, f.x)); }
+        if (f.y < 90 || f.y > H - 110) { f.a = -f.a; f.y = Math.max(90, Math.min(H - 110, f.y)); }
+      }
+      for (const p of mini.pops) p.t += dt;
+      mini.pops = mini.pops.filter((p) => p.t < 0.5);
+      if (mini.left <= 0) finishMini(false);
     }
   }
   function miniKey(e) {
-    if (mini && mini.m.type === 'memory') {
-      const i = FLOWERS.findIndex((f) => e.code === 'Digit' + f.key || e.code === 'Numpad' + f.key);
-      if (i >= 0) miniPress(i);
-    } else if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE' || e.code === 'KeyJ') { if (!e.repeat) miniPress(); }
+    if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE' || e.code === 'KeyJ') { if (!e.repeat) miniPress(); }
+    else if (KEYMAP[e.code]) keys[KEYMAP[e.code]] = true;
     e.preventDefault();
   }
-  // клик по канве: в «памяти» — по цветку, в «точности» — бросок
+  // клик по канве: светлячки — по точке клика, остальное — как нажатие
   function miniClick(x, y) {
     if (!mini) return;
-    if (mini.m.type === 'memory') {
-      const i = FLOWERS.findIndex((f, k) => Math.hypot(x - (W / 2 - 270 + k * 180), y - 450) < 70);
-      if (i >= 0) miniPress(i);
-    } else miniPress();
+    if (mini.m.type === 'flies') { if (mini.phase === 'play') { mini.cx = x; mini.cy = y; catchFly(x, y); } }
+    else miniPress();
   }
-  function flowerAt(x, y, r, color, glow) {
-    if (glow) { g.fillStyle = 'rgba(255,240,180,.35)'; g.beginPath(); g.arc(x, y, r * 1.9, 0, 6.28); g.fill(); }
+
+  // ---- отрисовка
+  function pebble(x, y, r) {                         // плоский серый камешек: тёмный контур, светлый блик
+    g.fillStyle = '#1b1e26'; g.beginPath(); g.ellipse(x, y, r + 2, r * 0.62 + 2, -0.25, 0, 6.28); g.fill();
+    g.fillStyle = '#7d8494'; g.beginPath(); g.ellipse(x, y, r, r * 0.62, -0.25, 0, 6.28); g.fill();
+    g.fillStyle = '#a9b0c0'; g.beginPath(); g.ellipse(x - r * 0.2, y - r * 0.18, r * 0.62, r * 0.32, -0.25, 0, 6.28); g.fill();
+    g.fillStyle = '#e4e8f2'; g.fillRect(Math.round(x - r * 0.45), Math.round(y - r * 0.32), Math.max(2, r * 0.25), Math.max(2, r * 0.12));
+  }
+  function miniPanel(x, y, w, h) {                  // тёмная панель в духе Deltarune: чёрный фон, белая рамка
+    g.fillStyle = 'rgba(0,0,0,.82)'; g.fillRect(x, y, w, h);
+    g.strokeStyle = '#fff'; g.lineWidth = 3; g.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
+  }
+  function miniText(txt, x, y, size, color) {
+    g.font = `bold ${size}px "Courier New", monospace`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = '#000'; g.fillText(txt, x + 2, y + 2);
+    g.fillStyle = color || '#fff'; g.fillText(txt, x, y);
+  }
+  function drawSkip() {
+    const m = mini.m, lake = img('assets/locations/mini_lake.jpg');
+    if (ready(lake)) g.drawImage(lake, 0, 0, W, H); else { g.fillStyle = '#163a4a'; g.fillRect(0, 0, W, H); }
+    for (const sp of mini.splashes) {                 // всплески: круги расходятся, брызги
+      const k = depth(sp.y), a = Math.max(0, 1 - sp.t / (sp.big ? 1.4 : 0.9));
+      if (a <= 0) continue;
+      g.strokeStyle = `rgba(220,245,255,${a})`; g.lineWidth = Math.max(1, 3 * k);
+      for (let r = 0; r < (sp.big ? 3 : 2); r++) {
+        const rr = (12 + sp.t * 70 + r * 14) * k;
+        g.beginPath(); g.ellipse(sp.x, sp.y, rr, rr * 0.3, 0, 0, 6.28); g.stroke();
+      }
+      g.fillStyle = `rgba(235,250,255,${a})`;
+      for (let i = 0; i < (sp.big ? 8 : 4); i++) {
+        const dx = (i - 3.5) * 7 * k, up = Math.max(0, Math.sin(Math.min(1, sp.t * 2.4) * Math.PI)) * (sp.big ? 40 : 22) * k * (1 - Math.abs(i - 3.5) / 5);
+        g.fillRect(sp.x + dx, sp.y - up, Math.max(2, 4 * k), Math.max(2, 4 * k));
+      }
+    }
+    if (mini.phase === 'fly') {                       // камешек улетает от игрока, уменьшается и прыгает по воде
+      const k = mini.res.skips, dur = 0.55 + k * 0.22, s = Math.min(1, mini.throwT / dur);
+      if (mini.bounced < k || s < 1) {
+        const hitAt = (i) => (0.25 + 0.75 * i / k);
+        const i = mini.bounced, s0 = i ? hitAt(i - 1) : -0.12, s1 = hitAt(i), u = Math.max(0, Math.min(1, (s - s0) / (s1 - s0)));
+        const pt = skipPoint(Math.max(0, s)), d = depth(pt.y);
+        const hopH = (i === 0 ? 160 : 70 / (i + 0.5)) * d * Math.sin(u * Math.PI) + (i === 0 ? (1 - u) * 120 : 0);
+        g.fillStyle = 'rgba(0,30,40,.35)'; g.beginPath(); g.ellipse(pt.x, pt.y, 14 * d, 4 * d, 0, 0, 6.28); g.fill();
+        pebble(pt.x, pt.y - hopH, 6 + 26 * d);
+      }
+    }
+    // шкала-дуга внизу по центру: тёмная полоса, серая полупрозрачная зона, зелёная часть, красная стрелка
+    const cx = W / 2, cy = H - 34, R = 200, th = 30;
+    const ang = (p) => Math.PI + p * Math.PI;
+    g.lineCap = 'butt';
+    g.strokeStyle = 'rgba(0,0,0,.75)'; g.lineWidth = th + 10; g.beginPath(); g.arc(cx, cy, R, Math.PI, 0); g.stroke();
+    g.strokeStyle = 'rgba(40,40,48,.9)'; g.lineWidth = th; g.beginPath(); g.arc(cx, cy, R, Math.PI, 0); g.stroke();
+    g.strokeStyle = 'rgba(200,200,210,.45)'; g.beginPath(); g.arc(cx, cy, R, ang(mini.zone - m.grey / 2), ang(mini.zone + m.grey / 2)); g.stroke();
+    const gr = g.createLinearGradient(cx - R, 0, cx + R, 0);
+    gr.addColorStop(0, '#2fbf4a'); gr.addColorStop(0.5, '#7cff8a'); gr.addColorStop(1, '#2fbf4a');
+    g.strokeStyle = gr; g.beginPath(); g.arc(cx, cy, R, ang(mini.zone - m.green / 2), ang(mini.zone + m.green / 2)); g.stroke();
+    const p = mini.phase === 'aim' ? skipPos() : mini.res ? mini.res.p : 0.5, a = ang(p);
+    g.fillStyle = '#ff2a2a'; g.strokeStyle = '#000'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(cx + Math.cos(a) * (R + 22), cy + Math.sin(a) * (R + 22));
+    g.lineTo(cx + Math.cos(a + 0.06) * (R - 26), cy + Math.sin(a + 0.06) * (R - 26)); g.lineTo(cx + Math.cos(a - 0.06) * (R - 26), cy + Math.sin(a - 0.06) * (R - 26));
+    g.closePath(); g.fill(); g.stroke();
+    miniPanel(20, 20, 420, 92);
+    miniText(`КАМЕШЕК ${Math.min(mini.n + 1, m.stones)} / ${m.stones}`, 230, 46, 24);
+    miniText(`ТЫ: ${mini.total}   ДОЛИТА: ${m.stones * m.skips[0] - m.dolitaLess}`, 230, 84, 22, '#ffe066');
+    if (mini.res && mini.phase === 'fly') miniText(['ДАЛЕКО!', 'НЕПЛОХО', 'БУЛЬК…'][mini.res.grade] + `  +${mini.res.skips}`, W / 2, H * 0.3, 34, ['#7cff8a', '#ffe066', '#ff8a7a'][mini.res.grade]);
+    if (mini.phase === 'ready') miniText('ЛОВИ ЗЕЛЁНОЕ!', W / 2, H * 0.3, 40);
+  }
+  // венок лежит на траве (вид сверху): каждый вплетённый цветок добавляется по кругу
+  const WRX = 470, WRY = 380;
+  let grassArt = null;
+  function pixFlower(x, y, s, color) {
+    const q = Math.max(2, Math.round(4 * s));
+    g.fillStyle = '#16301a';
+    for (const [dx, dy] of [[0, -2], [-2, 0], [2, 0], [0, 2], [-1, -1], [1, -1], [-1, 1], [1, 1], [0, 0]]) g.fillRect(x + dx * q - q, y + dy * q - q, q * 2 + 2, q * 2 + 2);
     g.fillStyle = color;
-    for (let i = 0; i < 6; i++) { const a = i * 1.047; g.beginPath(); g.arc(x + Math.cos(a) * r * 0.62, y + Math.sin(a) * r * 0.62, r * 0.48, 0, 6.28); g.fill(); }
-    g.fillStyle = '#f0c040'; g.beginPath(); g.arc(x, y, r * 0.34, 0, 6.28); g.fill();
+    for (const [dx, dy] of [[0, -2], [-2, 0], [2, 0], [0, 2], [-1, -1], [1, -1], [-1, 1], [1, 1]]) g.fillRect(x + dx * q - q + 1, y + dy * q - q + 1, q * 2, q * 2);
+    g.fillStyle = '#ffe14a'; g.fillRect(x - q + 1, y - q + 1, q * 2, q * 2);
+  }
+  function drawWeave() {
+    const m = mini.m;
+    grassArt ||= art(W, H, (x) => {                    // пиксельная трава
+      x.fillStyle = '#2d6a34'; x.fillRect(0, 0, W, H);
+      for (let i = 0; i < 2600; i++) {
+        const px = (i * 97) % W, py = (i * 61 + ((i * 13) % 17) * 23) % H;
+        x.fillStyle = ['#255c2c', '#3a7d3f', '#2a6330', '#468a48'][i % 4]; x.fillRect(px - px % 6, py - py % 6, 6, 6);
+      }
+    });
+    g.drawImage(grassArt, 0, 0);
+    const n = mini.flowers, total = m.need;
+    if (!(mini.phase === 'end' && !mini.win)) {        // стебли: зелёное кольцо, растёт с цветами
+      g.strokeStyle = '#173d1d'; g.lineWidth = 16;
+      g.beginPath(); g.arc(WRX, WRY, 130, -Math.PI / 2, -Math.PI / 2 + Math.max(0.25, n / total * 6.283)); g.stroke();
+      g.strokeStyle = '#4fae4a'; g.lineWidth = 8;
+      g.beginPath(); g.arc(WRX, WRY, 130, -Math.PI / 2, -Math.PI / 2 + Math.max(0.25, n / total * 6.283)); g.stroke();
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i + 0.5) / total * 6.283, s = i === n - 1 ? (mini.grow ?? 1) : 1;
+        pixFlower(Math.round(WRX + Math.cos(a) * 130), Math.round(WRY + Math.sin(a) * 130), 1.4 * s, WREATH_COLORS[i % WREATH_COLORS.length]);
+        g.fillStyle = '#4fae4a'; g.fillRect(WRX + Math.cos(a + 0.12) * 146 - 5, WRY + Math.sin(a + 0.12) * 146 - 3, 10, 6);   // листик
+      }
+    }
+    if (mini.torn) for (const f of mini.torn) { g.save(); g.translate(f.x, f.y); g.rotate(f.r); pixFlower(0, 0, 1.2, f.c); g.restore(); }
+    // шкала «аккуратность»: тёмный контейнер ~60% высоты, зелёная зона, красный указатель
+    const bx = W - 300, bw = 60, bt = H * 0.18, bh = H * 0.6;
+    g.fillStyle = 'rgba(0,0,0,.72)'; g.fillRect(bx - 8, bt - 8, bw + 16, bh + 16);
+    g.strokeStyle = '#fff'; g.lineWidth = 3; g.strokeRect(bx - 6.5, bt - 6.5, bw + 13, bh + 13);
+    const zy0 = bt + (1 - mini.c - mini.h / 2) * bh, zh = mini.h * bh;
+    const zg = g.createLinearGradient(0, zy0, 0, zy0 + zh);
+    zg.addColorStop(0, '#2fbf4a'); zg.addColorStop(0.5, '#7cff8a'); zg.addColorStop(1, '#2fbf4a');
+    g.fillStyle = zg; g.fillRect(bx, zy0, bw, zh);
+    const py = bt + (1 - Math.max(0, Math.min(1, mini.y))) * bh;
+    g.fillStyle = mini.outT > 0 ? '#ff6060' : '#ff2a2a'; g.strokeStyle = '#000'; g.lineWidth = 2;
+    g.fillRect(bx, py - 2, bw, 4);
+    g.beginPath(); g.moveTo(bx - 4, py); g.lineTo(bx - 30, py - 14); g.lineTo(bx - 30, py + 14); g.closePath(); g.fill(); g.stroke();
+    // вверху — значок венка, заполняется цветами
+    g.strokeStyle = '#4fae4a'; g.lineWidth = 6; g.beginPath(); g.arc(bx + bw / 2, bt - 46, 22, 0, 6.28); g.stroke();
+    g.strokeStyle = '#ffe14a'; g.beginPath(); g.arc(bx + bw / 2, bt - 46, 22, -Math.PI / 2, -Math.PI / 2 + n / total * 6.283); g.stroke();
+    miniText(`${n}/${total}`, bx + bw / 2, bt - 46, 16);
+    miniText(`АККУРАТНОСТЬ`, bx + bw / 2, bt + bh + 32, 18);
+    miniText(`${Math.round((mini.acc || 0) * 100)}%`, bx + bw / 2, bt + bh + 58, 24, mini.acc > 0.5 ? '#7cff8a' : '#ffe066');
+    miniPanel(20, 20, 470, 56);
+    miniText('ТАПАЙ — ДЕРЖИ СТРЕЛКУ В ЗЕЛЁНОМ', 255, 48, 20);
+    if (mini.phase === 'ready') miniText('ГОТОВ{|А}?'.replace('{|А}', state.flags.hero_gender === 'f' ? 'А' : ''), WRX, WRY, 40);
+    if (mini.phase === 'end' && !mini.win) miniText('ПОРВАЛ{|А} СТЕБЕЛЬ!'.replace('{|А}', state.flags.hero_gender === 'f' ? 'А' : ''), WRX, WRY, 36, '#ff8a7a');
+  }
+  function drawFlies() {
+    const m = mini.m;
+    g.fillStyle = 'rgba(2,3,10,.9)'; g.fillRect(0, 0, W, H);           // ночь: экран темнеет
+    for (const f of mini.flies) {
+      if (f.caught) continue;
+      const tw = 0.5 + 0.5 * Math.sin(f.ph * 1.7 + f.seed * 3);
+      if (tw < 0.12) continue;                         // моргнул — на миг пропал
+      g.globalCompositeOperation = 'lighter';
+      g.globalAlpha = 0.35 * tw; g.drawImage(blob('230,255,190'), f.x - 10, f.y - 10, 20, 20);
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+      g.fillStyle = `rgba(255,255,240,${0.55 + 0.45 * tw})`; g.fillRect(Math.round(f.x) - 2, Math.round(f.y) - 2, 4, 4);
+    }
+    for (const p of mini.pops) {
+      const a = 1 - p.t / 0.5;
+      g.strokeStyle = p.hit ? `rgba(200,255,150,${a})` : `rgba(255,255,255,${a * 0.4})`; g.lineWidth = 2;
+      g.beginPath(); g.arc(p.x, p.y, 6 + p.t * 50, 0, 6.28); g.stroke();
+    }
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2;                     // прицел (для клавиатуры)
+    g.beginPath(); g.arc(mini.cx, mini.cy, m.hit, 0, 6.28); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(mini.cx - 1, mini.cy - 1, 2, 2);
+    miniPanel(20, 20, 470, 92);
+    miniText(`СВЕТЛЯЧКИ: ${mini.got} / ${m.need}`, 255, 46, 24, '#e8ffb0');
+    miniText(`ВРЕМЯ: ${Math.max(0, Math.ceil(mini.left))}`, 255, 84, 22, mini.left < 6 ? '#ff8a7a' : '#fff');
+    if (mini.phase === 'ready') miniText('ТАПАЙ ПО ОГОНЬКАМ!', W / 2, H / 2, 38);
   }
   function drawMini() {
     if (!mini) return;
     const m = mini.m;
-    g.fillStyle = 'rgba(8,6,12,.72)'; g.fillRect(0, 0, W, H);
-    const X = W / 2 - 440, Y = 110, PW = 880, PH = 480;
-    g.fillStyle = '#1b1620'; g.fillRect(X, Y, PW, PH);
-    g.strokeStyle = '#c9a24a'; g.lineWidth = 4; g.strokeRect(X + 2, Y + 2, PW - 4, PH - 4);
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = '#f4dca0'; g.font = 'bold 36px Georgia, serif'; g.fillText(m.title, W / 2, Y + 48);
-    g.fillStyle = '#b9a98f'; g.font = '22px sans-serif'; g.fillText(m.hint, W / 2, Y + 92);
-    if (m.type === 'timing') {
-      // озеро
-      g.fillStyle = '#1c3550'; g.fillRect(X + 60, Y + 130, PW - 120, 150);
-      for (let i = 0; i < 9; i++) { g.fillStyle = 'rgba(190,230,255,.18)'; g.fillRect(X + 90 + i * 85 + Math.sin(time * 2 + i) * 8, Y + 160 + (i % 3) * 40, 30, 2); }
-      if (mini.res) {
-        const n = mini.res.pts, k = Math.min(1, mini.rt / 1.2);
-        for (let i = 0; i < n; i++) {                      // круги на воде — прыжки камушка / фонарик
-          if (k * n < i) break;
-          const cx = X + 120 + i * ((PW - 240) / Math.max(1, n)), cy = Y + 205 + Math.sin(i * 2) * 20;
-          g.strokeStyle = `rgba(200,235,255,${0.8 - (k * n - i) * 0.15})`; g.lineWidth = 2;
-          g.beginPath(); g.ellipse(cx, cy, 14 + (k * n - i) * 10, 5 + (k * n - i) * 3, 0, 0, 6.28); g.stroke();
-          if (m.lantern) { g.fillStyle = '#ffcf6a'; g.fillRect(cx - 6, cy - 16, 12, 12); g.fillStyle = 'rgba(255,200,90,.35)'; g.beginPath(); g.arc(cx, cy - 10, 20, 0, 6.28); g.fill(); }
-        }
-        if (!n) { g.fillStyle = '#e0f0ff'; g.font = 'bold 30px sans-serif'; g.fillText(m.lantern ? 'Порыв ветра — фонарик погас!' : 'Бульк!', W / 2, Y + 205); }
-        g.fillStyle = ['#7cf08a', '#f4d04a', '#ff8a7a'][mini.res.grade]; g.font = 'bold 30px sans-serif';
-        g.fillText(['Идеально!', 'Неплохо', 'Мимо'][mini.res.grade] + `  +${n}`, W / 2, Y + 312);
-      }
-      // шкала
-      const bx = X + 120, bw = PW - 240, by = Y + 350;
-      g.fillStyle = '#3a2f2a'; g.fillRect(bx, by, bw, 34);
-      g.fillStyle = '#c8a040'; g.fillRect(bx + (mini.zone - 0.16) * bw, by, 0.32 * bw, 34);
-      g.fillStyle = '#4cc860'; g.fillRect(bx + (mini.zone - 0.06) * bw, by, 0.12 * bw, 34);
-      const p = mini.phase === 'aim' ? miniPos() : mini.lastPos ?? 0.5;
-      if (mini.phase === 'aim') mini.lastPos = p;
-      g.fillStyle = '#fff'; g.fillRect(bx + p * bw - 3, by - 10, 6, 54);
-      g.fillStyle = '#f4dca0'; g.font = '24px sans-serif';
-      g.fillText(`Бросок ${Math.min(mini.try + 1, m.tries)} из ${m.tries}  ·  ${m.unit}: ${mini.total} (нужно ${m.need})`, W / 2, Y + 430);
-    } else {
-      // цепочка цветов: показ или ввод
-      const n = mini.seq.length;
-      for (let i = 0; i < n; i++) {
-        const cx = W / 2 + (i - (n - 1) / 2) * 90, cy = Y + 200;
-        g.fillStyle = 'rgba(255,255,255,.06)'; g.beginPath(); g.arc(cx, cy, 34, 0, 6.28); g.fill();
-        const showing = mini.phase === 'show' && mini.t >= i * 0.8 && mini.t < i * 0.8 + 0.65;
-        if (showing) flowerAt(cx, cy, 30, FLOWERS[mini.seq[i]].color, true);
-        else if (mini.phase !== 'show' && i < mini.input) flowerAt(cx, cy, 24, FLOWERS[mini.seq[i]].color);
-        else if (mini.phase === 'good') flowerAt(cx, cy, 24, FLOWERS[mini.seq[i]].color);
-      }
-      g.fillStyle = '#f4dca0'; g.font = '24px sans-serif';
-      const msg = mini.phase === 'show' ? 'Запоминай…' : mini.phase === 'input' ? 'Повтори!' : mini.phase === 'good' ? 'Верно!' : mini.phase === 'oops' ? 'Не тот цветок — смотри ещё раз' : '';
-      g.fillText(msg, W / 2, Y + 270);
-      for (let k = 0; k < 4; k++) {
-        const cx = W / 2 - 270 + k * 180, cy = 450;
-        const on = mini.pressed && mini.pressed.i === k;
-        g.fillStyle = on ? '#4a3a24' : '#2b231b'; g.beginPath(); g.arc(cx, cy, 62, 0, 6.28); g.fill();
-        g.strokeStyle = on ? '#e2b65a' : '#5c4a35'; g.lineWidth = 3; g.stroke();
-        flowerAt(cx, cy - 8, 26, FLOWERS[k].color);
-        g.fillStyle = '#b9a98f'; g.font = '18px sans-serif'; g.fillText(`${FLOWERS[k].key} · ${FLOWERS[k].name}`, cx, cy + 40);
-      }
-      g.fillStyle = '#f4dca0'; g.font = '22px sans-serif';
-      g.fillText(`Круг ${Math.min(mini.round + 1, m.rounds.length)} из ${m.rounds.length}  ·  ошибок можно: ${mini.lives - 1}`, W / 2, Y + PH - 20);
-      if (mini.flash) { g.fillStyle = `rgba(220,40,40,${mini.flash * 0.5})`; g.fillRect(X, Y, PW, PH); }
-    }
+    if (m.type === 'skip') drawSkip();
+    else if (m.type === 'weave') drawWeave();
+    else drawFlies();
     if (mini.phase === 'end') {
-      g.fillStyle = 'rgba(8,6,12,.6)'; g.fillRect(X, Y, PW, PH);
-      g.fillStyle = mini.win ? '#7cf08a' : '#ff8a7a'; g.font = 'bold 48px Georgia, serif';
-      g.fillText(mini.win ? 'Получилось!' : 'Не вышло…', W / 2, Y + PH / 2);
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, H / 2 - 60, W, 120);
+      miniText(mini.win ? 'ПОЛУЧИЛОСЬ!' : 'НЕ ВЫШЛО…', W / 2, H / 2, 52, mini.win ? '#7cff8a' : '#ff8a7a');
     }
   }
 
@@ -2877,11 +3011,30 @@ MAPS.palace_gate = {
   }
 
   // Зоны-триггеры: герой зашёл за линию — диалог
+  // approach — id персонажа: он подбегает к герою, врезается (толчок, вспышка), и только потом начинается диалог
+  let bump = null;
   function checkTriggers() {
-    if (chase) return;
+    if (chase || bump) return;
     for (const tr of map.triggers || []) {
-      if (check(tr.if) && (tr.maxY == null || hero.y < tr.maxY)) { startDialogue(tr.d); return; }
+      if (!check(tr.if) || (tr.maxY != null && hero.y >= tr.maxY)) continue;
+      const n = tr.approach && npcs.find((x) => x.id === tr.approach);
+      if (n) { bump = { n, d: tr.d, t: 0 }; return; }
+      startDialogue(tr.d); return;
     }
+  }
+  function updateBump(dt) {
+    if (!bump) return;
+    const n = bump.n, dx = hero.x - n.px, dy = hero.y - n.py, d = Math.hypot(dx, dy);
+    n.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+    n.running = true; n.walk = (n.walk || 0) + dt * 12;
+    if ((bump.t += dt) > 3 || d < 30) {
+      hero.x += dx / (d || 1) * 22; hero.y += dy / (d || 1) * 10;      // толчок плечом
+      flash('#ffffff'); n.running = false;
+      const dd = bump.d; bump = null; startDialogue(dd);
+      return;
+    }
+    const st = Math.min(d, 380 * dt);
+    n.px += dx / d * st; n.py += dy / d * st;
   }
 
   // ---------------------------------------------------------------- Фоны-картинки, горожане, бегущие фигуры, ловушки
@@ -2902,11 +3055,14 @@ MAPS.palace_gate = {
     }
     const go = map.gateOpen;
     if (go && check(go.if)) {
-      const [gx, gy, gw, gh] = go.rect, X = gx * T - ox, Y = gy * T - oy;
-      const gr = g.createLinearGradient(0, Y, 0, Y + gh * T);
-      gr.addColorStop(0, 'rgba(6,4,10,.97)'); gr.addColorStop(1, 'rgba(40,24,60,.9)');
-      g.fillStyle = gr; g.fillRect(X, Y, gw * T, gh * T);
-      g.fillStyle = 'rgba(190,140,255,.18)'; g.fillRect(X + 6, Y + gh * T - 22, gw * T - 12, 18);
+      const [gx, gy, gw, gh] = go.rect, X = gx * T - ox, Y = gy * T - oy, w = gw * T, h = gh * T, ry = (go.arch || 0.6) * T;
+      const gr = g.createLinearGradient(0, Y, 0, Y + h);
+      gr.addColorStop(0, 'rgba(10,6,16,.96)'); gr.addColorStop(1, 'rgba(46,30,66,.88)');
+      g.save(); g.beginPath();                        // проём по форме арки: полуэллипс сверху, прямые стороны
+      g.moveTo(X, Y + h); g.lineTo(X, Y + ry); g.ellipse(X + w / 2, Y + ry, w / 2, ry, 0, Math.PI, 0); g.lineTo(X + w, Y + h); g.closePath();
+      g.fillStyle = gr; g.fill(); g.clip();
+      g.fillStyle = 'rgba(190,140,255,.16)'; g.fillRect(X, Y + h - 20, w, 20);
+      g.restore();
     }
     const gs = map.gateShadow;
     if (gs) {
@@ -3002,20 +3158,27 @@ MAPS.palace_gate = {
       const p = u.r.path[u.i], tx = p[0] * T + T / 2, ty = p[1] * T + T - 6, dx = tx - u.x, dy = ty - u.y, d = Math.hypot(dx, dy), st = u.r.speed * dt;
       if (d > 1) u.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
       u.walk = (u.walk || 0) + dt * 12;
-      if (d <= st) { u.x = tx; u.y = ty; if (++u.i >= u.r.path.length) { u.done = true; if (u.r.set) { state.flags[u.r.set] = true; save(); } } }
+      if (u.fadeT != null) { if ((u.fadeT -= dt) <= 0) u.done = true; continue; }
+      if (d <= st) {
+        u.x = tx; u.y = ty;
+        if (++u.i >= u.r.path.length) {
+          if (u.r.set) { state.flags[u.r.set] = true; save(); }
+          if (u.r.fade) { u.fadeT = 0.6; u.i--; } else u.done = true;
+        }
+      }
       else { u.x += dx / d * st; u.y += dy / d * st; }
     }
     runners = runners.filter((u) => !u.done);
   }
   function drawRunner(u, ox, oy) {
-    const sp = img(`assets/sprites/${u.r.sprite}_${u.dir}.png`);
+    const moving = u.go && u.wait <= 0;
+    const sp = runSprite(u.r.sprite, u.dir, moving, (u.walk || 0) * 0.75);
     if (!ready(sp)) return;
-    const x = Math.round(u.x - ox), y = Math.round(u.y - oy), hop = u.go && u.wait <= 0 ? Math.abs(Math.sin(u.walk || 0)) * 4 : 0;
-    if (u.r.shadow) {                                 // тень на земле: залитая фигура, зеркально и полупрозрачно
-      g.save(); g.globalAlpha = 0.3; g.translate(x, y + u.r.shadow * T); g.scale(1, -0.75);
-      g.drawImage(silhouette(sp, '#0a0910'), -32, 0, 64, 64); g.restore();
-    } else shadow(x, y - 2, 20);
+    const x = Math.round(u.x - ox), y = Math.round(u.y - oy), hop = moving ? Math.abs(Math.sin(u.walk || 0)) * 4 : 0;
+    g.globalAlpha = u.fadeT != null ? Math.max(0, u.fadeT / 0.6) : 1;      // fade — тает у края ворот
+    shadow(x, y - 2, 20);
     g.drawImage(sp, x - 32, y - 64 - hop, 64, 64);
+    g.globalAlpha = 1;
   }
 
   // Ловушки лабиринта (map.traps): шипы по циклу, пропасти (урон и возврат на последнюю безопасную клетку, рывком можно перепрыгнуть),
@@ -4086,14 +4249,14 @@ MAPS.palace_gate = {
         } });
       }
     }
-    // фон-картинка: колонны, статуи, стойки — вырезки фона fgCrop [x0, y0, x1, y1] (px карты), глубина по нижней кромке:
+    // фон-картинка: колонны, статуи, стойки — вырезки фона fgCrop [x0, y0, x1, y1, глубина?] (px карты), глубина по нижней кромке:
     // кто выше кромки — за предметом (предмет его перекрывает, герой просвечивает), кто ниже — перед ним
     if (map.bg && map.fgCrop) {
       const im = img('assets/locations/' + map.bg + '.jpg');
       if (ready(im)) {
         const k = im.naturalWidth / (cols * T);
-        for (const [cx0, cy0, cx1, cy1] of map.fgCrop) objs.push({ y: cy1, draw: () => {
-          const behind = hero.y < cy1 && hero.y > cy0 + 40 && hero.x > cx0 - 10 && hero.x < cx1 + 10;
+        for (const [cx0, cy0, cx1, cy1, depth = cy1] of map.fgCrop) objs.push({ y: depth, draw: () => {
+          const behind = hero.y < depth && hero.y > cy0 + 40 && hero.x > cx0 - 10 && hero.x < cx1 + 10;
           g.globalAlpha = behind ? 0.6 : 1;
           g.drawImage(im, cx0 * k, cy0 * k, (cx1 - cx0) * k, (cy1 - cy0) * k, cx0 - ox, cy0 - oy, cx1 - cx0, cy1 - cy0);
           g.globalAlpha = 1;
@@ -4105,13 +4268,17 @@ MAPS.palace_gate = {
   }
 
   // персонажи: сортировка вместе со средним слоем по нижней кромке — герой ниже объекта рисуется поверх, выше — за ним
+  const CS = 1.4;                                    // масштаб персонажей на больших фонах
+  const big = (x, y, ox, oy, fn) => () => {
+    g.save(); g.translate(x - ox, y - oy); g.scale(CS, CS); g.translate(ox - x, oy - y); fn(); g.restore();
+  };
   function renderEntities(objs, ox, oy) {
-    for (const n of npcs) if (!n.prop) objs.push({ y: n.py, draw: () => drawNpc(n, ox, oy) });
-    for (const e of enemies) objs.push({ y: e.y, draw: () => drawEnemy(e, ox, oy) });
-    objs.push({ y: hero.y, draw: () => drawHero(ox, oy) });
-    if (chase) objs.push({ y: chase.y, draw: () => drawThief(ox, oy) });
-    for (const r of runners) objs.push({ y: r.y, draw: () => drawRunner(r, ox, oy) });
-    if (hunt) for (const f of hunt.figs) objs.push({ y: f.y, draw: () => drawFigure(f, ox, oy) });
+    for (const n of npcs) if (!n.prop) objs.push({ y: n.py, draw: big(n.px, n.py, ox, oy, () => drawNpc(n, ox, oy)) });
+    for (const e of enemies) objs.push({ y: e.y, draw: big(e.x, e.y, ox, oy, () => drawEnemy(e, ox, oy)) });
+    objs.push({ y: hero.y, draw: big(hero.x, hero.y, ox, oy, () => drawHero(ox, oy)) });
+    if (chase) objs.push({ y: chase.y, draw: big(chase.x, chase.y, ox, oy, () => drawThief(ox, oy)) });
+    for (const r of runners) objs.push({ y: r.y, draw: big(r.x, r.y, ox, oy, () => drawRunner(r, ox, oy)) });
+    if (hunt) for (const f of hunt.figs) objs.push({ y: f.y, draw: big(f.x, f.y, ox, oy, () => drawFigure(f, ox, oy)) });
     objs.sort((a, b) => a.y - b.y);
     for (const o of objs) o.draw();
     drawCombatFx(ox, oy);
@@ -4125,7 +4292,7 @@ MAPS.palace_gate = {
     if (map.vignette) drawVignette(ox, oy);
     drawCrack();
     if (near && mode === 'play') {
-      const X = near.px - ox, Y = near.py - oy - 84 + Math.sin(time * 5) * 3;
+      const X = near.px - ox, Y = near.py - oy - (near.prop ? 84 : 112) + Math.sin(time * 5) * 3;
       g.fillStyle = '#e2b65a';
       g.fillRect(X - 15, Y - 15, 30, 30);
       g.fillStyle = '#2a1d0b';
@@ -4486,10 +4653,13 @@ MAPS.palace_gate = {
     if (n.prop === 'nhouse') { g.drawImage(NHOUSE, x - 72, y - 128, 144, 132); return; }
     if (n.prop === 'stall') { g.drawImage(stalls[n.color] ||= stallArt(n.color), x - 48, y - 80, 96, 84); return; }
     if (n.prop === 'statue') {
-      g.fillStyle = n.color + '44';
-      g.beginPath(); g.ellipse(x, y - 64, 30 + Math.sin(time * 2 + n.px) * 4, 40, 0, 0, 6.28); g.fill();
-      shadow(x, y - 2, 26);
-      g.drawImage(statues[n.color] ||= statueArt(n.color), x - 36, y - 116, 72, 120);
+      const im = img(`assets/sprites/prop_stone_${n.rune}.png`);
+      shadow(x, y - 4, 34);
+      if (ready(im)) g.drawImage(im, x - 44, y - 96, 88, 97);
+      g.globalCompositeOperation = 'lighter';                    // мягкое свечение руны
+      g.globalAlpha = 0.35 + 0.2 * Math.sin(time * 2 + n.px);
+      g.drawImage(blob(n.glowRgb), x - 34, y - 86, 64, 64);
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
       return;
     }
     if (n.prop === 'spring') {
@@ -4506,7 +4676,6 @@ MAPS.palace_gate = {
         g.fillStyle = '#e0283c'; g.beginPath(); g.moveTo(x + 30, y - 22); g.lineTo(x + 38, y - 14); g.lineTo(x + 30, y - 4); g.lineTo(x + 22, y - 14); g.fill();
         g.fillStyle = '#ffb0b8'; g.fillRect(x + 27, y - 18, 3, 3);
       }
-      sparkles(x, y - 18, 34, 16, 4, '255,236,170', n.px);
       return;
     }
     if (n.prop === 'feast') {                        // длинный пиршественный стол с едой (средний слой)
@@ -4531,7 +4700,7 @@ MAPS.palace_gate = {
       const dx = hero.x - n.px, dy = hero.y - n.py;
       dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
     }
-    let sp = img(`assets/sprites/${n.sprite}_${dir}.png`);
+    let sp = runSprite(n.sprite, dir, n.running, (n.walk || 0) * 0.75);
     if ((n.hue || n.dark) && ready(sp)) sp = variant(sp, n.hue || 0, n.dark || 0);   // горожане: своя гамма, затемнены
     if (n.whisper) whisperOver(n, x, y);
     if (sp.getContext || ready(sp)) g.drawImage(sp, x - 32, Math.round(y - 64 + Math.sin(time * 2 + n.px) * 1), 64, 64);   // перекрашенный — уже холст
@@ -4838,7 +5007,8 @@ MAPS.palace_gate = {
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-      const moved = { blood_corridor1: 'blood_corridor2', blood_corridor3: 'blood_corridor2', order_corridor2: 'order_corridor1', palace_hall: 'luminos_throne' };
+      const moved = { blood_corridor1: 'blood_corridor2', blood_corridor3: 'blood_corridor2', order_corridor2: 'order_corridor1', palace_hall: 'luminos_throne',
+        slums2: 'slums1', slums3: 'slums1', demin: 'blood_entrance' };
       if (s && moved[s.map]) { s.map = moved[s.map]; s.x = s.y = null; }   // этих локаций больше нет
       if (s && s.hero && MAPS[s.map]) return s;
     } catch {}
