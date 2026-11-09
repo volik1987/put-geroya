@@ -22,6 +22,10 @@
     <!-- Подсказка над локацией -->
     <div id="area-name" class="area-name"></div>
     <div id="hud" class="hud" hidden></div>
+    <div id="hudbtns" class="hudbtns" hidden>
+      <button id="btn-bag" title="Инвентарь (I)" aria-label="Инвентарь"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#1a1410" d="M5 1h6v1h1v2h2v1h1v10H1V5h1V4h2V2h1z"/><path fill="#8a5428" d="M6 2h4v2H6zM2 5h12v9H2z"/><path fill="#a8703a" d="M3 6h10v3H3z"/><path fill="#5a3418" d="M4 10h8v3H4z"/><path fill="#e2b65a" d="M7 8h2v3H7z"/></svg></button>
+      <button id="btn-dots" title="Меню (Esc)" aria-label="Меню"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#f4dca0" d="M2 7h3v3H2zM6.5 7h3v3h-3zM11 7h3v3h-3z"/></svg></button>
+    </div>
     <div id="toast" class="toast"></div>
     <div id="ach-pop" class="ach-pop"><div id="ach-pop-icon" class="ach-icon"></div><div><div class="ach-pop-label">Достижение получено</div><div id="ach-pop-title" class="ach-title"></div></div></div>
     <div id="flash" class="flash"></div>
@@ -53,6 +57,7 @@
       <div class="menu">
         <button id="btn-continue" hidden>Продолжить</button>
         <button id="btn-new">Новая игра</button>
+        <button id="btn-saves-title" class="ghost">💾 Сохранения</button>
         <button id="btn-ach" class="ghost">🏆 Достижения</button>
       </div>
       <p class="hint">WASD — движение · Пробел / клик — атака · E — говорить · Q — бутылка · Enter — дальше</p>
@@ -123,7 +128,8 @@
     <section id="achievements" class="overlay dim" hidden>
       <h2>Достижения</h2>
       <div id="ach-count" class="note"></div>
-      <div id="ach-list" class="ach-list"></div>
+      <div id="ach-list" class="ach-board"></div>
+      <div id="ach-detail" class="ach-detail"></div>
       <div class="menu"><button id="btn-ach-back">Назад</button></div>
     </section>
 
@@ -135,27 +141,33 @@
       <div class="menu"><button id="btn-panel-close">Закрыть</button></div>
     </section>
 
-    <!-- Пауза -->
+    <!-- Пауза: бордовый баннер -->
     <section id="pause" class="overlay dim" hidden>
-      <h2>Пауза</h2>
-      <div class="menu">
-        <button id="btn-resume">Продолжить</button>
-        <button id="btn-bag-pause">🎒 Сумка</button>
-        <button id="btn-duel-pause" hidden>🥊 Вызов на бой</button>
-        <button id="btn-ach-pause">🏆 Достижения</button>
-        <button id="btn-to-title">В главное меню</button>
-        <button id="btn-wipe" class="ghost">Стереть сохранение</button>
+      <div class="banner">
+        <div class="banner-title">Пауза</div>
+        <div class="banner-menu">
+          <button id="btn-resume">Продолжить</button>
+          <button id="btn-saves-pause">Сохранения</button>
+          <button id="btn-ach-pause">Достижения</button>
+          <button id="btn-to-title">Выйти</button>
+        </div>
       </div>
+    </section>
+
+    <!-- Сохранения: 5 ячеек -->
+    <section id="saves" class="overlay dim" hidden>
+      <h2>Сохранения</h2>
+      <div id="saves-list" class="saves-list"></div>
+      <div class="menu row"><button id="btn-wipe" class="ghost" hidden>Стереть автосохранение</button><button id="btn-saves-back">Назад</button></div>
     </section>
 
     <!-- Сенсорное управление (появляется только на телефоне) -->
     <div id="touch" class="touch" hidden>
-      <div id="stick" class="stick"><div class="knob"></div></div>
-      <button id="btn-atk" class="atk">⚔</button>
-      <button id="btn-act" class="act">E</button>
-      <button id="btn-flask" class="flask">🧪</button>
-      <button id="btn-dash" class="dash-btn">⇧</button>
-      <button id="btn-menu" class="menu-btn">☰</button>
+      <div id="dpad" class="dpad"><b class="du"></b><b class="dl"></b><b class="dr"></b><b class="dd"></b><i></i></div>
+      <button id="btn-atk" class="atk" aria-label="Удар"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="#1a1410" d="M3 4h9v1h1v1h1v5h-1v2h-1v1H5v-1H4v-1H3v-2H2V6h1z"/><path fill="#f0c8a0" d="M4 5h2v2H4zM6 5h2v2H6zM8 5h2v2H8zM10 5h2v2h-2zM3 7h10v3H3zM4 10h8v2H4zM5 12h6v1H5z"/><path fill="#c89070" d="M4 9h9v1H4zM5 11h7v1H5z"/><path fill="#1a1410" d="M6 5h1v2H6zM8 5h1v2H8zM10 5h1v2h-1z"/></svg></button>
+      <button id="btn-act" class="act" aria-label="Взаимодействие">?</button>
+      <button id="btn-flask" class="flask" aria-label="Сосуд жизни"><img src="assets/sprites/icon_flask.png" alt=""></button>
+      <button id="btn-dash" class="dash-btn" aria-label="Рывок">⇧</button>
     </div>
   </div>
 

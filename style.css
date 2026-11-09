@@ -107,36 +107,37 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 
 /* --- Сенсорное управление ----------------------------------------------------- */
 .touch[hidden] { display: none; }
-.stick {
-  position: absolute; left: 60px; bottom: 60px; width: 220px; height: 220px; border-radius: 50%;
-  background: rgba(255, 255, 255, .07); border: 3px solid rgba(255, 255, 255, .18);
-}
-.knob {
-  position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
-  border-radius: 50%; background: rgba(255, 255, 255, .22); border: 3px solid rgba(255, 255, 255, .35);
-}
-.atk {
-  position: absolute; right: 60px; bottom: 60px; width: 170px; height: 170px; border-radius: 50%;
-  font-size: 70px; color: #fff; background: rgba(200, 66, 58, .8); border: 4px solid #ffb4a8;
-}
-.act {
-  position: absolute; right: 250px; bottom: 170px; width: 110px; height: 110px; border-radius: 50%;
-  font-size: 44px; font-weight: bold; color: #2a1d0b;
-  background: rgba(226, 182, 90, .85); border: 4px solid #f4dca0;
-}
-.flask {
-  position: absolute; right: 80px; bottom: 260px; width: 96px; height: 96px; border-radius: 50%;
-  font-size: 44px; background: rgba(60, 120, 160, .75); border: 4px solid #b9dbe6;
-}
-.dash-btn {
-  position: absolute; right: 250px; bottom: 30px; width: 110px; height: 110px; border-radius: 50%;
-  font-size: 50px; font-weight: bold; color: #fff; background: rgba(70, 140, 200, .75); border: 4px solid #9ad8ff;
-}
-.menu-btn {
-  position: absolute; right: 24px; top: 20px; width: 80px; height: 80px; font-size: 40px;
-  background: rgba(20, 16, 12, .6); border: 3px solid #5c4a35; border-radius: 10px; color: #f1e7d6;
-}
-.dialog ~ .touch .stick { z-index: 1; }
+/* пиксельная крестовина: каменные стрелки */
+.dpad { position: absolute; left: 50px; bottom: 50px; width: 240px; height: 240px; touch-action: none; }
+.dpad b, .dpad i { position: absolute; width: 80px; height: 80px; background: #6b5a48; border: 4px solid #1a1410;
+  box-shadow: inset -6px -6px 0 #45382b, inset 6px 6px 0 #8f7c66; image-rendering: pixelated; }
+.dpad i { left: 80px; top: 80px; border-color: #1a1410; background: #594a3b; box-shadow: none; }
+.dpad .du { left: 80px; top: 0; } .dpad .dd { left: 80px; top: 160px; } .dpad .dl { left: 0; top: 80px; } .dpad .dr { left: 160px; top: 80px; }
+.dpad b::after { content: ""; position: absolute; left: 50%; top: 50%; width: 0; height: 0; border: 16px solid transparent; }
+.dpad .du::after { border-bottom: 20px solid #f4dca0; border-top: 0; margin: -12px 0 0 -16px; }
+.dpad .dd::after { border-top: 20px solid #f4dca0; border-bottom: 0; margin: -8px 0 0 -16px; }
+.dpad .dl::after { border-right: 20px solid #f4dca0; border-left: 0; margin: -16px 0 0 -12px; }
+.dpad .dr::after { border-left: 20px solid #f4dca0; border-right: 0; margin: -16px 0 0 -8px; }
+.dpad[data-dir*="u"] .du, .dpad[data-dir*="d"] .dd, .dpad[data-dir*="l"] .dl, .dpad[data-dir*="r"] .dr { background: #8f7c66; box-shadow: inset 6px 6px 0 #45382b; }
+/* каменные кнопки: кулак (удар) и «?» (взаимодействие) */
+.atk, .act, .flask, .dash-btn { position: absolute; padding: 0; color: #f4dca0; background: #6b5a48; border: 5px solid #1a1410;
+  box-shadow: inset -7px -7px 0 #45382b, inset 7px 7px 0 #8f7c66; image-rendering: pixelated; }
+.atk:active, .act:active, .flask:active, .dash-btn:active { box-shadow: inset 7px 7px 0 #45382b; background: #5a4a3a; }
+.atk { right: 50px; bottom: 50px; width: 160px; height: 160px; }
+.atk svg { width: 104px; height: 104px; display: block; margin: auto; }
+.act { right: 230px; bottom: 50px; width: 120px; height: 120px; font: bold 64px/1 "Courier New", monospace; text-shadow: 4px 4px 0 #1a1410; }
+.flask { right: 64px; bottom: 236px; width: 96px; height: 96px; }
+.flask img { width: 42px; height: 60px; display: block; margin: auto; image-rendering: pixelated; }
+.dash-btn { right: 250px; bottom: 196px; width: 88px; height: 88px; font-size: 44px; font-weight: bold; }
+.dialog ~ .touch .dpad { z-index: 1; }
+
+/* кнопки HUD справа сверху: рюкзак и три точки */
+.hudbtns { position: absolute; top: 14px; right: 14px; display: flex; gap: 10px; z-index: 3; }
+.hudbtns[hidden] { display: none; }
+.hudbtns button { width: 68px; height: 68px; padding: 8px; cursor: pointer; background: #6b5a48; border: 4px solid #1a1410;
+  box-shadow: inset -5px -5px 0 #45382b, inset 5px 5px 0 #8f7c66; }
+.hudbtns button:hover { background: #7c6a56; }
+.hudbtns svg { width: 100%; height: 100%; display: block; }
 
 /* Тост — получен предмет/способность */
 .toast {
@@ -185,9 +186,9 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 .ach.on .ach-icon { border-color: #e2b65a; }
 .ach-title { font-size: 21px; font-weight: bold; color: #f4dca0; }
 .ach-desc { font-size: 16px; color: #b9a98f; line-height: 1.3; margin-top: 2px; }
-.ach-pop { position: absolute; top: 20px; right: 120px; display: flex; gap: 14px; align-items: center; padding: 12px 20px 12px 14px;
+.ach-pop { position: absolute; top: 96px; right: 16px; display: flex; gap: 14px; align-items: center; padding: 12px 20px 12px 14px;
            background: linear-gradient(#2b231b, #1a1410); border: 3px solid #e2b65a; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.6);
-           transform: translateY(-140%); transition: transform .4s; pointer-events: none; z-index: 7; }
+           transform: translateX(130%); transition: transform .4s; pointer-events: none; z-index: 7; }
 .ach-pop.show { transform: translateY(0); }
 .ach-pop-label { font-size: 15px; color: #b9a98f; text-transform: uppercase; letter-spacing: 1px; }
 #achievements { gap: 10px; }
@@ -240,3 +241,68 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 .ending-npcs:empty { display: none; }
 .ending-npcs img { width: 112px; height: 112px; image-rendering: pixelated; filter: drop-shadow(0 6px 4px rgba(0, 0, 0, .6)); }
 #ending.green .ending-npcs { display: none; }
+
+/* --- Патч v2.8 ------------------------------------------------------------- */
+/* Инвентарь: бордовая панель с ячейками */
+#panel .panel-list.inv-mode { display: block; width: 1000px; max-height: none; overflow: visible; padding: 14px 22px; background: #5a1420;
+  border: 6px solid #1a0a0c; box-shadow: inset 0 0 0 4px #8a2a36, 0 10px 30px #000; }
+.inv-tabs, .sky-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.sky-tabs { margin: 0 0 8px; }
+.inv-tabs button, .sky-tabs button { min-height: 44px !important; padding: 4px 18px !important; font-size: 20px !important; background: #3a0c14 !important;
+  border-color: #8a2a36 !important; box-shadow: none !important; }
+.inv-tabs button.on, .sky-tabs button.on { background: #e2b65a !important; color: #2a0a10 !important; border-color: #f4dca0 !important; font-weight: bold; }
+.inv-wrap { display: flex; gap: 20px; }
+.inv-eq { display: flex; flex-direction: column; gap: 8px; width: 150px; }
+.eq-l { font-size: 15px; color: #f0b8a8; margin-bottom: 2px; }
+.eq-stat { margin-top: 6px; font-size: 16px; line-height: 1.5; color: #f4dca0; }
+.inv-grid { display: grid; grid-template-columns: repeat(6, 92px); gap: 8px; }
+.slot { position: relative; width: 92px; height: 74px; display: flex; align-items: center; justify-content: center; font-size: 40px;
+  padding: 0 !important; min-height: 0 !important; background: #2a080e !important; border: 4px solid #1a0508 !important;
+  box-shadow: inset 4px 4px 0 #14040a, inset -3px -3px 0 #6a1e2a !important; border-radius: 2px !important; }
+.inv-eq .slot { width: 100%; }
+.slot.empty { opacity: .8; }
+.slot.on { border-color: #e2b65a !important; }
+.slot.sel { border-color: #fff !important; background: #4a1018 !important; }
+.slot.dim { filter: grayscale(1); opacity: .6; }
+.slot.curse { background: #1a0418 !important; }
+.slot .n { position: absolute; right: 5px; bottom: 2px; font-size: 16px; font-weight: bold; color: #fff; text-shadow: 2px 2px 0 #000; }
+.slot .ico, .ii-icon .ico { width: 30px; height: 44px; image-rendering: pixelated; }
+.inv-info { display: flex; gap: 14px; align-items: center; margin-top: 14px; padding: 10px 14px; min-height: 80px; background: #2a080e; border: 3px solid #1a0508; }
+.ii-icon { flex: none; width: 56px; font-size: 40px; text-align: center; }
+.ii-body { flex: 1; min-width: 0; }
+.inv-info button { min-height: 48px !important; padding: 6px 18px !important; font-size: 18px !important; white-space: nowrap; }
+.inv-info button:disabled { opacity: .5; }
+#starmap { display: block; width: 900px; height: 355px; border: 4px solid #1a0508; image-rendering: auto; cursor: pointer; }
+
+/* Меню паузы: бордовый баннер на древке */
+.banner { position: relative; width: 420px; padding: 40px 40px 110px; background: linear-gradient(#8a1a28, #5a0c18); color: #f4dca0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); box-shadow: inset 0 0 0 6px #e2b65a; text-align: center; }
+.banner::before { content: ""; position: absolute; inset: 14px 14px 60px; border: 2px dashed rgba(244, 220, 160, .45); pointer-events: none; }
+#pause::before { content: ""; width: 500px; height: 22px; margin-bottom: -14px; background: #5a3a1a; border: 4px solid #1a1410; border-radius: 11px; z-index: 1; }
+.banner-title { font-family: Georgia, serif; font-size: 46px; margin-bottom: 18px; text-shadow: 0 3px 0 #3a0610; }
+.banner-menu { display: flex; flex-direction: column; gap: 10px; }
+.banner-menu button { min-height: 56px !important; background: rgba(40, 6, 12, .55) !important; border: 3px solid #c9a24a !important; color: #f4dca0 !important;
+  font-size: 24px !important; box-shadow: none !important; }
+.banner-menu button:hover { background: #e2b65a !important; color: #3a0610 !important; }
+
+/* Сохранения */
+.saves-list { display: flex; flex-direction: column; gap: 10px; width: 900px; }
+.save-row { display: flex; gap: 14px; align-items: center; padding: 10px 14px; background: #2b231b; border: 3px solid #5c4a35; }
+.save-row.empty { opacity: .7; }
+.save-n { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; color: #2a1d0b; background: #e2b65a; }
+.save-body { flex: 1; min-width: 0; }
+.save-row button { min-height: 48px !important; padding: 4px 16px !important; font-size: 18px !important; }
+.save-row button:disabled { opacity: .4; }
+
+/* Достижения: концовки большими значками, остальное — сеткой */
+.ach-board { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ach-big, .ach-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 1100px; }
+.ach-cell { width: 70px; height: 70px; min-height: 0 !important; padding: 0 !important; font-size: 36px !important; border-radius: 50% !important;
+  background: #1c1712 !important; border: 3px solid #3a2f24 !important; filter: grayscale(1); opacity: .5; }
+.ach-cell.big { width: 120px; height: 120px; font-size: 64px !important; border-width: 5px !important; }
+.ach-cell.on { filter: none; opacity: 1; border-color: #e2b65a !important; background: #2b231b !important; }
+.ach-cell.sel { outline: 4px solid #fff; outline-offset: 2px; opacity: 1; }
+.ach-detail { display: flex; gap: 16px; align-items: center; width: 780px; min-height: 92px; padding: 10px 18px; background: #1c1712; border: 2px solid #5c4a35; }
+.ach-detail .ach-icon { width: 64px; height: 64px; font-size: 38px; }
+.ach-detail .ach-icon:not(.on) { filter: grayscale(1); }
+.ach-act { font-size: 17px; color: #e2b65a; margin-top: 2px; }

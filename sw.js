@@ -3,7 +3,7 @@
  * ВАЖНО: при каждом обновлении игры меняй VERSION — иначе у друзей останется старая версия.
  * Основные файлы кладутся в кэш сразу, спрайты и портреты — по мере загрузки.
  */
-const VERSION = 'v2.7.0';
+const VERSION = 'v2.8.0';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'style.css', 'dialogues.js', 'game.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',

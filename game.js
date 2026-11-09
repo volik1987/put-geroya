@@ -48,6 +48,12 @@
     gidan_duel: { sprite: 'gidan', boss: 'Император Гидан', xp: 90, resist: 0.35, hp: 70, speed: 120, keep: 250, aggro: 900, rest: 0.5, w: 34, h: 18, blink: 3.5,
       ranged: { every: 1.6, windup: 0.5, speed: 340, dmg: 12, count: 3, spread: 0.3, color: '154,74,255', homing: 1.2 } },
     dane_copy: { sprite: 'dane', tint: '#8fd8ff', ghost: true, xp: 0, gold: 0, hp: 3, life: 8, speed: 175, aggro: 900, dmg: 8, windup: 0.45, lunge: 520, lungeT: 0.25, rest: 0.6, w: 30, h: 16 },
+    // Путь Власти, Ворота дворца: Аэдел без шлема и Долита с луком — вдвоём, послабее, чем поодиночке
+    aedel_gate: { sprite: 'aedel', boss: 'Аэдел Анима', xp: 45, gold: 20, resist: 0.3, hp: 48, speed: 150, aggro: 900, rest: 0.6, w: 34, h: 18, dodge: 0.25,
+      dash: { speed: 880, time: 0.18, cd: 2.8, at: 320 },
+      arc: { every: 2.3, windup: 0.5, speed: 430, dmg: 11, wave: 9, bend: 9, spreadOut: 0.07, color: '120,200,255' } },
+    dolita_gate: { sprite: 'dolita_bow', xp: 35, gold: 10, resist: 0.3, hp: 30, speed: 150, keep: 260, aggro: 900, dmg: 10, windup: 0.45, lunge: 560, lungeT: 0.26, rest: 0.6, w: 34, h: 18,
+      ranged: { every: 1.8, windup: 0.45, speed: 520, dmg: 8, count: 3, spread: 0.16, arrow: true, color: '210,20,45' } },
     dolita_ally: { sprite: 'dolita', xp: 20, gold: 0, hp: 20, speed: 140, keep: 240, aggro: 900, rest: 0.6, w: 34, h: 18,
       ranged: { every: 3, windup: 0.6, speed: 340, dmg: 8, count: 3, spread: 0.3 } },
     captain: { sprite: 'nokt_captain', xp: 15, gold: 5, hp: 22, speed: 80, aggro: 600, dmg: 16, windup: 0.7, lunge: 430, lungeT: 0.3, rest: 1.0, w: 40, h: 20 },
@@ -236,7 +242,7 @@
       npcs: [
         { id: 'villager', sprite: 'townsman', hue: 3, x: 2, y: 6.6, dir: 'right', talk: [{ d: 'village_sign' }] },
         // лавка Дариан — у прилавка с полосатым навесом
-        { id: 'darian', sprite: 'darian', x: 5, y: 6.7, dir: 'down', if: { not: 'city_seen' }, talk: [{ d: 'darian' }] },
+        { id: 'darian', sprite: 'darian', x: 7.1, y: 5.9, dir: 'left', if: { not: 'city_seen' }, talk: [{ d: 'darian' }] },
         { id: 'elder', sprite: 'elder', x: 14, y: 5.6, dir: 'down',
           talk: [
             { if: { flag: 'elder_rewarded' }, d: 'elder_after' },
@@ -272,11 +278,14 @@
         ...[5, 6].map((y) => ({ x: 0, y, to: 'village', at: [19, 6], dir: 'left' })),
         ...[5, 6].map((y) => ({ x: 20, y, to: 'forest_glade', at: [1, 5.5], dir: 'right' })),
       ],
+      blocks: [[440, 140, 565, 225], [245, 205, 330, 285], [385, 275, 440, 325], [900, 380, 975, 440], [180, 420, 232, 478], [490, 530, 620, 630],
+        [840, 530, 895, 580], [1060, 445, 1200, 510], [970, 130, 1040, 240], [640, 100, 700, 175], [190, 195, 240, 290], [255, 470, 440, 600],
+        [640, 560, 690, 640], [775, 510, 870, 640], [930, 490, 1050, 575], [1165, 395, 1225, 445]],
       npcs: [],
       encounters: [
         { if: { not: 'forest_w1' }, lock: true, onClear: { set: { forest_w1: true }, d: 'forest_glade_clear' },
           enemies: [{ kind: 'wolf', x: 8, y: 3 }, { kind: 'wolf', x: 12, y: 3.6 }, { kind: 'wolf', x: 15.5, y: 5.2 }, { kind: 'wolf', x: 14, y: 7.6 },
-            { kind: 'wolf', x: 10, y: 8.2 }, { kind: 'wolf', x: 6, y: 7.4 }, { kind: 'wolf', x: 17.4, y: 3.6 }] },
+            { kind: 'wolf', x: 10.4, y: 7.3 }, { kind: 'wolf', x: 6.6, y: 6.4 }, { kind: 'wolf', x: 17.4, y: 3.6 }] },
       ],
       respawn: { map: 'village', at: [17, 6], dir: 'right', d: 'hero_down' },
       onEnter: [{ if: { not: 'forest_seen' }, d: 'forest_intro' }],
@@ -304,6 +313,8 @@
         ...[5, 6].map((y) => ({ x: 0, y, to: 'forest', at: [19, 5.5], dir: 'left' })),
         ...[5, 6].map((y) => ({ x: 20, y, to: 'stream', at: [1, 5], dir: 'right' })),
       ],
+      blocks: [[450, 130, 520, 225], [640, 130, 700, 175], [770, 190, 850, 240], [500, 395, 575, 445], [615, 545, 670, 580], [900, 490, 1050, 575],
+        [1160, 390, 1225, 445], [1170, 195, 1215, 255], [255, 190, 310, 250], [130, 420, 230, 505], [265, 530, 445, 640]],
       npcs: [],
       encounters: [
         { if: [{ flag: 'forest_w1' }, { not: 'forest_cleared' }], lock: true, onClear: { set: { forest_cleared: true }, d: 'forest_cleared' },
@@ -373,8 +384,8 @@
       '####.##..############',
       '###..............####',
       '##...........#####.##',
-      '.............#####.##',
-      '##...........#####..#',
+      '...........#######.##',
+      '##.........#######..#',
       '####...............##',
       '######.............##',
       '#####################',
@@ -387,7 +398,7 @@
     ],
     npcs: [
       // кучер — отдельный пиксельный персонаж, без портрета; повозка везёт в деревню
-      { id: 'coachman', sprite: 'coachman', x: 12, y: 6.2, dir: 'left', talk: [{ d: 'coachman' }] },
+      { id: 'coachman', prop: 'spot', x: 13.6, y: 7.9, talk: [{ d: 'coachman' }] },
     ],
     onEnter: [{ if: [{ flag: 'prologue_done' }, { not: 'palace_yard_seen' }], d: 'palace_yard' }],
   };
@@ -402,21 +413,7 @@
       ...[8, 9, 10, 11].map((x) => ({ x, y: 0, to: 'north_gate', at: [10, 10], dir: 'up' })),
       ...[8, 9, 10, 11].map((x) => ({ x, y: 11, to: 'village', at: [10, 1], dir: 'down' })),
     ],
-    npcs: [
-      // повержены — сидят у дороги, ждут решения
-      { id: 'bandit_a', sprite: 'bandit', x: 8.6, y: 4.2, dir: 'down', if: [{ flag: 'bandits_beaten' }, { not: 'bandits_done' }], talk: [{ d: 'bandits_choice' }] },
-      { id: 'bandit_b', sprite: 'bandit', x: 10.6, y: 4.4, dir: 'left', if: [{ flag: 'bandits_beaten' }, { not: 'bandits_done' }], talk: [{ d: 'bandits_choice' }] },
-      // патруль Люминоса поднимается с дороги
-      { id: 'patrol1', sprite: 'nokt_guard', tint: '#ffd86a', x: 8.4, y: 7.6, dir: 'up', if: [{ flag: 'bandits_beaten' }, { not: 'bandits_done' }] },
-      { id: 'patrol2', sprite: 'nokt_guard', tint: '#ffd86a', x: 11, y: 7.6, dir: 'up', if: [{ flag: 'bandits_beaten' }, { not: 'bandits_done' }] },
-    ],
-    encounters: [{
-      if: [{ flag: 'bandits_seen' }, { not: 'bandits_beaten' }], lock: true,
-      enemies: [{ kind: 'bandit', x: 8, y: 3 }, { kind: 'bandit', x: 11, y: 2 }, { kind: 'bandit', x: 7, y: 5 }, { kind: 'bandit', x: 12, y: 5 }],
-      onClear: { set: { bandits_beaten: true }, d: 'bandits_choice' },
-    }],
-    respawn: { map: 'mountains', at: [9, 10], dir: 'up', d: 'hero_down_bandits' },
-    onEnter: [{ if: { not: 'bandits_seen' }, d: 'bandits_ambush' }],
+    npcs: [],
   };
 
   // ============================================================ Этап 3
@@ -444,7 +441,6 @@
       ...[9, 10, 11].map((x) => ({ x, y: 2, to: 'trade_city', at: [10, 10], dir: 'up' })),
     ],
     gateOpen: { if: { flag: 'north_gate_open' }, rect: [9.15, 1.9, 2.7, 3.55], arch: 0.6 },
-    gateShadow: { src: [8.7, 1.1, 3.6, 4.4], alpha: 0.55, squash: 0.62 },
     runners: [{ if: { not: 'knight_seen' }, sprite: 'dark_knight_sword', from: [10, 5.2], near: 9.2, path: [[11.8, 5.2]], speed: 75, set: 'knight_seen', fade: true }],
     npcs: [
       // у ворот, пока путь не выбран
@@ -488,6 +484,9 @@
       '########.....########',
     ],
     fgCrop: [[130, 515, 548, 768], [895, 525, 1250, 768]],   // крыши нижних домов перекрывают героя
+    // фонари, ящики, лавки у домов
+    blocks: [[566, 182, 596, 212], [771, 185, 801, 214], [288, 300, 318, 330], [186, 440, 218, 472], [1038, 270, 1068, 300], [560, 680, 592, 712],
+      [508, 188, 566, 228], [400, 208, 480, 256], [812, 192, 862, 228], [912, 210, 990, 258], [1058, 288, 1104, 336], [1112, 356, 1162, 404]],
     spawn: [10, 10],
     exits: [
       ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'north_gate', at: [10, 6], dir: 'down' })),
@@ -501,8 +500,8 @@
       // молебенные камни: фиолетовая руна — Гилион (Разум), синяя — Диллад (Дух), зелёная — Эола (Чувства), красная — Мария (Кровь)
       { id: 'st_gilion', prop: 'statue', rune: 'gilion', glowRgb: '190,120,255', x: 6, y: 4.2, talk: [{ d: 'statue_gilion' }] },
       { id: 'st_maria', prop: 'statue', rune: 'maria', glowRgb: '255,70,80', x: 14, y: 4.2, talk: [{ d: 'statue_maria' }] },
-      { id: 'st_eola', prop: 'statue', rune: 'eola', glowRgb: '90,255,120', x: 6, y: 7.3, talk: [{ d: 'statue_eola' }] },
-      { id: 'st_dillad', prop: 'statue', rune: 'dillad', glowRgb: '90,200,255', x: 14, y: 7.3, talk: [{ d: 'statue_dillad' }] },
+      { id: 'st_eola', prop: 'statue', rune: 'eola', glowRgb: '90,255,120', x: 6, y: 6.8, talk: [{ d: 'statue_eola' }] },
+      { id: 'st_dillad', prop: 'statue', rune: 'dillad', glowRgb: '90,200,255', x: 14, y: 6.8, talk: [{ d: 'statue_dillad' }] },
       // записка Д.Т. и красный бриллиант — только если на Северных вратах никого не убил
       { id: 'note_2', prop: 'note', gem: true, x: 12, y: 9.2, if: [{ flag: 'gate_passed' }, { not: 'gate_fight' }, { not: 'note_2_taken' }],
         talk: [{ d: 'note_2' }] },
@@ -654,18 +653,19 @@
     spawn: [1, 5],
     exits: [
       ...[5, 6].map((y) => ({ x: 0, y, to: 'bert_gate', at: [10, 6], dir: 'down' })),
-      ...[5, 6].map((y) => ({ x: 20, y, to: 'blood_entrance', at: [10, 10], dir: 'up' })),
+      ...[5, 6].map((y) => ({ x: 20, y, to: 'dillad_gate', at: [10, 10], dir: 'up' })),
     ],
+    blocks: MAPS.forest.blocks,
     npcs: [],
   };
 
   // ============================================================ Храм Крови (Демин): высокие двери, три коридора с витражами Марии, молебенный зал
-  MAPS.blood_entrance = {
-    title: 'Храм Крови · Притвор',
-    bg: 'blood_entrance',
+  MAPS.dillad_gate = {
+    title: 'Демин · Врата Ордена Диллада',
+    bg: 'dillad_gate',
     tiles: [
       '#####################', '#####################', '#####################', '#####################',
-      '#########...#########',
+      '#####################',
       '##.................##',
       '##.................##',
       '##.................##',
@@ -675,25 +675,30 @@
       '#########...#########',
     ],
     spawn: [10, 10],
+    // свечи на высоких подставках
+    blocks: [[488, 372, 522, 404], [830, 372, 864, 404], [190, 530, 230, 562], [1122, 530, 1162, 562], [455, 690, 498, 720], [860, 690, 905, 720]],
     exits: [
-      ...[9, 10, 11].map((x) => ({ x, y: 4, to: 'blood_corridor2', at: [1, 7], dir: 'right' })),
-      // после храма тропа ведёт на север, к Лесу чувств; до того — обратно на лесную дорогу
-      ...[9, 10, 11].map((x) => ({ x, y: 11, if: { flag: 'temple_done' }, to: 'feelings_forest', at: [10, 10], dir: 'up' })),
+      ...[9, 10, 11].map((x) => ({ x, y: 5, to: 'order_corridor1', at: [1, 6.5], dir: 'right' })),
       ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'demin_road', at: [19, 5.5], dir: 'left' })),
     ],
     npcs: [
-      // четыре служителя в красных плащах с капюшонами
-      { id: 'cult1', sprite: 'cultist', x: 7.4, y: 5.3, dir: 'down', talk: [{ d: 'cultist_door' }] },
-      { id: 'cult4', sprite: 'cultist', x: 15.6, y: 8.6, dir: 'left', talk: [{ d: 'cultist_whisper' }] },
+      { id: 'dg_warrior', sprite: 'order_warrior', x: 7.2, y: 5.4, dir: 'down', w: 22, h: 10, talk: [{ d: 'dillad_gate_warrior' }] },
     ],
-    onEnter: [{ if: { not: 'blood_seen' }, d: 'blood_intro' }],
+    onEnter: [{ if: { not: 'dgate_seen' }, d: 'dillad_gate_intro' }],
   };
   const CORRIDOR = ['#####################', '#####################', '#####################', '#####################', '#####################', '#####################',
     '.....................', '.....................', '.....................',
     '#####################', '#####################', '#####################'];
   MAPS.blood_corridor2 = {
-    title: 'Храм Крови · Коридор витражей', bg: 'blood_corridor2', tiles: CORRIDOR, spawn: [1, 7],
-    exits: [...[6, 7, 8].map((y) => ({ x: 0, y, to: 'blood_entrance', at: [10, 5], dir: 'down' })), ...[6, 7, 8].map((y) => ({ x: 20, y, to: 'temple_nave', at: [10, 10], dir: 'up' }))],
+    // слева — арка (проход за статуей Диллада), справа — арка в молебенный зал; стены непроходимы
+    title: 'Храм Крови · Коридор витражей', bg: 'blood_corridor2', spawn: [2.5, 4.4],
+    tiles: ['#####################', '#####################', '#####################',
+      '##..#################', '##..#################', '##..###############..',
+      '#....................', '#....................', '#...................#',
+      '#####################', '#####################', '#####################'],
+    exits: [...[2, 3].map((x) => ({ x, y: 3, to: 'spirit_order', at: [10, 7], dir: 'down' })), ...[5, 6].map((y) => ({ x: 20, y, to: 'temple_nave', at: [10, 10], dir: 'up' }))],
+    blocks: [[96, 382, 132, 404], [306, 375, 336, 398], [880, 375, 912, 398], [1170, 375, 1202, 398], [62, 548, 98, 572], [224, 528, 258, 552], [400, 540, 434, 564],
+      [570, 545, 604, 569], [737, 545, 771, 569], [888, 535, 922, 559], [1048, 530, 1082, 554], [1198, 530, 1232, 554]],
     npcs: [],
     // восемь служителей храма стоят вдоль стен с самого начала и нападают все разом
     encounters: [{
@@ -701,7 +706,7 @@
       enemies: [[4.5, 6.1], [6.6, 8.1], [8.8, 6.2], [10.6, 8.2], [12.4, 6.1], [14.2, 8.1], [16.3, 6.2], [18.2, 7.4]].map(([x, y]) => ({ kind: 'cultist', x, y })),
       onClear: { set: { corridor_cleared: true }, d: 'corridor_cleared' },
     }],
-    respawn: { map: 'blood_entrance', at: [10, 6], dir: 'up', d: 'hero_down_temple' },
+    respawn: { map: 'blood_corridor2', at: [2.5, 4.4], dir: 'down', d: 'hero_down_temple' },
     onEnter: [{ if: { not: 'corridor_seen' }, d: 'corridor_attack' }],
   };
 
@@ -712,7 +717,7 @@
     '#####################', '#####################', '#####################'];
   MAPS.order_corridor1 = {
     title: 'Орден Диллада · Галерея фресок', bg: 'dillad_corridor', tiles: ORDER_TILES, spawn: [1, 6],
-    exits: [...[5, 6, 7, 8].map((y) => ({ x: 0, y, to: 'temple_nave', at: [18.4, 8], dir: 'left' })), ...[5, 6, 7, 8].map((y) => ({ x: 20, y, to: 'spirit_order', at: [10, 10], dir: 'up' }))],
+    exits: [...[5, 6, 7, 8].map((y) => ({ x: 0, y, to: 'dillad_gate', at: [10, 6], dir: 'down' })), ...[5, 6, 7, 8].map((y) => ({ x: 20, y, to: 'spirit_order', at: [10, 10], dir: 'up' }))],
     // часовые вдоль галереи, вразбивку
     npcs: warriors('oc1_', [[3.4, 4.7], [8.2, 8.1], [12.6, 4.7], [17.4, 8.1]]),
     onEnter: [{ if: { not: 'order_seen' }, d: 'order_intro' }],
@@ -721,28 +726,16 @@
   // ============================================================ Лес призраков чувств и Древо Чувств
   MAPS.feelings_forest = {
     title: 'Лес призраков чувств',
-    bg: 'feelings_forest',
-    tiles: [
-      '#########...#########',
-      '########.....########',
-      '#######.......#######',
-      '######.........######',
-      '######.........######',
-      '######.........######',
-      '######.........######',
-      '######.........######',
-      '######.........######',
-      '######.........######',
-      '#######.......#######',
-      '########.....########',
-    ],
-    spawn: [10, 10],
+    bg: 'forest_glade', bgTint: 'rgba(60,255,140,.10)',
+    tiles: MAPS.forest_glade.tiles,
+    blocks: MAPS.forest_glade.blocks,
+    spawn: [1, 5.5],
     exits: [
-      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'blood_entrance', at: [10, 10], dir: 'up' })),
-      ...[9, 10, 11].map((x) => ({ x, y: 0, to: 'feelings_tree', at: [10, 10], dir: 'up' })),
+      ...[5, 6].map((y) => ({ x: 0, y, to: 'temple_nave', at: [18.4, 8], dir: 'left' })),
+      ...[5, 6].map((y) => ({ x: 20, y, to: 'feelings_tree', at: [10, 10], dir: 'up' })),
     ],
     // зелёные прозрачные горожане Люминоса бродят без цели
-    npcs: crowd('ffg', [[7, 2.6, 0], [13, 3.4, 1], [6.6, 6.4, 2], [12.4, 8.8, 5], [9.6, 4.8, 4]],
+    npcs: crowd('ffg', [[7, 3.4, 0], [13, 4.4, 1], [5.6, 6.4, 2], [11.4, 7.4, 5], [9.6, 4.8, 4]],
       { ghost: '#5cff9a', wander: 1.3, models: ['townsman', 'townswoman', 'oldman', 'merchant', 'keeper', 'elder'] }),
     onEnter: [{ if: { not: 'ffor_seen' }, d: 'feelings_intro' }],
   };
@@ -762,7 +755,7 @@
     ],
     spawn: [10, 10],
     exits: [
-      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'feelings_forest', at: [10, 1], dir: 'down' })),
+      ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'feelings_forest', at: [19, 5.5], dir: 'left' })),
       ...[5, 6, 7].map((y) => ({ x: 20, y, to: 'nokt_capital', at: [13, 16], dir: 'up' })),
     ],
     npcs: [
@@ -796,7 +789,7 @@
     exits: [
       ...[9, 10, 11].map((x) => ({ x, y: 11, to: 'blood_corridor2', at: [19, 7], dir: 'left' })),
       // правая дверь: органный зал (пока Долита там), потом — галерея Ордена Диллада
-      ...[7, 8].map((y) => ({ x: 19, y, if: { flag: 'temple_done' }, to: 'order_corridor1', at: [1, 6], dir: 'right', else: 'order_door_locked' })),
+      ...[7, 8].map((y) => ({ x: 19, y, if: { flag: 'temple_done' }, to: 'feelings_forest', at: [1, 5.5], dir: 'right', else: 'order_door_locked' })),
       ...[7, 8].map((y) => ({ x: 19, y, if: [{ flag: 'priest_fled' }, { not: 'temple_done' }], to: 'organ_hall', at: [1.3, 6.5], dir: 'right' })),
     ],
     npcs: [
@@ -908,6 +901,7 @@
       { id: 'pg_aedel', sprite: 'aedel', x: 8.3, y: 3.6, dir: 'left', if: { eq: ['power_scene', 'gidan'] } },
       { id: 'desk', prop: 'desk', x: 5.5, y: 2.4, talk: [{ if: { flag: 'lumina_letter_read' }, d: 'desk_again' }, { d: 'lumina_letter' }] },
     ],
+    hideHero: { eq: ['power_scene', 'gidan'] },        // смерть Гидана — от третьего лица, героя в кадре нет
     onEnter: [{ if: { eq: ['power_scene', 'gidan'] }, d: 'power_gidan' }, { if: { not: 'study_seen' }, d: 'study_intro' }],
   };
 
@@ -974,12 +968,13 @@ MAPS.nokt_capital = {
       '#######..###.....#.##',
       '######..#########..##',
       '######...#.#.......#.',
-      '#####................',
-      '######..#...#.###....',
+      '######...............',
+      '#########...#.###....',
       '#########...#####..##',
       '#########...#####..##',
     ],
-    fgCrop: [[560, 190, 760, 450], [1075, 255, 1245, 440]],   // беседка и арка из роз — за ними можно пройти
+    fgCrop: [[560, 190, 760, 450], [1075, 255, 1245, 440]],
+    blocks: [[1066, 492, 1094, 524], [1222, 492, 1252, 524], [372, 512, 420, 560]],   // беседка и арка из роз — за ними можно пройти
     spawn: [19, 8],
     exits: [
       { x: 20, y: 8, to: 'nokt_capital', at: [5, 9.7], dir: 'down' },
@@ -1054,7 +1049,9 @@ MAPS.spirit_order = {
     spawn: [10, 10],
     exits: [...[8, 9, 10, 11, 12].map((x) => ({ x, y: 11, to: 'order_corridor1', at: [19, 6], dir: 'left' }))],
     npcs: [
-      { id: 'st_dillad_order', prop: 'spot', glow: '120,200,255', x: 10, y: 5.8, talk: [{ d: 'statue_dillad' }] },
+      { id: 'st_dillad_order', prop: 'spot', glow: '120,200,255', x: 10, y: 5.8, talk: [{ d: 'statue_dillad' }], if: { not: 'order_ghosts_clear' } },
+      { id: 'secret_passage', prop: 'spot', sparkle: '255,90,110', x: 10, y: 5.8, if: { flag: 'order_ghosts_clear' },
+        talk: [{ d: 'secret_passage' }] },
       { id: 'dane', sprite: 'dane', x: 10, y: 6.6, dir: 'down', if: [{ flag: 'order_ghosts_clear' }, { not: 'dane_fight' }],
         talk: [{ if: { flag: 'dane_defeated' }, d: 'dane_after' }, { d: 'dane' }] },
     ],
@@ -1109,15 +1106,16 @@ MAPS.palace_gate = {
       { id: 'pa_dolita', sprite: 'dolita', x: 10.5, y: 9.6, dir: 'left', if: { eq: ['power_scene', 'aedel'] } },
       { id: 'pa_guard1', sprite: 'nokt_guard', x: 4.5, y: 9.2, dir: 'right', if: { eq: ['power_scene', 'aedel'] } },
       { id: 'pa_guard2', sprite: 'nokt_guard', x: 11.6, y: 7.2, dir: 'left', if: { eq: ['power_scene', 'aedel'] } },
-      { id: 'pguard', sprite: 'nokt_guard', x: 10.4, y: 5.6, dir: 'down', if: [{ not: 'hgate_seen' }, { not: 'power_scene' }],
+      { id: 'pguard', sprite: 'nokt_guard', x: 10.4, y: 5.6, dir: 'down', if: [{ not: 'hgate_seen' }, { not: 'power_scene' }, { not: 'power_gate_fight' }],
         talk: [{ if: { flag: 'palace_open' }, d: 'pguard_open' }, { if: { path: 'power' }, d: 'pguard_power' }, { if: { flag: 'palace_password' }, d: 'pguard_pass' }, { d: 'pguard' }] },
       { id: 'knight', sprite: 'dark_knight_sword', x: 7.5, y: 5.4, dir: 'down', if: [{ not: 'knight_fight' }, { not: 'hknight_fight' }, { not: 'power_scene' }, { not: 'noc_palace_gates' }], talk: [{ d: 'knight_silent' }] },
       // бой остановлен: рыцарь опускает меч (knight_halt), затем снимает шлем (knight_stopped)
       { id: 'knight_halt', sprite: 'dark_knight_sword', x: 7.5, y: 6.4, dir: 'down', if: [{ flag: 'knight_halt' }, { not: 'knight_stopped' }] },
       { id: 'g_aedel', sprite: 'aedel', x: 7.5, y: 6.4, dir: 'down', if: { flag: 'knight_stopped' }, talk: [{ d: 'aedel_gate_after' }] },
       { id: 'g_dolita', sprite: 'dolita', x: 9, y: 6.7, dir: 'left', if: { flag: 'knight_halt' }, talk: [{ d: 'dolita_gate_after' }] },
-      // Власть: за открытыми воротами ждёт Долита
-      { id: 'pw_dolita_gate', sprite: 'dolita', x: 7.5, y: 2.6, dir: 'down', if: [{ flag: 'noc_palace_gates' }, { not: 'power_scene' }], talk: [{ d: 'power_hostage' }] },
+      // Власть: после боя у ворот — Долита на коленях, Аэдел без сознания
+      { id: 'pw_dolita_down', sprite: 'dolita', x: 8.2, y: 6.6, dir: 'left', if: [{ flag: 'power_gate_won' }, { in: ['power_scene', [undefined, 'hostage']] }] },
+      { id: 'pw_aedel_down', sprite: 'aedel', x: 5.6, y: 6.9, dir: 'right', if: [{ flag: 'power_gate_won' }, { in: ['power_scene', [undefined, 'hostage']] }] },
     ],
     encounters: [{
       if: [{ flag: 'knight_fight' }, { not: 'knight_halt' }],
@@ -1129,6 +1127,11 @@ MAPS.palace_gate = {
       if: [{ flag: 'hknight_fight' }, { not: 'aedel_beaten' }], lock: true,
       enemies: [{ kind: 'aedel3', x: 7.5, y: 6 }],
       onClear: { set: { aedel_beaten: true, palace_open: true }, add: { path_hate: 1 }, d: 'aedel_defeated' },
+    }, {
+      // Путь Власти: Долита и Аэдел выходят из ворот вдвоём
+      if: [{ flag: 'power_gate_fight' }, { not: 'power_gate_won' }], lock: true,
+      enemies: [{ kind: 'aedel_gate', x: 6.6, y: 5.8 }, { kind: 'dolita_gate', x: 8.6, y: 5.6 }],
+      onClear: { set: { power_gate_won: true }, d: 'power_hostage' },
     }],
     respawn: { map: 'palace_gate', at: [7.5, 12], dir: 'up', d: 'hero_down_knight' },
     onEnter: [
@@ -1423,10 +1426,11 @@ MAPS.palace_gate = {
   };
 
   const PROP_SIZE = {
-    throne: { w: 110, h: 50 }, stone: { w: 40, h: 18 }, sign: { w: 30, h: 14 },
+    throne: { w: 110, h: 50 }, stone: { w: 64, h: 24 }, sign: { w: 30, h: 14 },
     house: { w: 140, h: 52 }, altar: { w: 150, h: 40 }, pew: { w: 150, h: 26 }, mirror: { w: 50, h: 20 }, desk: { w: 130, h: 34 }, nhouse: { w: 140, h: 52 }, stall: { w: 92, h: 34 }, statue: { w: 64, h: 24 }, spring: { w: 70, h: 30 }, note: { w: 0, h: 0 },
     nthrone: { w: 110, h: 50 }, table: { w: 380, h: 56 }, arch: { w: 0, h: 0 }, feast: { w: 600, h: 34 },
-    commode: { w: 90, h: 24 }, portrait: { w: 70, h: 16 }, stand: { w: 40, h: 18 }, spot: { w: 0, h: 0 },
+    commode: { w: 90, h: 24 }, chest: { w: 50, h: 20 }, portrait: { w: 70, h: 16 }, stand: { w: 40, h: 18 }, spot: { w: 0, h: 0 },
+    post: { w: 24, h: 16 }, eye: { w: 44, h: 22 }, rtable: { w: 110, h: 30 },
   };
   let exitLock = false;
   const SOLID = new Set(['#', 'T', '~', 'W', 'G', 'F', 'R', 'K', 'X', 'B', 'Z', 'Y', 'I']);   // P — колонна: под ней можно пройти, снаряды о неё гаснут
@@ -1992,9 +1996,14 @@ MAPS.palace_gate = {
   }
 
   function maxHp() {
-    return HERO_HP + (state.flags.light_element === 'radiance' ? 25 : 0) + (lvl() - 1) * 10 + (blessed('feelings') ? Math.round(20 * blessK()) : 0);
+    return HERO_HP + (state.flags.light_element === 'radiance' ? 25 : 0) + (lvl() - 1) * 10 + (blessed('feelings') ? Math.round(20 * blessK()) : 0)
+      + (star('l_blue') ? 20 : 0);
   }
   const lvl = () => state.flags.level || 1;
+  // звёзды прокачки (карты Света и Тьмы) и надетая броня
+  const star = (id) => !!state.flags['star_' + id];
+  const armorK = () => (ARMOR[state.flags.armor] || {});
+  const maxSta = () => Math.round(100 * (star('d_blue') ? 1.25 : 1));
   // Сумка, дерево Полианны, благословения и проклятия
   const inv = (id) => state.flags['inv_' + id] || 0;
   const skill = (b) => state.flags['skill_' + b] || 0;
@@ -2002,16 +2011,18 @@ MAPS.palace_gate = {
   const blessed = (k) => !!state.flags['bless_' + k] && state.flags.temple_path !== 'hate';   // на пути Ненависти боги молчат
   const cursed = (k) => !!state.flags['curse_' + k];
   const dmgMul = () => (1 + (lvl() - 1) * 0.1) * (1 + 0.15 * Math.min(2, skill('power'))) * (buffs.dmg > 0 ? 1.2 : 1)
-    * (blessed('blood') ? 1 + (inv('amulet') ? 0.35 : 0.2) * blessK() : 1) * (cursed('blood') ? 0.85 : 1);
+    * (blessed('blood') ? 1 + (inv('amulet') ? 0.35 : 0.2) * blessK() : 1) * (cursed('blood') ? 0.85 : 1)
+    * (star('l_orange') ? 1.15 : 1) * (star('d_red') && state.hp < maxHp() / 2 ? 1.25 : 1);
   const dashCd = () => Math.max(0.4, DASH.cd - (lvl() - 1) * 0.06 - (skill('agility') >= 1 ? 0.15 : 0) - (blessed('spirit') ? 0.1 * blessK() : 0))
     + (cursed('spirit') ? 0.3 : 0);
-  const dashInv = () => (skill('agility') >= 2 ? 0.45 : DASH.inv);
-  const speedMul = () => 1 + (skill('agility') >= 2 ? 0.1 : 0) + (buffs.speed > 0 ? 0.2 : 0) + (blessed('spirit') ? 0.1 * blessK() : 0);
+  const dashInv = () => (skill('agility') >= 2 ? 0.45 : DASH.inv) + (star('d_purple') ? 0.12 : 0);
+  const speedMul = () => 1 + (skill('agility') >= 2 ? 0.1 : 0) + (buffs.speed > 0 ? 0.2 : 0) + (blessed('spirit') ? 0.1 * blessK() : 0)
+    + (star('l_white') ? 0.1 : 0) - (armorK().slow || 0);
   const maxMana = () => Math.round((MAX_MANA + (skill('spirit') >= 2 ? 30 : 0)) * (cursed('mind') ? 0.6 : 1));
   const maxAmmo = (w) => (w.ammo ? w.ammo + (skill('spirit') >= 2 ? 2 : 0) : 0);
   const manaRegenMul = () => (blessed('mind') ? 1 + 0.5 * blessK() : 1);
   const castMul = () => (blessed('mind') ? 1 - 0.3 * blessK() : 1);
-  const healMul = () => (1 + (inv('bowl') ? 0.25 : 0) + (blessed('feelings') ? 0.3 * blessK() : 0)) * (cursed('feelings') ? 0.7 : 1);
+  const healMul = () => (1 + (blessed('feelings') ? 0.3 * blessK() : 0)) * (cursed('feelings') ? 0.7 : 1);
   function healHero(n) {
     const v = Math.round(n * healMul());
     state.hp = Math.min(maxHp(), state.hp + v);
@@ -2041,6 +2052,21 @@ MAPS.palace_gate = {
   function refreshNpcs() {
     npcs = (map.npcs || []).filter((n) => check(n.if))
       .map((n) => ({ w: 30, h: 16, ...(PROP_SIZE[n.prop] || {}), ...n, px: n.x * T + T / 2, py: n.y * T + T - 6 }));
+    const fl = map.bgFlip ? (x) => map.tiles[0].length * T - x : (x) => x;      // зеркальный фон — зеркальные препятствия
+    for (const [i, [x0, y0, x1, y1]] of (map.blocks || []).entries()) {
+      const a = fl(x0), b = fl(x1);
+      npcs.push({ id: 'blk' + i, prop: 'post', px: (a + b) / 2, py: (y0 + y1) / 2 + 10, w: Math.abs(b - a), h: y1 - y0 });
+    }
+  }
+  // застрял в препятствии (после сцены, мини-игры, загрузки) — выталкиваем на ближайшее свободное место
+  function unstick() {
+    if (!blocked(hero.x, hero.y)) return;
+    for (let r = 6; r <= 260; r += 6) {
+      for (let a = 0; a < 16; a++) {
+        const x = hero.x + Math.cos(a / 16 * 6.283) * r, y = hero.y + Math.sin(a / 16 * 6.283) * r;
+        if (!blocked(x, y)) { hero.x = x; hero.y = y; return; }
+      }
+    }
   }
 
   function enterMap(id, at, dir) {
@@ -2058,6 +2084,8 @@ MAPS.palace_gate = {
     spawnEncounter();
     startHunt();
     startRooms();
+    for (const o of orbs) collectOrb(o);              // не долетевшие сферы — сразу в копилку
+    orbs = [];
     shots = []; sparks = []; floaters = [];
     hero.swing = null; hero.kx = hero.ky = 0; hero.inv = 0;
     hero.dash = null; hero.casting = null; hero.trail = []; hero.dodge = 0;
@@ -2164,6 +2192,7 @@ MAPS.palace_gate = {
   function update(dt) {
     time += dt;
     if (mode === 'mini') updateMini(dt);
+    if (mode === 'eye') updateEye(dt);
     if (mode !== 'play') { hero.moving = false; return; }
 
     const v = moveVector();
@@ -2178,6 +2207,7 @@ MAPS.palace_gate = {
       checkExits();
     }
     hero.moving = v.len > 0.15;
+    unstick();
     if (hero.kx || hero.ky) {                         // отбрасывание после удара
       moveHero(hero.kx * dt, 0); moveHero(0, hero.ky * dt);
       const k = Math.pow(0.002, dt);
@@ -2188,7 +2218,7 @@ MAPS.palace_gate = {
       hero.dir = Math.abs(v.x) > Math.abs(v.y) ? (v.x > 0 ? 'right' : 'left') : (v.y > 0 ? 'down' : 'up');
       hero.walk += dt * 10;
       const wade = map.hazard && map.hazard.slow && hz.phase === 'flood' && check(map.hazard.if) && inHazard(hero.x, hero.y - 8);   // красная жидкость вязнет
-      const spd = HERO_SPEED * speedMul() * (hunt && hunt.taunt ? hunt.h.taunt.slow : 1) * (wade ? map.hazard.slow : 1);
+      const spd = HERO_SPEED * speedMul() * (hero.sta != null && hero.sta < 12 ? 0.85 : 1) * (hunt && hunt.taunt ? hunt.h.taunt.slow : 1) * (wade ? map.hazard.slow : 1);
       moveHero(v.x * spd * dt, 0);
       moveHero(0, v.y * spd * dt);
       checkExits();
@@ -2294,6 +2324,7 @@ MAPS.palace_gate = {
           a: Math.random() * 6.28, sp: m.speed * (0.7 + Math.random() * 0.6), ph: Math.random() * 6.28, seed: i * 1.37 })) });
     }
     mode = 'mini';
+    cheer('start');
     $('hud').hidden = true;                          // плашка героя не перекрывает табло мини-игры
     for (const k in keys) keys[k] = false;
   }
@@ -2307,6 +2338,7 @@ MAPS.palace_gate = {
       const p = skipPos(), d = Math.abs(p - mini.zone);
       const grade = d < m.green / 2 ? 0 : d < m.grey / 2 ? 1 : 2, skips = m.skips[grade];
       mini.res = { grade, skips, p };
+      cheer(grade === 0 ? 'good' : grade === 2 ? 'bad' : 'idle');
       mini.total += skips;
       mini.phase = 'fly'; mini.throwT = 0; mini.splashes = []; mini.bounced = 0;
       mini.endX = W / 2 + (p - 0.5) * 360;
@@ -2317,6 +2349,7 @@ MAPS.palace_gate = {
   function catchFly(x, y) {
     const f = mini.flies.find((q) => !q.caught && Math.hypot(q.x - x, q.y - y) < mini.m.hit);
     mini.pops.push({ x, y, t: 0, hit: !!f });
+    if (Math.random() < 0.5) cheer(f ? 'good' : 'bad');
     if (!f) return;
     f.caught = true; mini.got++;
     if (mini.got >= mini.m.need) finishMini(true);
@@ -2376,7 +2409,7 @@ MAPS.palace_gate = {
       if (off <= half && mini.y > 0) {
         mini.outT = 0; mini.acc = 1 - off / half;
         if ((mini.inT += dt) >= m.perFlower) {
-          mini.inT = 0; mini.flowers++; mini.grow = 0;
+          mini.inT = 0; mini.flowers++; mini.grow = 0; cheer('good');
           if (mini.flowers >= m.need) return finishMini(true);
           mini.cWant = 0.25 + Math.random() * 0.5;
           mini.h = Math.max(m.minZone, mini.h - m.shrink);
@@ -2570,12 +2603,39 @@ MAPS.palace_gate = {
     miniText(`ВРЕМЯ: ${Math.max(0, Math.ceil(mini.left))}`, 255, 84, 22, mini.left < 6 ? '#ff8a7a' : '#fff');
     if (mini.phase === 'ready') miniText('ТАПАЙ ПО ОГОНЬКАМ!', W / 2, H / 2, 38);
   }
+  // реплика Долиты: портрет в углу и облачко; между событиями — сама что-нибудь скажет
+  let cheerT = { text: '', t: 0, idle: 0 };
+  function cheer(kind) {
+    const a = MINI_CHEER[kind];
+    if (!a) return;
+    cheerT.text = render(a[Math.floor(Math.random() * a.length)]); cheerT.t = 2.4; cheerT.idle = 4.5;
+  }
+  function drawCheer() {
+    if (!mini || mini.phase === 'end') return;
+    const dt = 1 / 60;
+    cheerT.t -= dt; cheerT.idle -= dt;
+    if (cheerT.idle <= 0) cheer('idle');
+    const im = img(CHARACTERS.dolita.portrait), X = 16, Y = H - 176;
+    g.fillStyle = '#1a1410'; g.fillRect(X - 4, Y - 4, 168, 168);
+    g.fillStyle = '#7a1622'; g.fillRect(X, Y, 160, 160);
+    if (ready(im)) g.drawImage(im, X, Y, 160, 160);
+    if (cheerT.t <= 0) return;
+    g.font = 'bold 22px sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+    const tw = g.measureText(cheerT.text).width, bx = X + 178, by = Y + 34;
+    g.globalAlpha = Math.min(1, cheerT.t * 3);
+    g.fillStyle = '#1a1410'; g.fillRect(bx - 4, by - 28, tw + 36, 56);
+    g.fillStyle = '#fff6e0'; g.fillRect(bx, by - 24, tw + 28, 48);
+    g.beginPath(); g.moveTo(bx, by + 4); g.lineTo(bx - 18, by + 18); g.lineTo(bx, by + 16); g.fill();
+    g.fillStyle = '#5a1018'; g.fillText(cheerT.text, bx + 14, by + 1);
+    g.globalAlpha = 1;
+  }
   function drawMini() {
     if (!mini) return;
     const m = mini.m;
     if (m.type === 'skip') drawSkip();
     else if (m.type === 'weave') drawWeave();
     else drawFlies();
+    drawCheer();
     if (mini.phase === 'end') {
       g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, H / 2 - 60, W, 120);
       miniText(mini.win ? 'ПОЛУЧИЛОСЬ!' : 'НЕ ВЫШЛО…', W / 2, H / 2, 52, mini.win ? '#7cff8a' : '#ff8a7a');
@@ -3047,6 +3107,7 @@ MAPS.palace_gate = {
     if (ready(im)) {
       if (map.bgFlip) { g.save(); g.translate(Wd - ox, -oy); g.scale(-1, 1); g.drawImage(im, 0, 0, Wd, Hd); g.restore(); }
       else g.drawImage(im, -ox, -oy, Wd, Hd);
+      if (map.bgTint) { g.fillStyle = map.bgTint; g.fillRect(-ox, -oy, Wd, Hd); }   // та же модель, другой настрой (Лес призраков)
     } else {                                         // картинки нет — цветной плейсхолдер с подписью
       g.fillStyle = map.bgColor || '#2a2438'; g.fillRect(-ox, -oy, Wd, Hd);
       g.fillStyle = 'rgba(255,255,255,.45)'; g.font = 'bold 30px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -3324,6 +3385,7 @@ MAPS.palace_gate = {
     const el = state.flags.light_element;
     if (w.ammo && hero.ammo < 1) { hero.cd = 0.3; return toast('Стрелы кончились — новая через пару секунд'); }
     if (w.manaCost && hero.mana < w.manaCost) { hero.cd = 0.3; return toast('Не хватает маны'); }
+    if (!useSta(w.type === 'melee' ? 9 : 7)) { hero.cd = 0.25; return; }
     hero.cd = w.cooldown * (el === 'storm' ? 0.75 : 1);
     const dmg = (w.dmg + (el === 'sun' ? 1 : 0)) * dmgMul();
     const hx = hero.x, hy = hero.y - 26;
@@ -3363,10 +3425,21 @@ MAPS.palace_gate = {
     shots.push({ x: hx + Math.cos(ang) * 20, y: hy + Math.sin(ang) * 20, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
       life: w.range / sp, dmg, kind: w.type, ang });
   }
+  // Выносливость: удары и рывок тратят силы; через 0.7 с без нагрузки — восстанавливаются. Без сил — нельзя бить, шаг медленнее.
+  function useSta(n) {
+    if (hero.sta == null) hero.sta = maxSta();
+    if (hero.sta < n) {
+      if (time - (hero.tiredT || -9) > 1.2) { hero.tiredT = time; floaters.push({ x: hero.x, y: hero.y - 84, text: INV_TEXT.tired, life: 1, color: '#ffd27a' }); }
+      return false;
+    }
+    hero.sta -= n; hero.staT = 0.7;
+    return true;
+  }
   // Рывок: в сторону движения (или взгляда), 0.3 с неуязвимости, перезарядка падает с уровнем
   function dash() {
     if (mode !== 'play' || hero.dash || hero.dashCd > 0 || hero.casting) return;
     if (hunt && hunt.stun > 0) return;
+    if (!useSta(star('d_purple') || star('l_white') ? 15 : 24)) return;
     const v = moveVector();
     let ax = v.x, ay = v.y;
     if (v.len < 0.15) [ax, ay] = { right: [1, 0], left: [-1, 0], down: [0, 1], up: [0, -1] }[hero.dir];
@@ -3377,6 +3450,7 @@ MAPS.palace_gate = {
     hero.kx = hero.ky = 0;
   }
 
+  let critN = 0;
   function hitEnemy(e, dmg, ang, ranged) {
     if (e.k.dodge && e.st !== 'rest' && !e.dash && Math.random() < e.k.dodge) {   // Аэдел уходит в сторону рывком
       const side = ang + (Math.random() < 0.5 ? 1.57 : -1.57);
@@ -3388,7 +3462,9 @@ MAPS.palace_gate = {
     if (e.k.ghost && ranged) dmg *= 1.5;             // призраки боятся света и магии
     if (e.k.weakSpirit && (blessed('spirit') || skill('spirit') >= 1)) dmg *= e.k.weakSpirit;
     if (ranged && e.k.resist) dmg *= 1 - e.k.resist * (skill('power') >= 3 ? 0.5 : 1);  // боссы держат стрелы и магию; «Пробой» — вполовину
+    if (star('d_black') && ++critN % 5 === 0) { dmg *= 2; floaters.push({ x: e.x, y: e.y - 92, text: 'КРИТ!', life: 0.8, color: '#c9a0ff' }); }
     dmg = Math.round(dmg * 10) / 10;
+    if (star('d_green') && state.hp > 0) state.hp = Math.min(maxHp(), state.hp + dmg * 0.08);    // «Ядовитый плющ»
     e.hp -= dmg;
     e.hit = 0.15;
     if (e.base.phases) phaseCheck(e);
@@ -3399,9 +3475,42 @@ MAPS.palace_gate = {
     burst(e.x, e.y - 24, 8, elemColor());
     if (e.hp <= 0) {
       e.dead = 0.001; burst(e.x, e.y - 20, 18, '120,110,100'); gainXp(e.k.xp || 0, e.k.mana || 0);
+      if (e.kind !== 'dane_copy' && !e.k.static) { dropOrb(e.x, e.y); state.flags.kills = (state.flags.kills || 0) + 1; }
       if (e.k.copies) for (const c of enemies) if (c.kind === 'dane_copy' && !c.dead) { c.dead = 0.001; burst(c.x, c.y - 30, 10, '150,220,255'); }
       const gold = state.map === 'arena' ? 0 : e.k.gold ?? (e.k.boss ? 30 : 0);   // на арене — только опыт и мана
       if (gold) { state.flags.gold = (state.flags.gold || 0) + gold; floaters.push({ x: e.x, y: e.y - 84, text: `+${gold} 💰`, life: 1.1, color: '#ffd86a' }); updateHud(); }
+    }
+  }
+
+  // Сфера маны: выпадает из побеждённой твари, подпрыгивает и летит к герою. Светлая — Путь Надежды, тёмная — Ненависть и Власть.
+  let orbs = [];
+  function dropOrb(x, y) {
+    const p = leadPath(), dark = p === 'hate' || p === 'power' ? Math.random() < 0.8 : Math.random() < 0.2;
+    orbs.push({ x, y: y - 24, vx: (Math.random() - 0.5) * 170, vy: -170 - Math.random() * 90, t: 0, dark });
+  }
+  function collectOrb(o) {
+    const f = state.flags, k = o.dark ? 'stars_dark' : 'stars_light';
+    f[k] = (f[k] || 0) + 1; f.stars_total = (f.stars_total || 0) + 1;
+    floaters.push({ x: hero.x, y: hero.y - 112, text: o.dark ? STAR_MAP.orbDark : STAR_MAP.orbLight, life: 1.2, color: o.dark ? '#c9a0ff' : '#ffe9a0' });
+  }
+  function updateOrbs(dt) {
+    for (const o of orbs) {
+      o.t += dt;
+      if (o.t < 0.55) { o.x += o.vx * dt; o.y += o.vy * dt; o.vy += 560 * dt; continue; }
+      const dx = hero.x - o.x, dy = hero.y - 34 - o.y, d = Math.hypot(dx, dy) || 1, st = Math.min(d, (260 + o.t * 520) * dt);
+      o.x += dx / d * st; o.y += dy / d * st;
+      if (d < 24) { o.got = true; collectOrb(o); }
+    }
+    if (orbs.some((o) => o.got)) orbs = orbs.filter((o) => !o.got);
+  }
+  function drawOrbs(ox, oy) {
+    for (const o of orbs) {
+      const x = Math.round(o.x - ox), y = Math.round(o.y - oy), p = 1 + 0.18 * Math.sin(time * 9 + o.x);
+      g.globalCompositeOperation = 'lighter';
+      g.drawImage(blob(o.dark ? '150,60,255' : '255,214,110'), x - 24 * p, y - 24 * p, 48 * p, 48 * p);
+      g.globalCompositeOperation = 'source-over';
+      g.fillStyle = o.dark ? '#14041f' : '#fff6d0'; g.fillRect(x - 5, y - 5, 10, 10);
+      g.fillStyle = o.dark ? '#b070ff' : '#ffd84a'; g.fillRect(x - 2, y - 8, 4, 16); g.fillRect(x - 8, y - 2, 16, 4);
     }
   }
 
@@ -3420,6 +3529,7 @@ MAPS.palace_gate = {
       return;
     }
     if (inv('ribbon')) dmg *= 0.85;                             // Красная лента
+    dmg *= (1 - (armorK().cut || 0)) * (star('l_brown') ? 0.85 : 1);   // броня оружейника и «Земная твердь"
     if (src === 'priest' && inv('dagger')) dmg *= 0.6;          // Священный кинжал
     dmg = Math.max(1, Math.round(dmg));
     state.hp = Math.max(0, state.hp - dmg);
@@ -3435,13 +3545,15 @@ MAPS.palace_gate = {
   function heroDown() {
     const dr = state.map === 'arena' && state.flags.duel_ret;                 // проиграл вызов — туда, откуда бросил перчатку
     if (dr) { state.flags.duel_ret = null; curEnc = null; enemies = []; ebolts = []; }
-    const r = dr ? { ...dr, d: 'duel_lost' } : map.respawn || { map: 'village', at: [14, 6], dir: 'up', d: 'hero_down' };
+    const le = state.flags.last_eye && MAPS[state.flags.last_eye.map] ? state.flags.last_eye : null;
+    const r = dr ? { ...dr, d: 'duel_lost' } : le ? { map: le.map, at: le.at, dir: 'down' } : map.respawn || { map: 'village', at: [14, 6], dir: 'up' };
+    if (!dr) { DIALOGUES.__death = [{ who: 'voice', text: DEATH_PHRASES[Math.floor(Math.random() * DEATH_PHRASES.length)] }]; r.d = '__death'; }
     mode = 'fade';
     fade(() => {
-      state.hp = maxHp();
+      state.hp = maxHp(); hero.sta = maxSta();
       enterMap(r.map, r.at, r.dir);
       setTimeout(() => startDialogue(r.d), 550);
-    });
+    }, null, dr ? null : 'sink');
   }
 
   function useFlask() {
@@ -3486,6 +3598,11 @@ MAPS.palace_gate = {
     hero.inv = Math.max(0, hero.inv - dt);
     hero.dodge = Math.max(0, hero.dodge - dt);
     hero.dashCd = Math.max(0, hero.dashCd - dt);
+    if (hero.sta == null) hero.sta = maxSta();
+    hero.staT = Math.max(0, (hero.staT || 0) - dt);
+    if (hero.staT <= 0) hero.sta = Math.min(maxSta(), hero.sta + dt * 32 * (star('l_sun') ? 2 : 1));
+    if (star('l_sun') && !curEnc && state.hp > 0 && state.hp < maxHp()) state.hp = Math.min(maxHp(), state.hp + dt * 0.5);   // «Полдень»
+    updateOrbs(dt);
     for (const t of hero.trail) t.life -= dt;
     hero.trail = hero.trail.filter((t) => t.life > 0);
     const w = WEAPONS[state.hero.weapon];
@@ -3836,7 +3953,7 @@ MAPS.palace_gate = {
     if (!ex) { exitLock = false; return; }
     if (exitLock) return;                 // только что пришли на эту клетку — ждём, пока сойдёт
     if (chase && chase.run) { stepBack(); return toast('Не упусти воровку!'); }
-    if (curEnc && curEnc.lock && enemies.length) { stepBack(); return toast(FIGHT_TEXT.doorsLocked); }
+    if (curEnc && curEnc.lock && enemies.some((e) => !e.dead)) { stepBack(); return toast(FIGHT_TEXT.doorsLocked); }   // замок невидим
     exitLock = true;
     if (!check(ex.if)) { stepBack(); if (ex.else) startDialogue(ex.else); return; }
     if (ex.to) fade(() => enterMap(ex.to, ex.at, ex.dir), null, MAPS[ex.to].entry);
@@ -4221,17 +4338,19 @@ MAPS.palace_gate = {
     }
     drawHazard(ox, oy);
     drawTraps(ox, oy);
-    if (curEnc && curEnc.lock && enemies.length) {   // бой: выходы затянуты льдом
-      for (const ex of map.exits || []) {
-        const X = ex.x * T - ox, Y = ex.y * T - oy;
-        g.fillStyle = `rgba(140,210,255,${0.45 + 0.1 * Math.sin(time * 3)})`; g.fillRect(X, Y, T, T);
-        g.strokeStyle = 'rgba(230,248,255,.8)'; g.lineWidth = 2;
-        g.beginPath(); g.moveTo(X + 8, Y + 8); g.lineTo(X + T - 8, Y + T - 8); g.moveTo(X + T - 8, Y + 8); g.lineTo(X + 8, Y + T - 8); g.stroke();
-      }
-    }
   }
 
   // средний слой: деревья, колонны, мебель, статуи — в общий список глубины
+  let heroBehind = false;                            // герой за вырезкой fgCrop — поверх рисуется только его полупрозрачный силуэт
+  function drawHeroGhost(ox, oy) {
+    const sp = heroSprite(hero.dir);
+    if (!ready(sp) || heroHidden()) return;
+    big(hero.x, hero.y, ox, oy, () => {
+      g.globalAlpha = 0.42;
+      g.drawImage(sp, Math.round(hero.x - ox) - 32, Math.round(hero.y - oy) - 64, 64, 64);
+      g.globalAlpha = 1;
+    })();
+  }
   function renderMid(objs, ox, oy) {
     const rows = map.tiles.length, cols = map.tiles[0].length;
     const x0 = Math.max(0, Math.floor(ox / T)), y0 = Math.max(0, Math.floor(oy / T));
@@ -4256,10 +4375,8 @@ MAPS.palace_gate = {
       if (ready(im)) {
         const k = im.naturalWidth / (cols * T);
         for (const [cx0, cy0, cx1, cy1, depth = cy1] of map.fgCrop) objs.push({ y: depth, draw: () => {
-          const behind = hero.y < depth && hero.y > cy0 + 40 && hero.x > cx0 - 10 && hero.x < cx1 + 10;
-          g.globalAlpha = behind ? 0.6 : 1;
+          if (hero.y < depth && hero.y > cy0 + 40 && hero.x > cx0 - 10 && hero.x < cx1 + 10) heroBehind = true;
           g.drawImage(im, cx0 * k, cy0 * k, (cx1 - cx0) * k, (cy1 - cy0) * k, cx0 - ox, cy0 - oy, cx1 - cx0, cy1 - cy0);
-          g.globalAlpha = 1;
         } });
       }
     }
@@ -4280,8 +4397,11 @@ MAPS.palace_gate = {
     for (const r of runners) objs.push({ y: r.y, draw: big(r.x, r.y, ox, oy, () => drawRunner(r, ox, oy)) });
     if (hunt) for (const f of hunt.figs) objs.push({ y: f.y, draw: big(f.x, f.y, ox, oy, () => drawFigure(f, ox, oy)) });
     objs.sort((a, b) => a.y - b.y);
+    heroBehind = false;
     for (const o of objs) o.draw();
+    if (heroBehind) drawHeroGhost(ox, oy);
     drawCombatFx(ox, oy);
+    drawOrbs(ox, oy);
     drawFireflies(ox, oy);
   }
 
@@ -4298,7 +4418,7 @@ MAPS.palace_gate = {
       g.fillStyle = '#2a1d0b';
       g.font = 'bold 20px sans-serif';
       g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText('E', X, Y + 1);
+      g.fillText(near.prop === 'eye' || touch ? '?' : 'E', X, Y + 1);
     }
     if (lbox > 0) {                                  // киношные полосы в ключевых сценах
       g.fillStyle = '#000';
@@ -4306,6 +4426,7 @@ MAPS.palace_gate = {
     }
     if (state && mode !== 'title' && mode !== 'create') { drawBars(); drawMadness(); drawRoomsHud(); drawChaseTimer(); drawBossBar(); drawPathIcon(); }
     if (mode === 'mini') drawMini();
+    if (eyeFx && mode === 'eye') drawEyeFx(); else eyeFx = null;
     if (fading) {                                    // переход: затемнение (или полосы letterbox) с названием локации
       const k = fading < 1 ? fading : Math.max(0, 2 - fading);
       if (fadeStyle === 'letterbox') {
@@ -4315,7 +4436,7 @@ MAPS.palace_gate = {
         g.fillStyle = `rgba(${fadeColor},${k})`;
         g.fillRect(0, 0, W, H);
       }
-      if (fading > 1 && fadeColor !== '255,255,255') {
+      if (fading > 1 && fadeColor !== '255,255,255' && fadeStyle !== 'sink') {
         g.globalAlpha = Math.min(1, (2 - fading) * 2.5, (fading - 1) * 6);
         g.font = '44px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
         g.fillStyle = '#e2c98a'; g.fillText(map.title, W / 2, H / 2);
@@ -4347,7 +4468,9 @@ MAPS.palace_gate = {
     g.beginPath(); g.ellipse(x + 4, y + 2, w, w * 0.32, 0, 0, Math.PI * 2); g.fill();
   }
 
+  const heroHidden = () => !!(map && map.hideHero && check(map.hideHero));   // кат-сцена от третьего лица — героя нет в кадре
   function drawHero(ox, oy) {
+    if (heroHidden()) return;
     const x = Math.round(hero.x - ox), y = Math.round(hero.y - oy);
     for (const t of hero.trail) {                    // шлейф рывка
       const tp = heroSprite(t.dir);
@@ -4514,57 +4637,83 @@ MAPS.palace_gate = {
   }
 
   // Полоса ОЗ и бутылка под плашкой героя
+  // Пиксельные значки HUD: сердце (ОЗ) и сфера энергии (выносливость)
+  const HEART_PX = ['.oo...oo.', 'orro.orro', 'ohrrorrro', 'ohrrrrrdo', 'orrrrrrdo', '.orrrrdo.', '..orrdo..', '...odo...', '....o....'];
+  const ORB_PX = ['..ooooo..', '.ollgggo.', 'olgggyggo', 'ogggyyggo', 'oggyyyygo', 'ogggyyggo', 'ogggygggo', '.oggggdo.', '..ooooo..'];
+  const PX_COL = { o: '#1a1410', r: '#e0303e', h: '#ffd0d0', d: '#8a1422', g: '#46c84a', l: '#c8ffaa', y: '#fff27a' };
+  function pixIcon(pat, x, y, s, col) {
+    for (let j = 0; j < pat.length; j++) for (let i = 0; i < pat[j].length; i++) {
+      const c = pat[j][i];
+      if (c === '.') continue;
+      g.fillStyle = (col && col[c]) || PX_COL[c]; g.fillRect(x + i * s, y + j * s, s, s);
+    }
+  }
+  function pixBar(x, y, w, h, k, c1, c2, back) {
+    g.fillStyle = '#1a1410'; g.fillRect(x - 4, y - 4, w + 8, h + 8);          // чёрный контур
+    g.fillStyle = '#6b5640'; g.fillRect(x - 2, y - 2, w + 4, h + 4);          // деревянная рамка
+    g.fillStyle = back; g.fillRect(x, y, w, h);
+    const fw = Math.round(w * Math.max(0, Math.min(1, k)));
+    g.fillStyle = c1; g.fillRect(x, y, fw, h);
+    g.fillStyle = c2; g.fillRect(x, y, fw, Math.max(2, Math.round(h * 0.3)));     // блик
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(x, y + h - 3, fw, 3);
+    g.fillStyle = 'rgba(0,0,0,.3)'; for (let i = 10; i < w; i += 10) g.fillRect(x + i, y, 2, h);   // деления
+  }
   function drawBars() {
     const max = maxHp(), hp = Math.max(0, state.hp);
-    const X = 16, Y = 58, Wd = 280;
-    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y, Wd + 8, 26);
-    g.fillStyle = '#3a1512'; g.fillRect(X + 4, Y + 4, Wd, 18);
-    g.fillStyle = hp / max > 0.3 ? '#c8423a' : (Math.floor(time * 4) % 2 ? '#ff5a4a' : '#c8423a');
-    g.fillRect(X + 4, Y + 4, Wd * hp / max, 18);
-    g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(X + 4, Y + 4, Wd * hp / max, 4);
-    g.font = 'bold 16px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = '#fff'; g.fillText(`ОЗ ${Math.ceil(hp)} / ${max}`, X + 4 + Wd / 2, Y + 14);
+    const X = 16, Y = 58, BX = X + 46;
+    g.fillStyle = 'rgba(10,8,6,.55)'; g.fillRect(X - 6, Y - 8, 330, 104);
+    // ОЗ
+    pixIcon(HEART_PX, X, Y - 2, 4);
+    const low = hp / max <= 0.3 && Math.floor(time * 4) % 2;
+    pixBar(BX, Y + 2, 250, 20, hp / max, low ? '#ff6a5a' : '#d8313f', low ? '#ffc0b0' : '#ff8a8a', '#3a1215');
+    g.font = 'bold 15px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = 'rgba(0,0,0,.7)'; g.fillText(`${Math.ceil(hp)} / ${max}`, BX + 126, Y + 13);
+    g.fillStyle = '#fff'; g.fillText(`${Math.ceil(hp)} / ${max}`, BX + 125, Y + 12);
+    // выносливость
+    const sta = hero.sta == null ? maxSta() : hero.sta, tired = sta < 12;
+    pixIcon(ORB_PX, X + 2, Y + 32, 4, tired ? { g: '#7a7a6a', l: '#b0b0a0', y: '#d8d8c0' } : null);
+    pixBar(BX, Y + 38, 210, 14, sta / maxSta(), tired ? '#9a9a7a' : '#5ad83a', tired ? '#cfcfb0' : '#d0ff9a', '#14301a');
     // опыт до следующего уровня
     const L = lvl(), x0 = xpFor(L), x1 = xpFor(L + 1), xp = state.flags.xp || 0;
-    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y + 26, Wd + 8, 10);
-    g.fillStyle = '#e2b65a'; g.fillRect(X + 4, Y + 29, Wd * Math.min(1, (xp - x0) / (x1 - x0)), 4);
+    pixBar(BX, Y + 62, 210, 5, Math.min(1, (xp - x0) / (x1 - x0)), '#e2b65a', '#fff0b0', '#2a2010');
+    g.font = 'bold 12px sans-serif'; g.textAlign = 'left'; g.fillStyle = '#e2b65a'; g.fillText('Ур. ' + L, BX + 220, Y + 64);
     // запас стрел, мана посоха, готовность рывка
-    const w = WEAPONS[state.hero.weapon];
+    const w = WEAPONS[state.hero.weapon], RY = Y + 74;
     let rx = X;
-    g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(X, Y + 38, Wd + 8, 22);
     const ammoN = maxAmmo(w);
     if (ammoN) {
       for (let i = 0; i < ammoN; i++) {
         const part = Math.max(0, Math.min(1, hero.ammo - i));
         g.fillStyle = part >= 1 ? '#f4dca0' : '#4a3f33';
-        g.fillRect(X + 8 + i * 16, Y + 42, 4, 14);
-        if (part > 0 && part < 1) { g.fillStyle = '#a08a60'; g.fillRect(X + 8 + i * 16, Y + 56 - 14 * part, 4, 14 * part); }
-        g.fillStyle = part >= 1 ? '#c8423a' : '#3a2f25'; g.fillRect(X + 6 + i * 16, Y + 42, 8, 3);
+        g.fillRect(X + 8 + i * 16, RY + 4, 4, 14);
+        if (part > 0 && part < 1) { g.fillStyle = '#a08a60'; g.fillRect(X + 8 + i * 16, RY + 18 - 14 * part, 4, 14 * part); }
+        g.fillStyle = part >= 1 ? '#c8423a' : '#3a2f25'; g.fillRect(X + 6 + i * 16, RY + 4, 8, 3);
       }
       rx = X + 8 + ammoN * 16;
     } else if (w.manaCost) {
-      g.fillStyle = '#1a2440'; g.fillRect(X + 4, Y + 43, 150, 12);
-      g.fillStyle = hero.mana >= w.manaCost ? '#5a9aff' : '#3a5a9a'; g.fillRect(X + 4, Y + 43, 150 * hero.mana / maxMana(), 12);
-      g.font = 'bold 11px sans-serif'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(`Мана ${Math.floor(hero.mana)}`, X + 79, Y + 50);
+      pixBar(X + 4, RY + 6, 150, 10, hero.mana / maxMana(), hero.mana >= w.manaCost ? '#5a9aff' : '#3a5a9a', '#bcd8ff', '#1a2440');
       rx = X + 162;
     }
-    g.font = 'bold 13px sans-serif'; g.textAlign = 'left';
+    g.font = 'bold 13px sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
     g.fillStyle = hero.dashCd > 0 ? '#7d7062' : '#9ad8ff';
-    g.fillText(hero.dashCd > 0 ? `Рывок ${hero.dashCd.toFixed(1)}` : 'Рывок ⇧', rx + 6, Y + 50);
-    g.textAlign = 'center';
+    g.fillText(hero.dashCd > 0 ? `Рывок ${hero.dashCd.toFixed(1)}` : 'Рывок ⇧', rx + 6, RY + 12);
+    // Сосуд жизни — красная круглая фляга с пробкой
     if (state.flags.got_flask) {
-      const fx = X + Wd + 22, full = state.flags.has_water_flask;
-      g.fillStyle = 'rgba(10,8,6,.7)'; g.fillRect(fx - 4, Y - 6, 62, 38);
-      g.fillStyle = '#b9dbe6'; g.fillRect(fx + 4, Y + 2, 14, 24); g.fillRect(fx + 8, Y - 3, 6, 6);
-      if (full) { g.fillStyle = '#d0283c'; g.fillRect(fx + 6, Y + 8, 10, 16); }
-      else if (flaskT > 0) { g.fillStyle = '#7a1824'; g.fillRect(fx + 6, Y + 24 - 16 * (1 - flaskT / 8), 10, 16 * (1 - flaskT / 8)); }
-      g.fillStyle = full ? '#f4dca0' : '#7d7062';
-      g.font = 'bold 18px sans-serif'; g.textAlign = 'left';
-      g.fillText('Q', fx + 28, Y + 14);
+      const fx = X + 336, full = state.flags.has_water_flask, im = img('assets/sprites/icon_flask.png');
+      g.fillStyle = 'rgba(10,8,6,.55)'; g.fillRect(fx - 6, Y - 8, 62, 66);
+      if (ready(im)) {
+        g.globalAlpha = full ? 1 : 0.3; g.drawImage(im, fx, Y - 4, 34, 50); g.globalAlpha = 1;
+        if (!full && flaskT > 0) {                    // наполняется: красная вода поднимается снизу
+          const k = 1 - flaskT / 8, hh = Math.round(50 * k);
+          g.save(); g.beginPath(); g.rect(fx, Y - 4 + 50 - hh, 34, hh); g.clip(); g.drawImage(im, fx, Y - 4, 34, 50); g.restore();
+        }
+      }
+      g.fillStyle = full ? '#f4dca0' : '#7d7062'; g.font = 'bold 16px sans-serif'; g.textAlign = 'left';
+      g.fillText('Q', fx + 38, Y + 10);
       const pots = inv('potion_s') + inv('potion_m');
-      if (pots) { g.font = 'bold 12px sans-serif'; g.fillStyle = '#e8a0b0'; g.fillText('+' + pots, fx + 28, Y + 30); }
+      if (pots) { g.font = 'bold 12px sans-serif'; g.fillStyle = '#e8a0b0'; g.fillText('+' + pots, fx + 36, Y + 32); }
     }
-    drawStatusIcons(X + Wd + 96, Y - 6);
+    drawStatusIcons(X + 402, Y - 6);
   }
   // Индикатор пути: после храма — выбранный путь, до него — ведущий счётчик path_* (при равенстве — «не выбран»)
   function leadPath() {
@@ -4574,7 +4723,7 @@ MAPS.palace_gate = {
     return c[0][1] > c[1][1] ? c[0][0] : 'none';
   }
   function drawPathIcon() {
-    const p = PATHS[leadPath()] || PATHS.none, x = W - 150, y = 40;
+    const p = PATHS[leadPath()] || PATHS.none, x = W - 222, y = 44;
     g.fillStyle = 'rgba(10,8,6,.7)'; g.beginPath(); g.arc(x, y, 22, 0, 6.29); g.fill();
     g.strokeStyle = p.color; g.lineWidth = 3; g.stroke();
     g.fillStyle = p.color; g.font = 'bold 22px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -4618,18 +4767,22 @@ MAPS.palace_gate = {
   }
 
   function drawNpc(n, ox, oy) {
+    if (n.prop === 'post') return;                   // невидимое препятствие
     const x = Math.round(n.px - ox), y = Math.round(n.py - oy);
     if (n.prop === 'spot') {                         // предмет нарисован на фоне; glow — мягкое свечение, чтобы его заметить
       if (n.sparkle) sparkles(x, y - 24, 46, 30, 7, n.sparkle, n.px);
       else if (n.glow) { g.fillStyle = `rgba(${n.glow},${0.18 + Math.sin(time * 3 + n.px) * 0.1})`; g.beginPath(); g.ellipse(x, y - 20, 40, 22, 0, 0, 6.28); g.fill(); }
       return;
     }
+    if (n.prop === 'eye') { drawEye(x, y - 52 + Math.sin(time * 2 + n.px) * 3, 5, !!state.flags['eye_' + state.map + '_' + n.id]); return; }
+    if (n.prop === 'chest') { drawChest(x, y, !!state.flags[n.flag]); return; }
     if (n.prop === 'sign') { g.drawImage(SIGN, x - 32, y - 60, 64, 64); return; }
     if (n.prop === 'house') { g.drawImage(HOUSE, x - 72, y - 128, 144, 132); return; }
     if (n.prop === 'altar') { g.drawImage(ALTAR, x - 96, y - 70, 192, 112); return; }
     if (n.prop === 'pew') { g.drawImage(PEW, x - 96, y - 40, 192, 64); return; }
     if (n.prop === 'mirror') { g.drawImage(MIRROR, x - 36, y - 104, 72, 108); return; }
-    if (n.prop === 'desk') { g.drawImage(DESK, x - 96, y - 82, 192, 112); return; }
+    if (n.prop === 'desk') { const im = img('assets/sprites/prop_desk.png'); shadow(x, y - 4, 70); if (ready(im)) g.drawImage(im, x - 80, y - 128, 160, 134); else g.drawImage(DESK, x - 96, y - 82, 192, 112); return; }
+    if (n.prop === 'rtable') { const im = img('assets/sprites/prop_rtable.png'); shadow(x, y - 4, 50); if (ready(im)) g.drawImage(im, x - 60, y - 108, 120, 114); return; }
     if (n.prop === 'organ') {
       g.drawImage(state.flags.organ_broken ? ORGAN_BROKEN : ORGAN, x - 192, y - 160, 384, 192);
       if (state.flags.organ_fight && !state.flags.organ_broken) {      // Долита играет: трубы вспыхивают по очереди в такт
@@ -4680,16 +4833,16 @@ MAPS.palace_gate = {
     }
     if (n.prop === 'feast') {                        // длинный пиршественный стол с едой (средний слой)
       const im = img('assets/sprites/prop_feast.png');
-      if (ready(im)) g.drawImage(im, x - 320, y - 140, 640, 149);
+      if (ready(im)) g.drawImage(im, x - 330, y - 236, 660, 244);
       return;
     }
     if (n.prop === 'throne') { g.drawImage(THRONE, x - 48, y - 108, 96, 112); return; }
-    if (n.prop === 'stone') {
-      const glow = state.flags.prologue_done ? 0.1 : 0.35 + Math.sin(time * 3) * 0.2;
+    if (n.prop === 'stone') {                        // Камень Истины: та же форма, что у молебенных камней, белый с золотом
+      const glow = state.flags.prologue_done ? 0.1 : 0.35 + Math.sin(time * 3) * 0.2, im = img('assets/sprites/prop_stone_truth.png');
       g.fillStyle = `rgba(255,236,170,${glow})`;
-      g.beginPath(); g.ellipse(x, y - 34, 34, 46, 0, 0, Math.PI * 2); g.fill();
-      shadow(x, y - 2, 18);
-      g.drawImage(STONE, x - 32, y - 78, 64, 80);
+      g.beginPath(); g.ellipse(x, y - 44, 40, 52, 0, 0, Math.PI * 2); g.fill();
+      shadow(x, y - 4, 34);
+      if (ready(im)) g.drawImage(im, x - 44, y - 96, 88, 97);
       return;
     }
     if (n.ghost) return drawCrowdGhost(n, ox, oy);
@@ -4716,11 +4869,66 @@ MAPS.palace_gate = {
     }
   }
 
+  // ---------------------------------------------------------------- Глаза сохранения (только чёрное и белое)
+  // Контур с белым белком, вертикальный зрачок, радужки нет. Закрыт, пока не сохранишься; потом смотрит всегда.
+  const EYE_OPEN = ['.....ooooo.....', '...oowwwwwoo...', '.oowwwwowwwwoo.', 'owwwwwwowwwwwwo', 'owwwwwwowwwwwwo', 'owwwwwwowwwwwwo', '.oowwwwowwwwoo.', '...oowwwwwoo...', '.....ooooo.....'];
+  const EYE_SHUT = ['...............', '...............', '...............', 'oo...........oo', '..oo.......oo..', '....ooooooo....', '...o..o.o..o...', '..o...o.o...o..', '...............'];
+  function drawEye(cx, cy, s, open) {
+    const pat = open ? EYE_OPEN : EYE_SHUT, x0 = cx - 7.5 * s, y0 = cy - 4.5 * s;
+    g.fillStyle = '#fff';                            // белая обводка — чтобы глаз читался на тёмном фоне
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 15; i++) if (pat[j][i] === 'o') g.fillRect(x0 + i * s - s / 2, y0 + j * s - s / 2, s * 2, s * 2);
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 15; i++) {
+      const c = pat[j][i];
+      if (c === '.') continue;
+      g.fillStyle = c === 'o' ? '#000' : '#fff';
+      g.fillRect(x0 + i * s, y0 + j * s, s, s);
+    }
+  }
+  function drawChest(x, y, open) {                   // сундук побочной локации
+    shadow(x, y - 2, 30);
+    g.fillStyle = '#2a1608'; g.fillRect(x - 26, y - 34, 52, 34);
+    g.fillStyle = open ? '#5a3418' : '#8a5428'; g.fillRect(x - 23, y - 31, 46, 28);
+    g.fillStyle = '#e2b65a'; g.fillRect(x - 23, y - 22, 46, 4); g.fillRect(x - 4, y - 26, 8, 10);
+    if (open) { g.fillStyle = '#1a0c04'; g.fillRect(x - 23, y - 44, 46, 12); }
+    else { g.fillStyle = '#a0662e'; g.fillRect(x - 23, y - 40, 46, 9); g.fillStyle = '#2a1608'; g.fillRect(x - 26, y - 43, 52, 3); }
+  }
+  let eyeFx = null;
+  function eyeSave(n) {
+    const f = state.flags, key = 'eye_' + state.map + '_' + n.id, first = !f[key];
+    if (first) { f[key] = 1; f.eyes_open = (f.eyes_open || 0) + 1; }
+    f.last_eye = { map: state.map, at: [n.x, n.y + 0.9] };
+    save();
+    eyeFx = { t: 0, first };
+    mode = 'eye';
+    for (const k in keys) keys[k] = false;
+  }
+  function updateEye(dt) {
+    if (!eyeFx) return;
+    eyeFx.t += dt;
+    if (eyeFx.t > 2.1) { const first = eyeFx.first; eyeFx = null; mode = 'play'; toast(first ? EYE_TEXT.saved : EYE_TEXT.again); }
+  }
+  // крупный план: глаз во весь экран открывается — лёгкий скример
+  function drawEyeFx() {
+    const t = eyeFx.t, s = 34, k = Math.min(1, Math.max(0, (t - 0.25) / 0.35)), out = t > 1.6 ? Math.min(1, (t - 1.6) / 0.5) : 0;
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    const shake = t > 0.55 && t < 0.85 ? (Math.random() - 0.5) * 18 : 0;
+    const cx = W / 2 + shake, cy = H / 2 + shake * 0.6;
+    g.save(); g.globalAlpha = 1 - out;
+    drawEye(cx, cy, s, true);
+    g.fillStyle = '#000';                            // веки: сходятся к середине, на открытии разъезжаются
+    const lid = (1 - k) * 4.6 * s;
+    g.fillRect(cx - 8 * s, cy - 5 * s, 16 * s, lid); g.fillRect(cx - 8 * s, cy + 5 * s - lid, 16 * s, lid);
+    if (k < 1) { g.fillStyle = '#fff'; g.fillRect(cx - 7 * s, cy - s / 2, 14 * s, s * (1 - k)); }   // щёлочка света
+    g.restore();
+    if (t > 0.58 && t < 0.7) { g.fillStyle = 'rgba(255,255,255,.65)'; g.fillRect(0, 0, W, H); }      // вспышка
+  }
+
   // ---------------------------------------------------------------- Диалоги
   const dlg = { lines: [], i: 0, typed: 0, full: '', sel: 0, choices: null };
 
   function interact() {
     if (!near) return;
+    if (near.prop === 'eye') return eyeSave(near);
     const pick = (near.talk || []).find((t) => check(t.if));
     if (pick) startDialogue(pick.d);
   }
@@ -4857,7 +5065,8 @@ MAPS.palace_gate = {
   // ---------------------------------------------------------------- Окна: сумка, лавка Дариан, дерево Полианны
   function openPanel(kind, back) {
     if (mode !== 'play' && mode !== 'pause') return;
-    panel = { kind, back: back || (mode === 'pause' ? 'pause' : 'play'), msg: kind === 'shop' ? SHOP.hello : kind === 'duel' ? DUELS.hello : '' };
+    panel = { kind, back: back || (mode === 'pause' ? 'pause' : 'play'), msg: kind === 'shop' ? SHOP.hello : kind === 'duel' ? DUELS.hello : kind === 'smith' ? SMITH.hello : '',
+      tab: 'inv', sel: null, sky: leadPath() === 'hate' || leadPath() === 'power' ? 'dark' : 'light', star: null };
     mode = 'panel';
     for (const k in keys) keys[k] = false;
     stick.x = stick.y = 0;
@@ -4881,23 +5090,26 @@ MAPS.palace_gate = {
     const f = state.flags, list = $('panel-list');
     const head = `💰 ${f.gold || 0}   ✦ ${f.mana_points || 0}   ❤ ${Math.ceil(state.hp)} / ${maxHp()}`;
     let html = '', cols = 2;
+    list.classList.toggle('inv-mode', panel.kind === 'bag');
+    $('panel-title').hidden = panel.kind === 'bag';
     if (panel.kind === 'bag') {
-      $('panel-title').textContent = BAG_TEXT.title;
-      const gifts = [], items = [];
-      if (f.got_flask) gifts.push(row(ITEMS.flask.icon, ITEMS.flask.name + (f.has_water_flask ? '' : ' (пуст)'), ITEMS.flask.desc, f.has_water_flask,
-        { act: 'use:flask', text: BAG_TEXT.use, off: !f.has_water_flask }));
-      for (const [id, it] of Object.entries(ITEMS)) {
-        if (id === 'flask' || !inv(id)) continue;
-        if (it.gift) gifts.push(row(it.icon, it.name, it.desc, true));
-        else if (it.duel) gifts.push(row(it.icon, it.name, it.desc, true, { act: 'use:' + id, text: BAG_TEXT.use }));
-        else items.push(row(it.icon, `${it.name} ×${inv(id)}`, it.desc, true, { act: 'use:' + id, text: BAG_TEXT.use }));
+      $('panel-title').textContent = panel.tab === 'up' ? STAR_MAP.title : INV_TEXT.tabInv;
+      html = renderInventory();
+      list.style.gridTemplateColumns = '';
+      list.innerHTML = html.replace(/\{([^{}|]*)\|([^{}]*)\}/g, (m) => render(m));
+      $('panel-sub').textContent = (panel.msg ? render(panel.msg) + '   ·   ' : '') + head;
+      return;
+    } else if (panel.kind === 'smith') {
+      $('panel-title').textContent = SMITH.title;
+      const icons = { sword: '🗡️', bow: '🏹', staff: '🪄' };
+      for (const [id, price] of Object.entries(SMITH.weapons)) {
+        const own = !!f['own_' + id], w = WEAPONS[id];
+        html += row(icons[id], w.name, w.info, true, own ? { act: 'x', text: SMITH.owned, off: true } : { act: 'bw:' + id, text: `Купить · ${price} 💰`, off: (f.gold || 0) < price });
       }
-      const bl = Object.keys(BLESSINGS).filter((k) => BLESSINGS[k].icon && f['bless_' + k])
-        .map((k) => row(BLESSINGS[k].icon, BLESSINGS[k].name, blessed(k) ? BLESSINGS[k].desc : BLESSINGS.off, blessed(k)));
-      const cu = Object.keys(CURSES).filter((k) => f['curse_' + k]).map((k) => row(CURSES[k].icon, CURSES[k].name, CURSES[k].desc, true));
-      const sec = (t, a) => (a.length ? `<div class="psec">${esc(t)}</div>` + a.join('') : '');
-      html = sec(BAG_TEXT.items, items) + sec(BAG_TEXT.gifts, gifts) + sec(BAG_TEXT.bless, bl) + sec(BAG_TEXT.curses, cu);
-      if (!html) html = `<div class="psec">${esc(BAG_TEXT.empty)}</div>`;
+      for (const [id, a] of Object.entries(ARMOR)) {
+        const own = !!f['own_armor_' + id];
+        html += row(a.icon, a.name, a.desc, true, own ? { act: 'x', text: SMITH.owned, off: true } : { act: 'ba:' + id, text: `Купить · ${a.price} 💰`, off: (f.gold || 0) < a.price });
+      }
     } else if (panel.kind === 'shop') {
       $('panel-title').textContent = SHOP.title;
       for (const id of SHOP.items) {
@@ -4932,10 +5144,184 @@ MAPS.palace_gate = {
     list.innerHTML = list.innerHTML.replace(/\{([^{}|]*)\|([^{}]*)\}/g, (m, a, b) => render(m));
     $('panel-sub').textContent = (panel.msg ? render(panel.msg) + '   ·   ' : '') + head;
   }
+  // ---- Инвентарь: бордовая панель с ячейками; слева — что надето, справа — сетка, снизу — описание выбранного
+  const W_ICON = { sword: '🗡️', bow: '🏹', staff: '🪄' };
+  function invEntries() {
+    const f = state.flags, out = [];
+    for (const id of Object.keys(WEAPONS)) if (f['own_' + id] || state.hero.weapon === id) out.push({ key: 'w:' + id, icon: W_ICON[id], name: WEAPONS[id].name, desc: WEAPONS[id].info, on: state.hero.weapon === id });
+    for (const [id, a] of Object.entries(ARMOR)) if (f['own_armor_' + id]) out.push({ key: 'a:' + id, icon: a.icon, name: a.name, desc: a.desc, on: f.armor === id });
+    for (const [id, it] of Object.entries(ITEMS)) {
+      if (id === 'flask' || !inv(id)) continue;
+      out.push({ key: 'i:' + id, icon: it.icon, name: it.name, desc: it.desc, n: it.gift || it.duel ? 0 : inv(id), use: !it.gift });
+    }
+    for (const [k, b] of Object.entries(BLESSINGS)) if (b.icon && f['bless_' + k]) out.push({ key: 'b:' + k, icon: b.icon, name: b.name, desc: blessed(k) ? b.desc : BLESSINGS.off, dim: !blessed(k) });
+    for (const [k, c] of Object.entries(CURSES)) if (f['curse_' + k]) out.push({ key: 'c:' + k, icon: c.icon, name: c.name, desc: c.desc, curse: true });
+    return out;
+  }
+  function renderInventory() {
+    const f = state.flags, T2 = INV_TEXT;
+    let h = `<div class="inv-tabs"><button data-act="tab:inv" class="${panel.tab === 'inv' ? 'on' : ''}">🎒 ${esc(T2.tabInv)}</button>`
+      + `<button data-act="tab:up" class="${panel.tab === 'up' ? 'on' : ''}">✦ ${esc(T2.tabUp)}</button></div>`;
+    if (panel.tab === 'up') {
+      const sky = panel.sky, nodes = sky === 'light' ? STAR_MAP.light_nodes : STAR_MAP.dark_nodes;
+      const have = f[sky === 'light' ? 'stars_light' : 'stars_dark'] || 0;
+      h += `<div class="sky-tabs"><button data-act="sky:light" class="${sky === 'light' ? 'on' : ''}">☀ ${esc(STAR_MAP.light)} · ${f.stars_light || 0} ✦</button>`
+        + `<button data-act="sky:dark" class="${sky === 'dark' ? 'on' : ''}">☾ ${esc(STAR_MAP.dark)} · ${f.stars_dark || 0} ✦</button></div>`;
+      h += `<canvas id="starmap" width="760" height="300"></canvas>`;
+      const n = nodes[panel.star];
+      if (n) {
+        const lit = star(panel.star), side = Object.keys(nodes).filter((k) => !nodes[k].center), open = !n.center || side.every(star);
+        h += `<div class="inv-info"><div class="ii-icon" style="color:${n.color === '#000000' ? '#c9a0ff' : n.color}">✦</div><div class="ii-body"><div class="ach-title">${esc(n.name)}</div>`
+          + `<div class="ach-desc">${esc(n.desc)}${open || lit ? '' : ' ' + esc(STAR_MAP.locked) + '.'}</div></div>`
+          + (lit ? `<button disabled>${esc(STAR_MAP.lit)}</button>` : `<button data-act="learn_star:${panel.star}"${!open || have < n.cost ? ' disabled' : ''}>Зажечь · ${n.cost} ✦</button>`) + '</div>';
+      } else h += `<div class="inv-info"><div class="ii-body"><div class="ach-desc">${esc(STAR_MAP.hint)} ${esc(render(STAR_MAP.have.replace('{n}', have)))}</div></div></div>`;
+      return h;
+    }
+    const all = invEntries(), sel = all.find((e) => e.key === panel.sel);
+    const w = WEAPONS[state.hero.weapon], ar = ARMOR[f.armor];
+    const eqSlot = (lbl, icon, key) => `<div class="eq"><div class="eq-l">${esc(lbl)}</div><button class="slot${panel.sel === key ? ' sel' : ''}" data-act="sel:${key}">${icon || ''}</button></div>`;
+    h += '<div class="inv-wrap"><div class="inv-eq">'
+      + eqSlot(T2.weapon, W_ICON[state.hero.weapon], 'w:' + state.hero.weapon)
+      + eqSlot(T2.armor, ar ? ar.icon : '', ar ? 'a:' + f.armor : 'none')
+      + eqSlot(T2.vessel, f.got_flask ? ITEMS.flask.icon : '', f.got_flask ? 'flask' : 'none')
+      + `<div class="eq-stat">❤ ${Math.ceil(state.hp)}/${maxHp()}<br>⚡ ${Math.round(hero.sta == null ? maxSta() : hero.sta)}/${maxSta()}<br>💰 ${f.gold || 0}</div></div><div class="inv-grid">`;
+    const cells = Math.max(18, Math.ceil(all.length / 6) * 6);
+    for (let i = 0; i < cells; i++) {
+      const e = all[i];
+      h += e ? `<button class="slot${e.on ? ' on' : ''}${e.dim ? ' dim' : ''}${e.curse ? ' curse' : ''}${panel.sel === e.key ? ' sel' : ''}" data-act="sel:${e.key}">${e.icon}${e.n > 1 ? `<span class="n">${e.n}</span>` : ''}</button>`
+        : '<div class="slot empty"></div>';
+    }
+    h += '</div></div>';
+    let info = `<div class="ii-body"><div class="ach-desc">${esc(T2.pick)}</div></div>`;
+    if (panel.sel === 'flask' && f.got_flask) {
+      info = `<div class="ii-icon">${ITEMS.flask.icon}</div><div class="ii-body"><div class="ach-title">${esc(ITEMS.flask.name)}${f.has_water_flask ? '' : ' (пуст)'}</div><div class="ach-desc">${esc(ITEMS.flask.desc)}</div></div>`
+        + `<button data-act="use:flask"${f.has_water_flask ? '' : ' disabled'}>${esc(T2.use)}</button>`;
+    } else if (sel) {
+      const [k, id] = sel.key.split(':');
+      let btn = '';
+      if (k === 'w') btn = sel.on ? `<button disabled>${esc(T2.equipped)}</button>` : `<button data-act="equip:${id}">${esc(T2.equip)}</button>`;
+      if (k === 'a') btn = sel.on ? `<button data-act="unwear:${id}">${esc(T2.unwear)}</button>` : `<button data-act="wear:${id}">${esc(T2.wear)}</button>`;
+      if (k === 'i' && sel.use) btn = `<button data-act="use:${id}">${esc(T2.use)}</button>`;
+      info = `<div class="ii-icon">${sel.icon}</div><div class="ii-body"><div class="ach-title">${esc(sel.name)}${sel.n > 1 ? ' ×' + sel.n : ''}</div><div class="ach-desc">${esc(sel.desc)}</div></div>${btn}`;
+    }
+    return h + `<div class="inv-info">${info}</div>`;
+  }
+  // ---- Карты прокачки: Свет — голубое небо, облака, солнце в центре, звёзды квадратом; Тьма — ночь, мерцание, ромб, чёрная дыра
+  const SKY_POS = {
+    l_blue: [-150, -92], l_orange: [150, -92], l_brown: [150, 92], l_white: [-150, 92], l_sun: [0, 0],
+    d_green: [0, -106], d_blue: [190, 0], d_red: [0, 100], d_purple: [-190, 0], d_black: [0, 0],
+  };
+  const TWINKLE = Array.from({ length: 140 }, (_, i) => ({ x: (i * 97.13) % 760, y: (i * 53.71 + i * i * 0.37) % 300, s: 1 + (i % 3), ph: i * 1.7, sp: 1 + (i % 5) * 0.6 }));
+  function starShape(c, x, y, r, col, edge) {
+    c.beginPath();
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * 0.36 : r; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    c.closePath(); c.fillStyle = col; c.fill(); c.lineWidth = 3; c.strokeStyle = edge; c.stroke();
+  }
+  function drawStarMap() {
+    const cv = $('starmap');
+    if (!cv || !panel || panel.tab !== 'up') return;
+    const c = cv.getContext('2d'), Wc = cv.width, Hc = cv.height, cx = Wc / 2, cy = Hc / 2, t = time, light = panel.sky === 'light';
+    const nodes = light ? STAR_MAP.light_nodes : STAR_MAP.dark_nodes, ids = Object.keys(nodes);
+    let grd = c.createLinearGradient(0, 0, 0, Hc);
+    if (light) { grd.addColorStop(0, '#3d8fe0'); grd.addColorStop(1, '#bfe6ff'); } else { grd.addColorStop(0, '#04020c'); grd.addColorStop(1, '#1d0b38'); }
+    c.fillStyle = grd; c.fillRect(0, 0, Wc, Hc);
+    if (light) {                                           // облака плывут
+      c.fillStyle = 'rgba(255,255,255,.85)';
+      for (let i = 0; i < 7; i++) {
+        const x = ((i * 157 + t * (10 + i * 3)) % (Wc + 220)) - 110, y = 30 + (i * 71) % (Hc - 60);
+        for (const [dx, dy, r] of [[0, 0, 22], [24, -8, 26], [50, 0, 20], [26, 8, 22]]) { c.beginPath(); c.arc(x + dx, y + dy, r, 0, 6.29); c.fill(); }
+      }
+    } else for (const s of TWINKLE) {                      // звёзды мерцают
+      c.globalAlpha = 0.25 + 0.75 * Math.abs(Math.sin(t * s.sp + s.ph));
+      c.fillStyle = '#fff'; c.fillRect(s.x, s.y, s.s, s.s);
+    }
+    c.globalAlpha = 1;
+    const P = (id) => [cx + SKY_POS[id][0], cy + SKY_POS[id][1]];
+    const side = ids.filter((k) => !nodes[k].center), mid = ids.find((k) => nodes[k].center);
+    c.lineWidth = 3;
+    for (let i = 0; i < side.length; i++) {                // контур квадрата / ромба и лучи к центру
+      const a = side[i], b = side[(i + 1) % side.length], on = star(a) && star(b);
+      c.strokeStyle = on ? (light ? 'rgba(255,240,170,.9)' : 'rgba(200,150,255,.9)') : 'rgba(150,150,150,.45)';
+      c.beginPath(); c.moveTo(...P(a)); c.lineTo(...P(b)); c.stroke();
+      c.strokeStyle = star(a) && star(mid) ? (light ? 'rgba(255,240,170,.9)' : 'rgba(200,150,255,.9)') : 'rgba(150,150,150,.3)';
+      c.setLineDash([6, 8]); c.beginPath(); c.moveTo(...P(a)); c.lineTo(...P(mid)); c.stroke(); c.setLineDash([]);
+    }
+    for (const id of ids) {
+      const n = nodes[id], [x, y] = P(id), on = star(id), pulse = 1 + 0.08 * Math.sin(t * 3 + x);
+      if (on) {                                            // свечение горящей звезды
+        const gl = c.createRadialGradient(x, y, 2, x, y, n.center ? 80 : 50);
+        gl.addColorStop(0, n.color === '#000000' ? 'rgba(170,80,255,.7)' : n.color + 'cc'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = gl; c.fillRect(x - 90, y - 90, 180, 180);
+      }
+      if (id === 'l_sun') {
+        c.save(); c.translate(x, y); c.rotate(on ? t * 0.4 : 0);
+        c.fillStyle = on ? '#ffd84a' : '#9a9a9a';
+        for (let i = 0; i < 12; i++) { c.rotate(Math.PI / 6); c.fillRect(-4, -58 * pulse, 8, 18); }
+        c.restore();
+        c.beginPath(); c.arc(x, y, 34, 0, 6.29); c.fillStyle = on ? '#ffe680' : '#8a8a8a'; c.fill(); c.lineWidth = 4; c.strokeStyle = on ? '#ff9a2a' : '#5a5a5a'; c.stroke();
+      } else if (id === 'd_black') {
+        c.save(); c.translate(x, y);
+        for (let i = 0; i < 3; i++) {                      // аккреционный диск
+          c.rotate(on ? t * (0.6 + i * 0.3) : 0.4);
+          c.beginPath(); c.ellipse(0, 0, 58 - i * 8, 16 - i * 3, 0, 0, 6.29);
+          c.strokeStyle = on ? ['#ff8a3a', '#c94aff', '#ffd27a'][i] : '#6a6a6a'; c.lineWidth = 3; c.stroke();
+        }
+        c.restore();
+        c.beginPath(); c.arc(x, y, 26, 0, 6.29); c.fillStyle = on ? '#000' : '#4a4a4a'; c.fill(); c.lineWidth = 3; c.strokeStyle = on ? '#e0c0ff' : '#7a7a7a'; c.stroke();
+      } else starShape(c, x, y, 26 * (on ? pulse : 1), on ? n.color : '#8c8c8c', on ? '#fff' : '#555');
+      if (panel.lit && panel.lit.id === id) {              // вспышка: звезда только что загорелась
+        const k = (performance.now() - panel.lit.at) / 1200;
+        if (k < 1) for (let r = 0; r < 3; r++) { c.beginPath(); c.arc(x, y, 20 + (k + r * 0.25) * 90, 0, 6.29); c.strokeStyle = `rgba(255,255,255,${Math.max(0, 0.8 - k - r * 0.2)})`; c.lineWidth = 4; c.stroke(); }
+      }
+      if (panel.star === id) { c.strokeStyle = '#fff'; c.lineWidth = 2; c.setLineDash([4, 4]); c.strokeRect(x - 44, y - 44, 88, 88); c.setLineDash([]); }
+      c.font = 'bold 14px sans-serif'; c.textAlign = 'center'; c.fillStyle = light ? '#12305a' : '#e8dcff';
+      c.fillText(n.name, x, y + (n.center ? 62 : 46));
+    }
+  }
+  $('panel-list').addEventListener('click', (e) => {
+    if (e.target.id !== 'starmap' || mode !== 'panel') return;
+    const r = e.target.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 760 - 380, y = (e.clientY - r.top) / r.height * 300 - 150;
+    const nodes = panel.sky === 'light' ? STAR_MAP.light_nodes : STAR_MAP.dark_nodes;
+    let best = null, bd = 60;
+    for (const id of Object.keys(nodes)) { const d = Math.hypot(SKY_POS[id][0] - x, SKY_POS[id][1] - y); if (d < bd) { bd = d; best = id; } }
+    panel.star = best; panel.msg = '';
+    renderPanel();
+  });
   $('panel-list').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-act]');
     if (!b || b.disabled || mode !== 'panel') return;
     const [act, id] = b.dataset.act.split(':'), f = state.flags;
+    if (act === 'tab') { panel.tab = id; panel.msg = ''; return renderPanel(); }
+    if (act === 'sky') { panel.sky = id; panel.star = null; return renderPanel(); }
+    if (act === 'sel') { panel.sel = id === 'none' ? null : b.dataset.act.slice(4); return renderPanel(); }
+    if (act === 'equip') {
+      state.hero.weapon = id; f.hero_weapon = id;
+      hero.ammo = maxAmmo(WEAPONS[id]); hero.mana = maxMana(); hero.cd = 0.3;
+      panel.sel = 'w:' + id; save(); updateHud(); return renderPanel();
+    }
+    if (act === 'wear') { f.armor = id; save(); return renderPanel(); }
+    if (act === 'unwear') { f.armor = null; save(); return renderPanel(); }
+    if (act === 'learn_star') {
+      const light = id[0] === 'l', key = light ? 'stars_light' : 'stars_dark', n = (light ? STAR_MAP.light_nodes : STAR_MAP.dark_nodes)[id];
+      if ((f[key] || 0) < n.cost) panel.msg = STAR_MAP.noStars;
+      else {
+        f[key] -= n.cost; f['star_' + id] = true; f.stars_lit = (f.stars_lit || 0) + 1;
+        if (id === 'd_blue') hero.sta = maxSta();
+        panel.lit = { id, at: performance.now() };
+        panel.msg = STAR_MAP.learned[Math.floor(Math.random() * STAR_MAP.learned.length)];
+      }
+      save(); return renderPanel();
+    }
+    if (act === 'bw' || act === 'ba') {
+      const price = act === 'bw' ? SMITH.weapons[id] : ARMOR[id].price;
+      if ((f.gold || 0) < price) panel.msg = SMITH.noGold;
+      else {
+        f.gold -= price;
+        if (act === 'bw') f['own_' + id] = true; else { f['own_armor_' + id] = true; f.own_armor_any = true; if (!f.armor) f.armor = id; }
+        panel.msg = SMITH.bought[Math.floor(Math.random() * SMITH.bought.length)];
+      }
+      save(); return renderPanel();
+    }
     if (act === 'use' && id === 'glove') { panel.kind = 'duel'; panel.msg = DUELS.hello; renderPanel(); return; }
     if (act === 'duel') {
       const d = DUELS.list[id];
@@ -5008,8 +5394,9 @@ MAPS.palace_gate = {
     try {
       const s = JSON.parse(localStorage.getItem(SAVE_KEY));
       const moved = { blood_corridor1: 'blood_corridor2', blood_corridor3: 'blood_corridor2', order_corridor2: 'order_corridor1', palace_hall: 'luminos_throne',
-        slums2: 'slums1', slums3: 'slums1', demin: 'blood_entrance' };
+        slums2: 'slums1', slums3: 'slums1', demin: 'dillad_gate', blood_entrance: 'dillad_gate' };
       if (s && moved[s.map]) { s.map = moved[s.map]; s.x = s.y = null; }   // этих локаций больше нет
+      if (s && s.flags) { delete s.flags.inv_bowl; s.flags['own_' + s.hero.weapon] = true; }
       if (s && s.hero && MAPS[s.map]) return s;
     } catch {}
     return null;
@@ -5017,7 +5404,7 @@ MAPS.palace_gate = {
 
   // ---------------------------------------------------------------- Экраны
   function screen(name) {
-    for (const id of ['title', 'create', 'pause', 'ending', 'locked', 'achievements', 'panel']) $(id).hidden = id !== name;
+    for (const id of ['title', 'create', 'pause', 'ending', 'locked', 'achievements', 'panel', 'saves']) $(id).hidden = id !== name;
   }
 
   function toTitle() {
@@ -5032,33 +5419,81 @@ MAPS.palace_gate = {
   }
 
   function pause(on) {
-    if (on && mode === 'play') { mode = 'pause'; screen('pause'); $('btn-duel-pause').hidden = !inv('glove'); }
+    if (on && mode === 'play') { mode = 'pause'; screen('pause'); }
     else if (!on && mode === 'pause') { mode = 'play'; screen(null); }
   }
 
   $('btn-new').addEventListener('click', () => { mode = 'create'; screen('create'); updateCreate(); });
-  $('btn-continue').addEventListener('click', () => {
+  $('btn-continue').addEventListener('click', resume);
+  function resume() {
     state = load();
     if (!state) return;
+    $('dialog').hidden = true;
     screen(null);
     mode = 'play';
     const { x, y } = state;                     // enterMap перезапишет позицию в сохранении
     enterMap(state.map, null, state.dir);
     if (x != null) { hero.x = x; hero.y = y; }
     snapCamera();
-  });
+    updateHud();
+  }
   $('btn-back').addEventListener('click', toTitle);
   $('btn-ending').addEventListener('click', toTitle);
   $('btn-resume').addEventListener('click', () => pause(false));
-  $('btn-bag-pause').addEventListener('click', () => openPanel('bag', 'pause'));
-  $('btn-duel-pause').addEventListener('click', () => openPanel('duel', 'pause'));
   $('btn-to-title').addEventListener('click', toTitle);
+  // 5 ячеек сохранений: по умолчанию «Сохранение N», можно переименовать
+  const SLOTS_KEY = 'pg2_slots';
+  const slots = () => { try { const a = JSON.parse(localStorage.getItem(SLOTS_KEY)); if (Array.isArray(a)) return a; } catch {} return [null, null, null, null, null]; };
+  const setSlots = (a) => { try { localStorage.setItem(SLOTS_KEY, JSON.stringify(a)); } catch { toast('Не хватает места для сохранения'); } };
+  let savesFrom = 'title';
+  function showSaves(from) {
+    savesFrom = from;
+    const a = slots(), T3 = MENU_TEXT;
+    $('saves-list').innerHTML = a.map((s, i) => {
+      const name = (s && s.name) || T3.slot.replace('{n}', i + 1);
+      const info = s ? `${(MAPS[s.s.map] || {}).title || ''} · ${s.s.hero.name} · Ур. ${s.s.flags.level || 1} · ${new Date(s.t).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : T3.empty;
+      return `<div class="save-row${s ? '' : ' empty'}"><div class="save-n">${i + 1}</div><div class="save-body"><div class="ach-title">${esc(name)}</div><div class="ach-desc">${esc(info)}</div></div>`
+        + (from === 'pause' ? `<button data-s="save:${i}">${esc(T3.save)}</button>` : '')
+        + `<button data-s="load:${i}"${s ? '' : ' disabled'}>${esc(T3.load)}</button><button data-s="rename:${i}" class="ghost">✎</button></div>`;
+    }).join('');
+    $('btn-wipe').hidden = from !== 'title' || !load();
+    screen('saves');
+  }
+  $('saves-list').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-s]');
+    if (!b || b.disabled) return;
+    const [act, n] = b.dataset.s.split(':'), i = +n, a = slots();
+    if (act === 'save') {
+      if (a[i] && !confirm(MENU_TEXT.overwrite)) return;
+      save();
+      a[i] = { name: a[i] && a[i].name, t: Date.now(), s: JSON.parse(JSON.stringify(state)) };
+      setSlots(a); toast(MENU_TEXT.saved.replace('{n}', i + 1));
+    } else if (act === 'load' && a[i]) {
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify(a[i].s)); } catch {}
+      fading = 0; fadeCb = null; mode = 'title';
+      return resume();
+    } else if (act === 'rename') {
+      const v = prompt(MENU_TEXT.renamePrompt, (a[i] && a[i].name) || MENU_TEXT.slot.replace('{n}', i + 1));
+      if (v == null) return;
+      a[i] = a[i] || null;
+      if (!a[i]) return toast(MENU_TEXT.empty);
+      a[i].name = v.replace(/[<>{}|]/g, '').trim().slice(0, 28) || null;
+      setSlots(a);
+    }
+    showSaves(savesFrom);
+  });
+  $('btn-saves-pause').addEventListener('click', () => showSaves('pause'));
+  $('btn-saves-title').addEventListener('click', () => showSaves('title'));
+  $('btn-saves-back').addEventListener('click', () => screen(savesFrom));
   $('btn-wipe').addEventListener('click', () => {
-    if (!confirm('Стереть сохранение?')) return;
+    if (!confirm('Стереть автосохранение?')) return;
     try { localStorage.removeItem(SAVE_KEY); } catch {}
     state = null;
     toTitle();
   });
+  // кнопки HUD: рюкзак и три точки
+  $('btn-bag').addEventListener('click', () => { if (mode === 'play') openPanel('bag'); });
+  $('btn-dots').addEventListener('click', () => pause(true));
 
   // --- Создание героя
   const pick = { gender: 'm', weapon: 'sword' };
@@ -5084,7 +5519,7 @@ MAPS.palace_gate = {
     state = {
       v: 1,
       hero: { name: name[0].toUpperCase() + name.slice(1), gender: pick.gender, weapon: pick.weapon },
-      flags: { hero_gender: pick.gender, hero_weapon: pick.weapon, bad_past: !!meta().bad_run, hate_first_clear: !!meta().hate_first_clear },
+      flags: { hero_gender: pick.gender, hero_weapon: pick.weapon, ['own_' + pick.weapon]: true, bad_past: !!meta().bad_run, hate_first_clear: !!meta().hate_first_clear },
       map: null,
     };
     screen(null);
@@ -5105,21 +5540,20 @@ MAPS.palace_gate = {
   // ---------------------------------------------------------------- Сенсорное управление
   const touch = matchMedia('(pointer: coarse)').matches;
   if (touch) $('touch').hidden = false;
-  (() => {
-    const el = $('stick'), knob = el.querySelector('.knob');
+  (() => {                                          // крестовина: тянешь палец — идёшь в ту сторону (и по диагонали)
+    const el = $('dpad');
     let id = null;
     const set = (e) => {
       const r = el.getBoundingClientRect();
-      let x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-      let y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-      const l = Math.hypot(x, y);
-      if (l > 1) { x /= l; y /= l; }
+      const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2), dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      let x = Math.abs(dx) > 0.3 ? Math.sign(dx) : 0, y = Math.abs(dy) > 0.3 ? Math.sign(dy) : 0;
+      if (x && y) { x *= 0.7071; y *= 0.7071; }
       stick.x = x; stick.y = y;
-      knob.style.transform = `translate(${x * 60}px, ${y * 60}px)`;
+      el.dataset.dir = (y < 0 ? 'u' : y > 0 ? 'd' : '') + (x < 0 ? 'l' : x > 0 ? 'r' : '');
     };
-    el.addEventListener('pointerdown', (e) => { id = e.pointerId; el.setPointerCapture(id); set(e); });
+    el.addEventListener('pointerdown', (e) => { id = e.pointerId; try { el.setPointerCapture(id); } catch {} set(e); });
     el.addEventListener('pointermove', (e) => { if (e.pointerId === id) set(e); });
-    const up = () => { id = null; stick.x = stick.y = 0; knob.style.transform = ''; };
+    const up = () => { id = null; stick.x = stick.y = 0; el.dataset.dir = ''; };
     el.addEventListener('pointerup', up);
     el.addEventListener('pointercancel', up);
   })();
@@ -5137,7 +5571,6 @@ MAPS.palace_gate = {
     if (mode === 'dialog') { if (dlg.choices.length && dlg.typed >= dlg.full.length) return; advance(); }
     else if (mode === 'play') interact();
   });
-  $('btn-menu').addEventListener('pointerdown', () => pause(mode === 'play'));
 
   // ---------------------------------------------------------------- Этап 8: трещина и «Ошибка 888»
   // Трещина экрана: ломаные из точки удара, держатся до конца (и на экране ошибки).
@@ -5250,21 +5683,27 @@ MAPS.palace_gate = {
   let achFrom = 'title';
   function showAchievements(from) {
     achFrom = from;
-    const got = achGot(), list = $('ach-list'), all = Object.entries(ACHIEVEMENTS);
-    list.innerHTML = '';
-    for (const [id, a] of all) {
+    const got = achGot(), all = Object.entries(ACHIEVEMENTS);
+    const cell = ([id, a]) => {
       const on = !!got[id], secret = a.hidden && !on;
-      const row = document.createElement('div');
-      row.className = 'ach' + (on ? ' on' : '');
-      row.innerHTML = '<div class="ach-icon"></div><div><div class="ach-title"></div><div class="ach-desc"></div></div>';
-      row.querySelector('.ach-icon').textContent = secret ? '?' : a.icon;
-      row.querySelector('.ach-title').textContent = secret ? '???' : a.title;
-      row.querySelector('.ach-desc').textContent = secret ? 'Скрытое достижение' : a.desc;
-      list.appendChild(row);
-    }
+      return `<button class="ach-cell${a.big ? ' big' : ''}${on ? ' on' : ''}" data-id="${id}">${secret ? '?' : a.icon}</button>`;
+    };
+    $('ach-list').innerHTML = `<div class="ach-big">${all.filter(([, a]) => a.big).map(cell).join('')}</div>`
+      + `<div class="ach-grid">${all.filter(([, a]) => !a.big).map(cell).join('')}</div>`;
+    $('ach-detail').innerHTML = `<div class="ach-desc">Нажми на значок, чтобы узнать, за что он.</div>`;
     $('ach-count').textContent = `Получено ${all.filter(([id]) => got[id]).length} из ${all.length}`;
     screen('achievements');
   }
+  $('ach-list').addEventListener('click', (e) => {
+    const b = e.target.closest('.ach-cell');
+    if (!b) return;
+    const id = b.dataset.id, a = ACHIEVEMENTS[id], on = !!achGot()[id], secret = a.hidden && !on;
+    document.querySelectorAll('.ach-cell.sel').forEach((x) => x.classList.remove('sel'));
+    b.classList.add('sel');
+    $('ach-detail').innerHTML = `<div class="ach-icon${on ? ' on' : ''}">${secret ? '?' : a.icon}</div><div><div class="ach-title">${esc(secret ? '???' : a.title)}</div>`
+      + `<div class="ach-act">${esc(secret ? 'Скрытое достижение' : a.act || '')}</div>`
+      + `<div class="ach-desc">${esc(secret ? '' : on ? a.desc : (a.desc ? 'Ещё не получено.' : ''))}</div></div>`;
+  });
   $('btn-ach').addEventListener('click', () => showAchievements('title'));
   $('btn-ach-pause').addEventListener('click', () => showAchievements('pause'));
   $('btn-ach-back').addEventListener('click', () => screen(achFrom));
@@ -5285,7 +5724,7 @@ MAPS.palace_gate = {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (fading) {                                  // затемнение → смена карты → проявление
-      fading += dt * (fadeStyle === 'letterbox' ? 1 : 2 / 1.5);
+      fading += dt * (fadeStyle === 'letterbox' ? 1 : fadeStyle === 'sink' ? 0.6 : 2 / 1.5);   // смерть: экран медленно тонет во тьме
       if (fading >= 1 && fadeCb) { const cb = fadeCb; fadeCb = null; cb(); }
       if (fading >= 2) { fading = 0; if (mode === 'fade') mode = 'play'; }
     }
@@ -5302,12 +5741,98 @@ MAPS.palace_gate = {
     const sx = sway * Math.sin(time * 2.3) * 10 + (Math.random() - 0.5) * shake, sy = sway * Math.cos(time * 1.9) * 6 + (Math.random() - 0.5) * shake;
     g.setTransform(c, sn, -sn, c, sx + W / 2 - (c * W / 2 - sn * H / 2), sy + H / 2 - (sn * W / 2 + c * H / 2));
     if (mode === 'create') { time += dt; drawPreview(); }
+    if (mode === 'panel') drawStarMap();
+    const hb = mode === 'play' && !!map;
+    if ($('hudbtns').hidden === hb) $('hudbtns').hidden = !hb;
     draw();
     g.setTransform(1, 0, 0, 1, 0, 0);
     nextFrame(frame);
   }
 
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  // ============================================================ Патч v2.8: новые твари, побочные локации, Глаза, оружейник
+  Object.assign(ENEMIES, {
+    // теневой волк — быстрее обычного, фиолетовый; пёс крови — крепкий; болотный огонёк — держит дистанцию и плюётся
+    shadow_wolf: { sprite: 'wolf', tint: '#6a2aff', xp: 7, gold: 3, hp: 9, speed: 125, aggro: 460, dmg: 11, windup: 0.45, lunge: 520, lungeT: 0.3, rest: 0.6, w: 40, h: 18 },
+    blood_hound: { sprite: 'blood_wolf', xp: 9, gold: 4, hp: 12, speed: 112, aggro: 480, dmg: 13, windup: 0.5, lunge: 500, lungeT: 0.3, rest: 0.7, w: 40, h: 18 },
+    bog_spirit: { sprite: 'cultist', tint: '#6affa8', ghost: true, xp: 8, mana: 1, gold: 3, hp: 8, speed: 80, keep: 260, aggro: 640, rest: 0.7, w: 30, h: 16,
+      ranged: { every: 2.1, windup: 0.6, speed: 260, dmg: 8, count: 1, spread: 0, color: '120,255,170' } },
+  });
+  const flipRows = (rows) => rows.map((r) => [...r].reverse().join(''));
+  const chestNpc = (id, x, y) => ({ id: 'chest', prop: 'chest', flag: 'chest_' + id, x, y,
+    talk: [{ if: { flag: 'chest_' + id }, d: 'chest_empty' }, { if: { flag: 'side_' + id + '_clear' }, d: 'chest_' + id }, { d: 'chest_locked' }] });
+  const sideEnc = (id, enemies) => [{ if: { not: 'side_' + id + '_clear' }, lock: true, onClear: { set: { ['side_' + id + '_clear']: true }, d: 'side_clear' }, enemies }];
+  // Тёмная чаща — зеркальная вторая поляна в сумерках; вход — тропка в верхней части поляны
+  MAPS.side_thicket = {
+    title: 'Тёмная чаща', bg: 'forest_glade', bgFlip: true, bgTint: 'rgba(30,0,70,.42)',
+    tiles: flipRows(MAPS.forest_glade.tiles), spawn: [19, 5.5], blocks: MAPS.forest_glade.blocks,
+    exits: [5, 6].map((y) => ({ x: 20, y, to: 'forest_glade', at: [10, 3.3], dir: 'down' })),
+    npcs: [chestNpc('thicket', 2, 4.4)],
+    encounters: sideEnc('thicket', [{ kind: 'shadow_wolf', x: 11, y: 2.6 }, { kind: 'shadow_wolf', x: 4.6, y: 3.4 }, { kind: 'shadow_wolf', x: 8, y: 4.6 },
+      { kind: 'shadow_wolf', x: 12, y: 8.2 }, { kind: 'shadow_wolf', x: 14.6, y: 4.4 }]),
+    respawn: { map: 'forest_glade', at: [10, 3.3], dir: 'down' },
+    onEnter: [{ if: { not: 'side_thicket_seen' }, d: 'side_thicket_intro' }],
+  };
+  // Ущелье ветров — зеркальный перевал в холодной дымке; вход — за валуном на Северном перевале
+  MAPS.side_gorge = {
+    title: 'Ущелье ветров', bg: 'mountains', bgFlip: true, bgTint: 'rgba(20,40,90,.36)',
+    tiles: flipRows(MAPS.mountains.tiles), spawn: [10, 10],
+    exits: [8, 9, 10, 11, 12, 13].map((x) => ({ x, y: 11, to: 'mountains', at: [8, 6.6], dir: 'down' })),
+    npcs: [chestNpc('gorge', 10.5, 1.2)],
+    encounters: sideEnc('gorge', [{ kind: 'blood_hound', x: 9, y: 3 }, { kind: 'blood_hound', x: 12, y: 4.4 },
+      { kind: 'bog_spirit', x: 10.5, y: 1.8 }, { kind: 'bog_spirit', x: 12.6, y: 6 }]),
+    respawn: { map: 'mountains', at: [8, 6.6], dir: 'down' },
+    onEnter: [{ if: { not: 'side_gorge_seen' }, d: 'side_gorge_intro' }],
+  };
+  // Старый подвал под трущобами Берта
+  MAPS.side_cellar = {
+    title: 'Берт · Старый подвал', bg: 'slums2', bgTint: 'rgba(0,25,10,.5)',
+    tiles: SLUM_TILES, spawn: [1, 6],
+    exits: [5, 6, 7].map((y) => ({ x: 0, y, to: 'slums1', at: [10, 6.2], dir: 'down' })),
+    npcs: [chestNpc('cellar', 19.4, 6)],
+    encounters: sideEnc('cellar', [{ kind: 'blood_hound', x: 12, y: 6 }, { kind: 'bog_spirit', x: 16, y: 5.2 }, { kind: 'shadow_wolf', x: 17.5, y: 7 },
+      { kind: 'bog_spirit', x: 9, y: 7.2 }]),
+    respawn: { map: 'slums1', at: [10, 6.2], dir: 'down' },
+    onEnter: [{ if: { not: 'side_cellar_seen' }, d: 'side_cellar_intro' }],
+  };
+  MAPS.forest_glade.npcs.push({ id: 'side_path', prop: 'spot', glow: '190,140,255', x: 10, y: 1.9, talk: [{ d: 'side_thicket_path' }] });
+  MAPS.mountains.npcs.push({ id: 'side_path', prop: 'spot', glow: '170,200,255', x: 7.3, y: 5.6, talk: [{ d: 'side_gorge_path' }] });
+  MAPS.slums1.npcs.push({ id: 'side_path', prop: 'spot', glow: '140,255,170', x: 10, y: 5.1, if: { not: 'theft_run' }, talk: [{ d: 'side_cellar_path' }] });
+  // Глаза сохранения — через локацию, перед боями (подойти и нажать «?» / E)
+  for (const [m, x, y] of [['village', 10.5, 6.6], ['forest_glade', 18, 4.3], ['mountains', 11.4, 4], ['trade_city', 16, 4.4], ['bert_gate', 17, 7.4],
+    ['dillad_gate', 4, 7.4], ['spirit_order', 14.5, 8.4], ['temple_nave', 5, 8.4], ['feelings_tree', 5, 7.6], ['nokt_capital', 19, 6.4], ['palace_gate', 12.5, 9.4]]) {
+    MAPS[m].npcs = MAPS[m].npcs || [];
+    MAPS[m].npcs.push({ id: 'eye', prop: 'eye', x, y, talk: [{ d: 'eye' }] });
+  }
+  // Оружейник Борн на торговой улице (статист, стоявший там, отходит левее)
+  {
+    const st = MAPS.trade_street.npcs, b = st.find((n) => n.id === 'bst3');
+    if (b) { b.x = 7.8; b.y = 6.9; b.dir = 'right'; }
+    st.push({ id: 'smith', sprite: 'merchant', x: 16.4, y: 5.9, dir: 'down', talk: [{ d: 'smith' }] });
+  }
+
+  // Нет двух одинаковых персонажей на одной локации: статист с лицом именного NPC получает другую модель,
+  // одинаковые NPC без сюжетной роли (стража, воины, горожане), стоящие одновременно, — разную гамму одежды
+  const STORY_LOOKS = new Set(['dolita', 'dolita_bow', 'aedel', 'aedel_sword', 'gidan', 'lumina', 'priest', 'dane', 'polianna', 'darian', 'thief', 'ambassador',
+    'dark_knight', 'dark_knight_sword', 'stranger', 'coachman', 'nokt_captain']);
+  for (const m of Object.values(MAPS)) {
+    const list = (m.npcs || []).filter((n) => n.sprite && !n.prop && !n.ghost);
+    const named = new Set(list.filter((n) => !/^[a-z_]+\d+$/.test(n.id) || n.hue == null).map((n) => n.sprite));
+    let k = 0;
+    for (const n of list) {
+      if (n.hue == null || !named.has(n.sprite) || !/\d$/.test(n.id)) continue;
+      const free = CROWD_MODELS.filter((s) => !named.has(s));
+      if (free.length) n.sprite = free[k++ % free.length];
+    }
+    const seen = {};
+    for (const n of list) {
+      if (n.hue != null || n.tint || STORY_LOOKS.has(n.sprite)) continue;
+      const key = n.sprite + JSON.stringify(n.if || null);
+      seen[key] = (seen[key] || 0) + 1;
+      if (seen[key] > 1) n.hue = 1 + (seen[key] * 4) % CLOTH.length;
+    }
+  }
 
   // проверка карт: все строки одной длины; одиночные enemies → encounters
   for (const [id, m] of Object.entries(MAPS)) {
@@ -5318,7 +5843,7 @@ MAPS.palace_gate = {
 
   // Для отладки и автотестов
   window.PG = { get state() { return state; }, get mode() { return mode; }, get enemies() { return enemies; }, get npcs() { return npcs; }, get chase() { return chase; },
-    get curEnc() { return curEnc; }, get mini() { return mini; }, get ffly() { return ffly; }, get hunt() { return hunt; }, get rooms() { return rooms; }, get fxInfo() { return { parts: parts.length, fxA, rainK, lbox, puffs: puffs.length }; }, draw, miniPress, hz, hero, enterMap, startDialogue, attack, useFlask, useItem, quickHeal, openPanel, closePanel, maxHp, dmgMul, maxMana, healMul, buffs, zoom, get ebolts() { return ebolts; }, startDuel, leadPath, MAPS, ELEMENTS };
+    get curEnc() { return curEnc; }, get mini() { return mini; }, get ffly() { return ffly; }, get hunt() { return hunt; }, get rooms() { return rooms; }, get fxInfo() { return { parts: parts.length, fxA, rainK, lbox, puffs: puffs.length }; }, draw, miniPress, hz, hero, enterMap, startDialogue, attack, useFlask, useItem, quickHeal, openPanel, closePanel, maxHp, dmgMul, maxMana, healMul, buffs, zoom, get ebolts() { return ebolts; }, startDuel, leadPath, MAPS, ELEMENTS, interact, startMini, pause, showSaves, showAchievements, get orbs() { return orbs; }, get near() { return near; }, set mode(v) { mode = v; } };
 
   toTitle();
   nextFrame(frame);
