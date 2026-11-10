@@ -73,7 +73,7 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 .hud { position: absolute; top: 16px; left: 16px; font-size: 18px; color: #b9a98f; text-shadow: 0 2px 0 #000; }
 
 /* --- Диалог ---------------------------------------------------------------- */
-.dialog { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; pointer-events: auto; }
+.dialog { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; pointer-events: auto; z-index: 6; }   /* диалог всегда поверх кнопок */
 .dialog[hidden] { display: none; }
 .dlg-portrait {
   position: absolute; left: 24px; bottom: 14px; width: 256px; height: 256px;
@@ -121,15 +121,14 @@ h2 { font-family: Georgia, serif; font-weight: normal; font-size: 44px; margin: 
 .dpad[data-dir*="u"] .du, .dpad[data-dir*="d"] .dd, .dpad[data-dir*="l"] .dl, .dpad[data-dir*="r"] .dr { background: #8f7c66; box-shadow: inset 6px 6px 0 #45382b; }
 /* каменные кнопки: кулак (удар) и «?» (взаимодействие) */
 .atk, .act, .flask, .dash-btn { position: absolute; padding: 0; color: #f4dca0; background: #6b5a48; border: 5px solid #1a1410;
-  box-shadow: inset -7px -7px 0 #45382b, inset 7px 7px 0 #8f7c66; image-rendering: pixelated; }
+  box-shadow: inset -7px -7px 0 #45382b, inset 7px 7px 0 #8f7c66; image-rendering: pixelated; border-radius: 50%; }
 .atk:active, .act:active, .flask:active, .dash-btn:active { box-shadow: inset 7px 7px 0 #45382b; background: #5a4a3a; }
 .atk { right: 50px; bottom: 50px; width: 160px; height: 160px; }
 .atk svg { width: 104px; height: 104px; display: block; margin: auto; }
-.act { right: 230px; bottom: 50px; width: 120px; height: 120px; font: bold 64px/1 "Courier New", monospace; text-shadow: 4px 4px 0 #1a1410; }
+.act { right: 250px; bottom: 196px; width: 100px; height: 100px; font: bold 54px/1 "Courier New", monospace; text-shadow: 4px 4px 0 #1a1410; }
 .flask { right: 64px; bottom: 236px; width: 96px; height: 96px; }
 .flask img { width: 42px; height: 60px; display: block; margin: auto; image-rendering: pixelated; }
-.dash-btn { right: 250px; bottom: 196px; width: 88px; height: 88px; font-size: 44px; font-weight: bold; }
-.dialog ~ .touch .dpad { z-index: 1; }
+.dash-btn { right: 230px; bottom: 50px; width: 120px; height: 120px; font-size: 56px; font-weight: bold; }
 
 /* кнопки HUD справа сверху: рюкзак и три точки */
 .hudbtns { position: absolute; top: 14px; right: 14px; display: flex; gap: 10px; z-index: 3; }
